@@ -8,6 +8,7 @@
             Table = table;
             Column = column;
         }
+
         public string Name { get; }
         public TableInformation Table { get; }
         public ColumnInformation Column { get; }

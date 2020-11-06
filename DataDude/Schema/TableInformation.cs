@@ -6,7 +6,7 @@ namespace DataDude.Schema
 {
     public class TableInformation : IEnumerable<ColumnInformation>
     {
-        private IDictionary<string, ColumnInformation> _columns;
+        private readonly IDictionary<string, ColumnInformation> _columns;
         public TableInformation(string schema, string name, IEnumerable<ColumnInformation> columns)
         {
             Schema = schema;

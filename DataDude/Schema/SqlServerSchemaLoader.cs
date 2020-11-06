@@ -1,9 +1,9 @@
-﻿using Dapper;
-using DataDude.Schema;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Dapper;
+using DataDude.Schema;
 
 namespace DataDude.SqlServer
 {

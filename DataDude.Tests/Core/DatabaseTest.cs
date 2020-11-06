@@ -1,6 +1,6 @@
-﻿using ADatabaseFixture.GalacticWasteManagement;
+﻿using System;
+using ADatabaseFixture.GalacticWasteManagement;
 using Respawn;
-using System;
 using Xunit;
 
 namespace DataDude.Tests.Core
@@ -13,12 +13,12 @@ namespace DataDude.Tests.Core
             Fixture = fixture;
         }
 
-        public DatabaseFixture Fixture { get; }
-
         public static Checkpoint Checkpoint { get; } = new Checkpoint
         {
             TablesToIgnore = GalacticWasteManagementMigrator.VersioningTables,
         };
+
+        public DatabaseFixture Fixture { get; }
 
         public void Dispose()
         {

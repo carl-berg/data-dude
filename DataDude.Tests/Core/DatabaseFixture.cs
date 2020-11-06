@@ -1,17 +1,18 @@
-﻿using ADatabaseFixture;
+﻿using System.Collections.Generic;
+using System.Reflection;
+using ADatabaseFixture;
 using ADatabaseFixture.GalacticWasteManagement;
 using GalacticWasteManagement;
 using GalacticWasteManagement.Scripts;
 using GalacticWasteManagement.Scripts.EmbeddedScripts;
 using GalacticWasteManagement.Scripts.ScriptProviders;
-using System.Collections.Generic;
-using System.Reflection;
 
 namespace DataDude.Tests.Core
 {
     public class DatabaseFixture : DatabaseFixtureBase
     {
-        public DatabaseFixture() : base(
+        public DatabaseFixture()
+            : base(
                 new SqlServerDatabaseAdapter(),
                 GalacticWasteManagementMigrator.Create(new DefaultProjectSettings()))
         {
@@ -19,15 +20,17 @@ namespace DataDude.Tests.Core
 
         private class DefaultProjectSettings : ProjectSettings
         {
-            public DefaultProjectSettings() : base(
+            public DefaultProjectSettings()
+                : base(
                 new DefaultMigrationVersioning(),
                 new GalacticWasteManagement.SqlServer.MsSql150ScriptParser(),
                 new List<IScriptProvider>
                 {
                     new BuiltInScriptsScriptProvider(),
-                    new EmbeddedScriptProvider(Assembly.GetAssembly(typeof(DatabaseFixture)), "Core.Scripts")
+                    new EmbeddedScriptProvider(Assembly.GetAssembly(typeof(DatabaseFixture)), "Core.Scripts"),
                 })
-            { }
+            {
+            }
         }
     }
 }

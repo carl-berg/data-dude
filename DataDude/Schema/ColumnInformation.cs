@@ -27,6 +27,7 @@ namespace DataDude.Schema
             Scale = scale;
             _foreignKeys = new List<ForeignKeyInformation>();
         }
+
         public string Name { get; }
         public string DataType { get; } = default!;
         public bool IsIdentity { get; }

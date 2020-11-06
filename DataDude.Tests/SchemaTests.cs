@@ -1,21 +1,23 @@
-﻿using DataDude.Schema;
+﻿using System.Threading.Tasks;
 using DataDude.SqlServer;
 using DataDude.Tests.Core;
 using Shouldly;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace DataDude.Tests
 {
     public class SchemaTests : DatabaseTest
     {
-        public SchemaTests(DatabaseFixture fixture) : base(fixture) { }
+        public SchemaTests(DatabaseFixture fixture)
+            : base(fixture)
+        {
+        }
 
         [Fact]
         public async Task Test_Schema_Loading()
         {
             using var connection = Fixture.CreateNewConnection();
-            
+
             var schema = await new SqlServerSchemaLoader(connection).Load();
 
             schema["Office"].ShouldNotBeNull();

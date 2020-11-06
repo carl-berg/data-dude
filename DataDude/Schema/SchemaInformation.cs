@@ -1,15 +1,12 @@
-﻿using Dapper;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace DataDude.Schema
 {
     public class SchemaInformation : IEnumerable<TableInformation>
     {
-        private IDictionary<string, TableInformation> _tables;
+        private readonly IDictionary<string, TableInformation> _tables;
         public SchemaInformation(IEnumerable<TableInformation> tables) => _tables = tables
             .ToDictionary(x => $"{x.Schema}.{x.Name}", x => x);
 
