@@ -1,4 +1,5 @@
 ﻿using DataDude.Schema;
+using DataDude.SqlServer;
 using DataDude.Tests.Core;
 using Shouldly;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
             
-            var schema = await SchemaInformation.Load(connection);
+            var schema = await new SqlServerSchemaLoader(connection).Load();
 
             schema["Office"].ShouldNotBeNull();
             schema["Buildings.Office"].ShouldNotBeNull();
