@@ -25,6 +25,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Core\Scripts\Migrations\1.0.0\01.Schema.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\DataDude\DataDude.csproj" />
   </ItemGroup>
 

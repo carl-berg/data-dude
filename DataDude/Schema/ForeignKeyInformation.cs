@@ -1,16 +1,18 @@
-﻿namespace DataDude.Schema
+﻿using System.Collections.Generic;
+
+namespace DataDude.Schema
 {
     public class ForeignKeyInformation
     {
-        public ForeignKeyInformation(string name, TableInformation table, ColumnInformation column)
+        public ForeignKeyInformation(string name, TableInformation referencedTable, IEnumerable<(ColumnInformation Column, ColumnInformation ReferencedColumn)> columns)
         {
             Name = name;
-            Table = table;
-            Column = column;
+            ReferencedTable = referencedTable;
+            Columns = columns;
         }
 
         public string Name { get; }
-        public TableInformation Table { get; }
-        public ColumnInformation Column { get; }
+        public TableInformation ReferencedTable { get; }
+        public IEnumerable<(ColumnInformation Column, ColumnInformation ReferencedColumn)> Columns { get; }
     }
 }

@@ -4,7 +4,6 @@ namespace DataDude.Schema
 {
     public class ColumnInformation
     {
-        private readonly IList<ForeignKeyInformation> _foreignKeys;
         public ColumnInformation(
             string name,
             string dataType,
@@ -25,7 +24,6 @@ namespace DataDude.Schema
             MaxLength = maxLength;
             Precision = precision;
             Scale = scale;
-            _foreignKeys = new List<ForeignKeyInformation>();
         }
 
         public string Name { get; }
@@ -37,7 +35,5 @@ namespace DataDude.Schema
         public int MaxLength { get; }
         public int Precision { get; }
         public int Scale { get; }
-        public IEnumerable<ForeignKeyInformation> ForeignKeys => _foreignKeys;
-        public void AddForeignKey(ForeignKeyInformation fk) => _foreignKeys.Add(fk);
     }
 }

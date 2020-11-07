@@ -40,56 +40,72 @@ namespace DataDude.SqlServer
 
             var schema = new SchemaInformation(tables);
 
-            foreach (var key in foreignKeys)
+            foreach (var group in foreignKeys.GroupBy(x => (x.ConstraintName, x.SchemaName, x.TableName, x.ReferencedSchemaName, x.ReferencedTableName)))
             {
-                var column = schema[$"{key.SchemaName}.{key.TableName}"]?[key.ColumnName];
-                var referenceTable = schema[$"{key.ReferencedSchemaName}.{key.ReferencedTableName}"];
-                if (column is { } && referenceTable is { } && referenceTable[key.ReferencedColumnName] is { } referenceColumn)
+                var constraintName = group.Key.ConstraintName;
+                var table = schema[$"{group.Key.SchemaName}.{group.Key.TableName}"];
+                var referenceTable = schema[$"{group.Key.ReferencedSchemaName}.{group.Key.ReferencedTableName}"];
+
+                if (table is null || referenceTable is null)
                 {
-                    column.AddForeignKey(new ForeignKeyInformation(key.ConstraintName, referenceTable, referenceColumn));
+                    throw new SchemaInformationException($"Could not resolve tables for foreign key {constraintName}");
                 }
-                else
-                {
-                    throw new SchemaInformationException($"Failed to match schema columns for foreign key {key.ConstraintName}");
-                }
+
+                var fkColumns = GetForeignKeyColumns(constraintName, table, referenceTable, group);
+                table.AddForeignKey(new ForeignKeyInformation(group.Key.ConstraintName, referenceTable, fkColumns));
             }
 
             return schema;
         }
 
+        private IEnumerable<(ColumnInformation, ColumnInformation)> GetForeignKeyColumns(string constraintName, TableInformation table, TableInformation referenceTable, IEnumerable<ForeignKey> fkColumns)
+        {
+            foreach (var fk in fkColumns)
+            {
+                if (table[fk.ColumnName] is { } column && referenceTable[fk.ReferencedColumnName] is { } referenceColumn)
+                {
+                    yield return (column, referenceColumn);
+                }
+                else
+                {
+                    throw new SchemaInformationException($"Could not resolve columns for foreign key {constraintName}");
+                }
+            }
+        }
+
         private async Task<(IEnumerable<SysColumns>, IEnumerable<ForeignKey>)> LoadSchema()
         {
             using var reader = await _connection.QueryMultipleAsync(
-                            @"SELECT 
-                s.name as TableSchema,
-                t.name as TableName,
-                c.name as ColumnName,
-                y.name as DataType,
-                c.is_nullable As IsNullable,
-                c.is_identity as IsIdentity,
-                c.is_computed as IsComputed,
-                IIF(c.default_object_id > 0, 1, 0) as HasDefault,
-                c.max_length AS MaxLength,
-                c.precision as Precision,
-                c.Scale as Scale
-            FROM sys.tables t
-            inner join sys.columns c on c.object_id = t.object_id
-            inner join sys.types y ON c.user_type_id = y.user_type_id
-            inner join sys.schemas s ON s.schema_id = t.schema_id
-            ORDER BY s.name, t.name
+                @"SELECT 
+                    s.name as TableSchema,
+                    t.name as TableName,
+                    c.name as ColumnName,
+                    y.name as DataType,
+                    c.is_nullable As IsNullable,
+                    c.is_identity as IsIdentity,
+                    c.is_computed as IsComputed,
+                    IIF(c.default_object_id > 0, 1, 0) as HasDefault,
+                    c.max_length AS MaxLength,
+                    c.precision as Precision,
+                    c.Scale as Scale
+                FROM sys.tables t
+                inner join sys.columns c on c.object_id = t.object_id
+                inner join sys.types y ON c.user_type_id = y.user_type_id
+                inner join sys.schemas s ON s.schema_id = t.schema_id
+                ORDER BY s.name, t.name
 
-            SELECT 
-                OBJECT_NAME(f.object_id) as ConstraintName,
-                SCHEMA_NAME(f.schema_id) AS SchemaName,
-                OBJECT_NAME(f.parent_object_id) TableName,
-                COL_NAME(fk.parent_object_id,fk.parent_column_id) ColumnName,
-                SCHEMA_NAME(referenced_table.schema_id) AS ReferencedSchemaName,
-                OBJECT_NAME(fk.referenced_object_id) as ReferencedTableName,
-                COL_NAME(fk.referenced_object_id, fk.referenced_column_id) as ReferencedColumnName
-                FROM sys.foreign_keys AS f
-            INNER JOIN sys.foreign_key_columns AS fk ON f.object_id = fk.constraint_object_id
-            INNER JOIN sys.tables referenced_table ON fk.referenced_object_id = referenced_table.object_id",
-                            transaction: _transaction);
+                SELECT 
+                    OBJECT_NAME(f.object_id) as ConstraintName,
+                    SCHEMA_NAME(f.schema_id) AS SchemaName,
+                    OBJECT_NAME(f.parent_object_id) TableName,
+                    COL_NAME(fk.parent_object_id,fk.parent_column_id) ColumnName,
+                    SCHEMA_NAME(referenced_table.schema_id) AS ReferencedSchemaName,
+                    OBJECT_NAME(fk.referenced_object_id) as ReferencedTableName,
+                    COL_NAME(fk.referenced_object_id, fk.referenced_column_id) as ReferencedColumnName
+                    FROM sys.foreign_keys AS f
+                INNER JOIN sys.foreign_key_columns AS fk ON f.object_id = fk.constraint_object_id
+                INNER JOIN sys.tables referenced_table ON fk.referenced_object_id = referenced_table.object_id",
+                transaction: _transaction);
 
             var allColumns = await reader.ReadAsync<SysColumns>();
             var allForeignKeys = await reader.ReadAsync<ForeignKey>();
