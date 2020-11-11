@@ -15,6 +15,8 @@ CREATE TABLE People.Employee (
 	LastName NVARCHAR(50) NOT NULL,
 	FullName AS CONCAT(FirstName, ' ', LastName),
 	Active BIT NOT NULL DEFAULT(1),
+	CreatedAt DATETIME DEFAULT(GETDATE()),
+	UpdatedAt DATETIME NULL,
 )
 
 CREATE TABLE Buildings.OfficeOccupant (
@@ -33,4 +35,10 @@ CREATE TABLE People.OfficeOccupancy (
 	EndDate DATE NULL,
 	CONSTRAINT FK_OfficeOccupancy_OfficeOccupant FOREIGN KEY (OfficeId, EmployeeId) REFERENCES Buildings.OfficeOccupant(OfficeId, EmployeeId)
 )
+GO
 
+CREATE TRIGGER People.EmployeeUpdatedAt ON People.Employee AFTER UPDATE AS BEGIN
+	UPDATE People.Employee 
+		SET People.Employee.UpdatedAt = GETDATE()
+	WHERE People.Employee.Id IN (SELECT Id FROM inserted)
+END

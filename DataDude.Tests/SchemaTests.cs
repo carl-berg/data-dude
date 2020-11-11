@@ -29,7 +29,8 @@ namespace DataDude.Tests
                 table => table["Id"].IsNullable.ShouldBeFalse(),
                 table => table["FullName"].IsComputed.ShouldBeTrue(),
                 table => table["Active"].HasDefaultValue.ShouldBeTrue(),
-                table => table.ForeignKeys.ShouldBeEmpty());
+                table => table.ForeignKeys.ShouldBeEmpty(),
+                table => table.Triggers.ShouldContain(x => x.Name == "EmployeeUpdatedAt"));
 
             schema["OfficeOccupant"].ShouldHaveForeignKey(
                 constraint: "FK_OfficeOccupant_Employee",

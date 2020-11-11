@@ -20,7 +20,7 @@ namespace DataDude.SqlServer
 
         public async Task<SchemaInformation> Load()
         {
-            var (columns, foreignKeys) = await LoadSchema();
+            var (columns, foreignKeys, triggers) = await LoadSchema();
 
             var tables = columns
                 .GroupBy(x => (x.TableSchema, x.TableName))
@@ -55,6 +55,20 @@ namespace DataDude.SqlServer
                 table.AddForeignKey(new ForeignKeyInformation(group.Key.ConstraintName, referenceTable, fkColumns));
             }
 
+            foreach (var group in triggers.GroupBy(x => (x.SchemaName, x.TableName)))
+            {
+                var table = schema[$"{group.Key.SchemaName}.{group.Key.TableName}"];
+                if (table is null)
+                {
+                    throw new SchemaInformationException($"Could not resolve tables for triggers {string.Join(", ", group.Select(x => x.Name))}");
+                }
+
+                foreach (var trigger in group)
+                {
+                    table.AddTrigger(new TriggerInformation(trigger.Name, trigger.IsDisabled));
+                }
+            }
+
             return schema;
         }
 
@@ -73,7 +87,7 @@ namespace DataDude.SqlServer
             }
         }
 
-        private async Task<(IEnumerable<SysColumns>, IEnumerable<ForeignKey>)> LoadSchema()
+        private async Task<(IEnumerable<SysColumns>, IEnumerable<ForeignKey>, IEnumerable<Trigger> triggers)> LoadSchema()
         {
             using var reader = await _connection.QueryMultipleAsync(
                 @"SELECT 
@@ -104,12 +118,21 @@ namespace DataDude.SqlServer
                     COL_NAME(fk.referenced_object_id, fk.referenced_column_id) as ReferencedColumnName
                     FROM sys.foreign_keys AS f
                 INNER JOIN sys.foreign_key_columns AS fk ON f.object_id = fk.constraint_object_id
-                INNER JOIN sys.tables referenced_table ON fk.referenced_object_id = referenced_table.object_id",
+                INNER JOIN sys.tables referenced_table ON fk.referenced_object_id = referenced_table.object_id
+
+                SELECT 
+	                SCHEMA_NAME (t.schema_id) AS SchemaName,
+	                OBJECT_NAME (parent_id) as TableName,
+	                tr.name AS Name,
+	                is_disabled AS IsDisabled
+                FROM sys.triggers tr
+                INNER JOIN sys.tables t ON tr.parent_id= t.object_id",
                 transaction: _transaction);
 
             var allColumns = await reader.ReadAsync<SysColumns>();
             var allForeignKeys = await reader.ReadAsync<ForeignKey>();
-            return (allColumns, allForeignKeys);
+            var triggers = await reader.ReadAsync<Trigger>();
+            return (allColumns, allForeignKeys, triggers);
         }
 
         private class SysColumns
@@ -136,6 +159,14 @@ namespace DataDude.SqlServer
             public string ReferencedSchemaName { get; set; } = default!;
             public string ReferencedTableName { get; set; } = default!;
             public string ReferencedColumnName { get; set; } = default!;
+        }
+
+        private class Trigger
+        {
+            public string SchemaName { get; set; } = default!;
+            public string TableName { get; set; } = default!;
+            public string Name { get; set; } = default!;
+            public bool IsDisabled { get; set; }
         }
     }
 }
