@@ -33,6 +33,7 @@ namespace DataDude
             new BinaryDefaultHandler(),
             new DateDefaultValueHandler(),
             new BoolDefaultHandler(),
+            new VersionDefaultHandler(),
         };
 
         public SchemaInformation Schema { get; internal set; }
