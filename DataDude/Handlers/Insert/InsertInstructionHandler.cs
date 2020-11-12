@@ -53,7 +53,7 @@ namespace DataDude.Handlers.Insert
             var parameters = new DynamicParameters();
             foreach (var p in columnsToInsert)
             {
-                parameters.Add(p.Key.Name, p.Value.Value);
+                parameters.Add(p.Key.Name, p.Value.Value, p.Value.DbType);
             }
 
             // How do we best handle fetching inserted row? This won't work if there are triggers on the table, they will need to be disabled during this execution

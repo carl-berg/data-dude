@@ -17,7 +17,7 @@ namespace DataDude.Handlers.Insert
                 }
                 else
                 {
-                    Add(column, ColumnValue.NotSet());
+                    Add(column, ColumnValue.NotSet);
                 }
             }
         }
