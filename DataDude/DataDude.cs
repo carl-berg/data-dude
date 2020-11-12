@@ -3,14 +3,18 @@ using System.Data;
 using System.Threading.Tasks;
 using DataDude.Handlers;
 using DataDude.Instructions;
+using DataDude.SqlServer;
 
 namespace DataDude
 {
     public class DataDude
     {
-        public DataDude()
+        private readonly ISchemaLoader _schemaLoader;
+
+        public DataDude(ISchemaLoader? schemaLoader = null)
         {
             Context = new DataDudeContext();
+            _schemaLoader = schemaLoader ?? new SqlServerSchemaLoader();
         }
 
         public DataDudeContext Context { get; }
@@ -21,6 +25,7 @@ namespace DataDude
 
         public async Task Go(IDbConnection connection, IDbTransaction? transaction = null)
         {
+            Context.Schema = await _schemaLoader.Load(connection, transaction);
             foreach (var instruction in Context.Instructions)
             {
                 bool wasHandled = false;

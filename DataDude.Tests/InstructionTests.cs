@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Dapper;
-using DataDude.SqlServer;
 using DataDude.Tests.Core;
 using Shouldly;
 using Xunit;
@@ -21,6 +20,19 @@ namespace DataDude.Tests
 
             await new DataDude()
                 .Execute("INSERT INTO Buildings.Office(Name) VALUES(@Name)", new { Name = "test" })
+                .Go(connection);
+
+            var officeName = await connection.QuerySingleAsync<string>("SELECT Name FROM Buildings.Office");
+            officeName.ShouldBe("test");
+        }
+
+        [Fact]
+        public async Task Test_Can_Insert_Instruction()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await new DataDude()
+                .Insert("Office", new { Name = "test" })
                 .Go(connection);
 
             var officeName = await connection.QuerySingleAsync<string>("SELECT Name FROM Buildings.Office");

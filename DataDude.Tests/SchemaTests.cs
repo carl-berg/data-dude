@@ -18,7 +18,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            var schema = await new SqlServerSchemaLoader(connection).Load();
+            var schema = await new SqlServerSchemaLoader().Load(connection);
 
             schema["Office"].ShouldNotBeNull();
             schema["Buildings.Office"].ShouldNotBeNull();

@@ -7,20 +7,11 @@ using DataDude.Schema;
 
 namespace DataDude.SqlServer
 {
-    public class SqlServerSchemaLoader
+    public class SqlServerSchemaLoader : ISchemaLoader
     {
-        private readonly IDbConnection _connection;
-        private readonly IDbTransaction? _transaction;
-
-        public SqlServerSchemaLoader(IDbConnection connection, IDbTransaction? transaction = null)
+        public async Task<SchemaInformation> Load(IDbConnection connection, IDbTransaction? transaction = null)
         {
-            _connection = connection;
-            _transaction = transaction;
-        }
-
-        public async Task<SchemaInformation> Load()
-        {
-            var (columns, foreignKeys, triggers) = await LoadSchema();
+            var (columns, foreignKeys, triggers) = await LoadSchema(connection, transaction);
 
             var tables = columns
                 .GroupBy(x => (x.TableSchema, x.TableName))
@@ -87,9 +78,9 @@ namespace DataDude.SqlServer
             }
         }
 
-        private async Task<(IEnumerable<SysColumns>, IEnumerable<ForeignKey>, IEnumerable<Trigger> triggers)> LoadSchema()
+        private async Task<(IEnumerable<SysColumns>, IEnumerable<ForeignKey>, IEnumerable<Trigger> triggers)> LoadSchema(IDbConnection connection, IDbTransaction? transaction = null)
         {
-            using var reader = await _connection.QueryMultipleAsync(
+            using var reader = await connection.QueryMultipleAsync(
                 @"SELECT 
                     s.name as TableSchema,
                     t.name as TableName,
@@ -127,7 +118,7 @@ namespace DataDude.SqlServer
 	                is_disabled AS IsDisabled
                 FROM sys.triggers tr
                 INNER JOIN sys.tables t ON tr.parent_id= t.object_id",
-                transaction: _transaction);
+                transaction: transaction);
 
             var allColumns = await reader.ReadAsync<SysColumns>();
             var allForeignKeys = await reader.ReadAsync<ForeignKey>();
