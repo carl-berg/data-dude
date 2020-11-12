@@ -19,22 +19,19 @@ namespace DataDude.Handlers.Insert
 
                     foreach (var valueHandler in context.InsertValueHandlers)
                     {
-                        foreach (var column in statement)
-                        {
-                            statement[column.Key] = valueHandler.Handle(statement.Table, column.Key, column.Value);
-                        }
+                        statement.InvokeValueHandler(valueHandler);
                     }
 
                     foreach (var insertInterceptor in context.InsertInterceptors)
                     {
-                        await insertInterceptor.OnInsert(statement, context);
+                        await insertInterceptor.OnInsert(statement, context, connection, transaction);
                     }
 
                     var insertedRow = await Insert(statement, connection, transaction);
 
                     foreach (var insertInterceptor in context.InsertInterceptors)
                     {
-                        await insertInterceptor.OnInserted(insertedRow, statement, context);
+                        await insertInterceptor.OnInserted(insertedRow, statement, context, connection, transaction);
                     }
                 }
                 else

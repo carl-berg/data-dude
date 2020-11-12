@@ -13,7 +13,7 @@ namespace DataDude.Handlers.Insert
             {
                 if (instruction.ColumnValues.TryGetValue(column.Name, out var value) && value is { })
                 {
-                    Add(column, ColumnValue.Set(value));
+                    Add(column, new ColumnValue(value));
                 }
                 else
                 {
@@ -23,5 +23,13 @@ namespace DataDude.Handlers.Insert
         }
 
         public TableInformation Table { get; }
+
+        public void InvokeValueHandler(IDataDudeInsertValueHandler handler)
+        {
+            foreach (var column in this)
+            {
+                this[column.Key].Set(handler.Handle(Table, column.Key, column.Value));
+            }
+        }
     }
 }
