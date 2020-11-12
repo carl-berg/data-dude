@@ -1,4 +1,6 @@
-﻿namespace DataDude.Handlers.Insert
+﻿using System.Data;
+
+namespace DataDude.Handlers.Insert
 {
     public class ColumnValue
     {
@@ -17,9 +19,11 @@
         public object? Value { get; private set; }
 
         public ColumnValueType Type { get; private set; }
+        public DbType? DbType { get; private set; }
 
         public static ColumnValue Ignore() => new ColumnValue(ColumnValueType.Ignore);
         public static ColumnValue NotSet() => new ColumnValue(ColumnValueType.NotSet);
+        public static ColumnValue Null(DbType dbType) => new ColumnValue(ColumnValueType.Set) { DbType = dbType };
 
         public void Set(ColumnValue value)
         {

@@ -38,5 +38,18 @@ namespace DataDude.Tests
             var officeName = await connection.QuerySingleAsync<string>("SELECT Name FROM Buildings.Office");
             officeName.ShouldBe("test");
         }
+
+        [Fact]
+        public async Task Test_Can_Insert_Instruction_With_Nullable_Default()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await new DataDude()
+                .Insert("Office")
+                .Go(connection);
+
+            var officeName = await connection.QuerySingleAsync<string>("SELECT Name FROM Buildings.Office");
+            officeName.ShouldBe(null);
+        }
     }
 }

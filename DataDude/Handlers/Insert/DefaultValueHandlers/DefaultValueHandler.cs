@@ -6,13 +6,17 @@ namespace DataDude.Handlers.Insert.DefaultValueHandlers
     {
         public ColumnValue Handle(TableInformation table, ColumnInformation column, ColumnValue value)
         {
-            if (column.IsNullable ||
-                column.HasDefaultValue ||
+            if (column.HasDefaultValue ||
                 column.IsComputed ||
                 column.IsIdentity ||
                 value.Type is ColumnValueType.Ignore or ColumnValueType.Set)
             {
                 return value;
+            }
+            else if (column.IsNullable)
+            {
+                var dbType = TypeConverter.ToDbType(column.DataType);
+                return ColumnValue.Null(dbType);
             }
             else if (GetDefaultValue(table, column, value) is { } newValue)
             {
