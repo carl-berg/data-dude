@@ -13,7 +13,7 @@ namespace DataDude.Handlers.Insert
         {
             if (instruction is InsertInstruction insert)
             {
-                if (context.Schema[insert.TableName] is { } table)
+                if (context.Schema?[insert.TableName] is { } table)
                 {
                     var statement = new InsertStatement(table, insert);
 
@@ -65,7 +65,14 @@ namespace DataDude.Handlers.Insert
                 parameters,
                 transaction);
 
-            return insertedRow as IDictionary<string, object>;
+            if (insertedRow is IDictionary<string, object> { } typedRow)
+            {
+                return typedRow;
+            }
+            else
+            {
+                throw new System.Exception("Could not parse inserted row as dictionary");
+            }
         }
     }
 }

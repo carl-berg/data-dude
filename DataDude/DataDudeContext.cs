@@ -37,7 +37,7 @@ namespace DataDude
             new VersionDefaultHandler(),
         };
 
-        public SchemaInformation Schema { get; internal set; }
+        public SchemaInformation? Schema { get; internal set; }
 
         public T? Get<T>(string key)
         {

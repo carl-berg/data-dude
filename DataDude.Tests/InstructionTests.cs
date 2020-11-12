@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Dapper;
-using DataDude.Handlers.Insert.Interception;
 using DataDude.Tests.Core;
 using Shouldly;
 using Xunit;
