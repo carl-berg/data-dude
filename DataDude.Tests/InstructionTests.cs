@@ -40,7 +40,7 @@ namespace DataDude.Tests
         }
 
         [Fact]
-        public async Task Test_Can_Insert_Instruction_With_Nullable_Default()
+        public async Task Test_Can_Insert_Instruction_With_Default()
         {
             using var connection = Fixture.CreateNewConnection();
 
@@ -49,7 +49,7 @@ namespace DataDude.Tests
                 .Go(connection);
 
             var officeName = await connection.QuerySingleAsync<string>("SELECT Name FROM Buildings.Office");
-            officeName.ShouldBe(null);
+            officeName.ShouldBeEmpty();
         }
     }
 }

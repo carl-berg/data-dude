@@ -6,7 +6,7 @@ GO
 
 CREATE TABLE Buildings.Office (
 	Id INT IDENTITY PRIMARY KEY,
-	Name NVARCHAR(50)
+	Name NVARCHAR(50) NOT NULL
 )
 
 CREATE TABLE People.Employee (
