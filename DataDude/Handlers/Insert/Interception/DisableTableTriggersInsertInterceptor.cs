@@ -8,7 +8,7 @@ using Dapper;
 namespace DataDude.Handlers.Insert.Interception
 {
     /// <summary>
-    /// This interceptor is needed as long as we use OUTPUT inserted.* to get inserted row data
+    /// This interceptor is needed as long as we use OUTPUT inserted.* to get inserted row data.
     /// </summary>
     public class DisableTableTriggersInsertInterceptor : IDataDudeInsertInterceptor
     {

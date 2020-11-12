@@ -24,6 +24,7 @@ namespace DataDude
         public IList<IDataDudeInsertInterceptor> InsertInterceptors { get; } = new List<IDataDudeInsertInterceptor>
         {
             new DisableTableTriggersInsertInterceptor(),
+            new IndentityInsertInterceptor(),
         };
 
         public IList<IDataDudeInsertValueHandler> InsertValueHandlers { get; } = new List<IDataDudeInsertValueHandler>
@@ -38,7 +39,15 @@ namespace DataDude
 
         public SchemaInformation Schema { get; internal set; }
 
-        public T Get<T>(string key) => (T)_store[key];
+        public T? Get<T>(string key)
+        {
+            if (_store.TryGetValue(key, out var value) && value is T typedValue)
+            {
+                return typedValue;
+            }
+
+            return default;
+        }
 
         public void Set<T>(string key, T value)
         {

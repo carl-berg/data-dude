@@ -17,5 +17,7 @@ namespace DataDude.Handlers
 
             return new DataDudeInstructionHandlerResult(false);
         }
+
+        public Task PreProcess(IDataDudeInstruction instruction, DataDudeContext context) => Task.CompletedTask;
     }
 }

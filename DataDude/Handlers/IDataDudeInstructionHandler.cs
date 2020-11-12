@@ -7,5 +7,7 @@ namespace DataDude.Handlers
     public interface IDataDudeInstructionHandler
     {
         Task<DataDudeInstructionHandlerResult> Handle(IDataDudeInstruction instruction, DataDudeContext context, IDbConnection connection, IDbTransaction? transaction = null);
+
+        Task PreProcess(IDataDudeInstruction instruction, DataDudeContext context);
     }
 }

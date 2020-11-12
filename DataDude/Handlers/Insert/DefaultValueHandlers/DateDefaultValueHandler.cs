@@ -1,5 +1,5 @@
-﻿using DataDude.Schema;
-using System;
+﻿using System;
+using DataDude.Schema;
 
 namespace DataDude.Handlers.Insert.DefaultValueHandlers
 {

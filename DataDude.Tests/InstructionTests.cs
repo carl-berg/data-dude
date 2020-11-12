@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Dapper;
+using DataDude.Handlers.Insert.Interception;
 using DataDude.Tests.Core;
 using Shouldly;
 using Xunit;
@@ -50,6 +51,37 @@ namespace DataDude.Tests
 
             var officeName = await connection.QuerySingleAsync<string>("SELECT Name FROM Buildings.Office");
             officeName.ShouldBeEmpty();
+        }
+
+        [Fact]
+        public async Task Test_Can_Insert_With_Explicit_Foreign_Keys()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await new DataDude()
+                .Insert("Office", new { Id = 1 })
+                .Insert("Employee", new { Id = 1 })
+                .Insert("OfficeOccupant", new { OfficeId = 1, EmployeeId = 1 })
+                .Go(connection);
+
+            var occupants = await connection.QueryAsync<dynamic>("SELECT * FROM Buildings.OfficeOccupant");
+            occupants.ShouldHaveSingleItem();
+        }
+
+        [Fact]
+        public async Task Test_Can_Insert_With_Automatic_Foreign_Keys()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await new DataDude()
+                .EnableAutomaticForeignKeys()
+                .Insert("Office")
+                .Insert("Employee")
+                .Insert("OfficeOccupant")
+                .Go(connection);
+
+            var occupants = await connection.QueryAsync<dynamic>("SELECT * FROM Buildings.OfficeOccupant");
+            occupants.ShouldHaveSingleItem();
         }
     }
 }

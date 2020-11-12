@@ -33,6 +33,18 @@ namespace DataDude
                 {
                     try
                     {
+                        await handler.PreProcess(instruction, Context);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception($"Data dude failed during pre-processing of a '{instruction.GetType()}' type instruction", ex);
+                    }
+                }
+
+                foreach (var handler in Context.InstructionHandlers)
+                {
+                    try
+                    {
                         var result = await handler.Handle(instruction, Context, connection, transaction);
                         if (result is { Handled: true })
                         {

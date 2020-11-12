@@ -1,4 +1,5 @@
-﻿using DataDude.Instructions;
+﻿using DataDude.Handlers.Insert.Interception;
+using DataDude.Instructions;
 
 namespace DataDude
 {
@@ -13,6 +14,12 @@ namespace DataDude
         public static DataDude Insert(this DataDude dude, string table, object? data = null)
         {
             dude.AddInstruction(new InsertInstruction(table, data));
+            return dude;
+        }
+
+        public static DataDude EnableAutomaticForeignKeys(this DataDude dude)
+        {
+            dude.Context.InsertInterceptors.Add(new ForeignKeyInterceptor());
             return dude;
         }
     }
