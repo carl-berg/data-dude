@@ -4,12 +4,29 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
+    <Version>0.1.0-alpha.1</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSymbols>true</IncludeSymbols>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <Authors>Carl Berg</Authors>
+    <Copyright>Copyright (c) $([System.DateTime]::Now.Year) Carl Berg</Copyright>
+    <Description>DataDude, the dude abides</Description>
+    <PackageTags>DataDude;Database;Fixture;Integration Tests</PackageTags>
+    <PackageProjectUrl>https://github.com/carl-berg/data-dude</PackageProjectUrl>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.35" />
-    <PackageReference Include="Spinit.StyleCop.Analyzers" Version="1.0.0" />
+    <PackageReference Include="Spinit.StyleCop.Analyzers" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Include="..\LICENSE" Pack="true" PackagePath="" />
   </ItemGroup>
 
 </Project>
