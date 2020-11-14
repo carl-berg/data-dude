@@ -44,8 +44,6 @@ namespace DataDude.Instructions.Insert
             return new HandleInstructionResult(false);
         }
 
-        public Task PreProcess(IInstruction instruction, DataDudeContext context) => Task.CompletedTask;
-
         protected virtual async Task<IDictionary<string, object>> Insert(InsertStatement statement, IDbConnection connection, IDbTransaction? transaction = null)
         {
             var columnsToInsert = statement.Data.Where(x => x.Value.Type == ColumnValueType.Set);

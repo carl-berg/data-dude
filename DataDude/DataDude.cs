@@ -6,45 +6,26 @@ using DataDude.SqlServer;
 
 namespace DataDude
 {
-    public class DataDude
+    public class DataDude : DataDudeContext
     {
         private readonly ISchemaLoader _schemaLoader;
 
         public DataDude(ISchemaLoader? schemaLoader = null)
         {
-            Context = new DataDudeContext();
             _schemaLoader = schemaLoader ?? new SqlServerSchemaLoader();
         }
 
-        public DataDudeContext Context { get; }
-
-        public void AddInstruction(IInstruction instruction) => Context.Instructions.Add(instruction);
-
-        public void AddHandler(IInstructionHandler handler) => Context.InstructionHandlers.Add(handler);
-
         public async Task Go(IDbConnection connection, IDbTransaction? transaction = null)
         {
-            Context.Schema = await _schemaLoader.Load(connection, transaction);
-            foreach (var instruction in Context.Instructions)
+            Schema = await _schemaLoader.Load(connection, transaction);
+            foreach (var instruction in Instructions)
             {
                 bool wasHandled = false;
-                foreach (var handler in Context.InstructionHandlers)
+                foreach (var handler in InstructionHandlers)
                 {
                     try
                     {
-                        await handler.PreProcess(instruction, Context);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new Exception($"Data dude failed during pre-processing of a '{instruction.GetType()}' type instruction", ex);
-                    }
-                }
-
-                foreach (var handler in Context.InstructionHandlers)
-                {
-                    try
-                    {
-                        var result = await handler.Handle(instruction, Context, connection, transaction);
+                        var result = await handler.Handle(instruction, this, connection, transaction);
                         if (result is { Handled: true })
                         {
                             wasHandled = true;
@@ -52,13 +33,13 @@ namespace DataDude
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception($"Data dude failed during processing of a '{instruction.GetType()}' type instruction", ex);
+                        throw new HandlerException($"Data dude failed while processing an instruction of type '{instruction.GetType()}'", ex);
                     }
                 }
 
                 if (!wasHandled)
                 {
-                    throw new Exception($"Instruction of type '{instruction.GetType()}' lacks handler and cannot be processed");
+                    throw new HandlerException($"Instruction of type '{instruction.GetType()}' lacks handler and cannot be processed");
                 }
             }
         }
