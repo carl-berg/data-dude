@@ -3,6 +3,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
+using DataDude.Schema;
 
 namespace DataDude.Instructions.Insert
 {
@@ -48,11 +49,14 @@ namespace DataDude.Instructions.Insert
         {
             var columnsToInsert = statement.Data.Where(x => x.Value.Type == ColumnValueType.Set);
             var columns = string.Join(", ", columnsToInsert.Select(x => x.Column.Name));
-            var values = string.Join(", ", columnsToInsert.Select(x => $"@{x.Column.Name}"));
+            var values = string.Join(", ", columnsToInsert.Select(x => GetParameterNameOrRawSql(x.Column, x.Value)));
             var parameters = new DynamicParameters();
             foreach (var (column, value) in columnsToInsert)
             {
-                parameters.Add(column.Name, value.Value, value.DbType);
+                if (!(value.Value is RawSql))
+                {
+                    parameters.Add(column.Name, value.Value, value.DbType);
+                }
             }
 
             // How do we best handle fetching inserted row? This won't work if there are triggers on the table, they will need to be disabled during this execution
@@ -70,6 +74,16 @@ namespace DataDude.Instructions.Insert
             {
                 throw new System.Exception("Could not parse inserted row as dictionary");
             }
+        }
+
+        private string GetParameterNameOrRawSql(ColumnInformation column, ColumnValue columnValue)
+        {
+            if (columnValue.Value is RawSql rawSql)
+            {
+                return rawSql.ToString();
+            }
+
+            return $"@{column.Name}";
         }
     }
 }

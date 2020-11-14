@@ -29,6 +29,7 @@ namespace DataDude.Tests
                 table => table["Id"].IsNullable.ShouldBeFalse(),
                 table => table["FullName"].IsComputed.ShouldBeTrue(),
                 table => table["Active"].DefaultValue.ShouldBe("((1))"),
+                table => table["CreatedAt"].DefaultValue.ShouldBe("(getdate())"),
                 table => table.ForeignKeys.ShouldBeEmpty(),
                 table => table.Triggers.ShouldContain(x => x.Name == "EmployeeUpdatedAt"));
 

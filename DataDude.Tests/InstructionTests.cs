@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Dapper;
+using DataDude.Instructions.Insert;
 using DataDude.Tests.Core;
 using Shouldly;
 using Xunit;
@@ -81,6 +82,20 @@ namespace DataDude.Tests
 
             var occupants = await connection.QueryAsync<dynamic>("SELECT * FROM Buildings.OfficeOccupant");
             occupants.ShouldHaveSingleItem();
+        }
+
+        [Fact]
+        public async Task Test_Can_Insert_With_Raw_SQL()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await new DataDude()
+                .EnableAutomaticForeignKeys()
+                .Insert("Office", new { Name = new RawSql("CONCAT('A', 'B', 'C')") })
+                .Go(connection);
+
+            var name = await connection.QuerySingleAsync<string>("SELECT Name FROM Buildings.Office");
+            name.ShouldBe("ABC");
         }
     }
 }
