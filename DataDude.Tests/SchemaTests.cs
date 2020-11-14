@@ -24,11 +24,11 @@ namespace DataDude.Tests
             schema["Buildings.Office"].ShouldNotBeNull();
             schema["Employee"].ShouldSatisfyAllConditions(
                 table => table["Id"].DataType.ShouldBe("int"),
-                table => table["Id"].HasDefaultValue.ShouldBeFalse(),
+                table => table["Id"].DefaultValue.ShouldBeNull(),
                 table => table["Id"].IsIdentity.ShouldBeTrue(),
                 table => table["Id"].IsNullable.ShouldBeFalse(),
                 table => table["FullName"].IsComputed.ShouldBeTrue(),
-                table => table["Active"].HasDefaultValue.ShouldBeTrue(),
+                table => table["Active"].DefaultValue.ShouldBe("((1))"),
                 table => table.ForeignKeys.ShouldBeEmpty(),
                 table => table.Triggers.ShouldContain(x => x.Name == "EmployeeUpdatedAt"));
 

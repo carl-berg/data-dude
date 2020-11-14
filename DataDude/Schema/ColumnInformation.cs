@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace DataDude.Schema
+﻿namespace DataDude.Schema
 {
     public class ColumnInformation
     {
@@ -10,7 +8,7 @@ namespace DataDude.Schema
             bool isIdentity,
             bool isNullable,
             bool isComputed,
-            bool hasDefaultValue,
+            string? defaultValue,
             int maxLength,
             int precision,
             int scale)
@@ -20,7 +18,7 @@ namespace DataDude.Schema
             IsIdentity = isIdentity;
             IsNullable = isNullable;
             IsComputed = isComputed;
-            HasDefaultValue = hasDefaultValue;
+            DefaultValue = defaultValue;
             MaxLength = maxLength;
             Precision = precision;
             Scale = scale;
@@ -31,7 +29,7 @@ namespace DataDude.Schema
         public bool IsIdentity { get; }
         public bool IsNullable { get; }
         public bool IsComputed { get; }
-        public bool HasDefaultValue { get; }
+        public string? DefaultValue { get; }
         public int MaxLength { get; }
         public int Precision { get; }
         public int Scale { get; }

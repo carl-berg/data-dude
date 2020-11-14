@@ -24,7 +24,7 @@ namespace DataDude.SqlServer
                         x.IsIdentity,
                         x.IsNullable,
                         x.IsComputed,
-                        x.HasDefault,
+                        x.DefaultValue,
                         x.MaxLength,
                         x.Precision,
                         x.Scale))));
@@ -89,7 +89,7 @@ namespace DataDude.SqlServer
                     c.is_nullable As IsNullable,
                     c.is_identity as IsIdentity,
                     c.is_computed as IsComputed,
-                    IIF(c.default_object_id > 0, 1, 0) as HasDefault,
+                    OBJECT_DEFINITION(c.default_object_id) as DefaultValue,
                     c.max_length AS MaxLength,
                     c.precision as Precision,
                     c.Scale as Scale
@@ -135,7 +135,7 @@ namespace DataDude.SqlServer
             public bool IsNullable { get; set; }
             public bool IsIdentity { get; set; }
             public bool IsComputed { get; set; }
-            public bool HasDefault { get; set; }
+            public string? DefaultValue { get; set; }
             public int MaxLength { get; set; }
             public int Precision { get; set; }
             public int Scale { get; set; }
