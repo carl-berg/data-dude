@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,26 +18,33 @@ namespace DataDude.Instructions.Insert
                 {
                     var statement = new InsertStatement(table, insert);
 
-                    foreach (var valueHandler in context.InsertValueProviders)
+                    try
                     {
-                        statement.InvokeValueProvider(valueHandler);
+                        foreach (var valueHandler in context.InsertValueProviders)
+                        {
+                            statement.InvokeValueProvider(valueHandler);
+                        }
+
+                        foreach (var insertInterceptor in context.InsertInterceptors)
+                        {
+                            await insertInterceptor.OnInsert(statement, context, connection, transaction);
+                        }
+
+                        var insertedRow = await Insert(statement, connection, transaction);
+
+                        foreach (var insertInterceptor in context.InsertInterceptors)
+                        {
+                            await insertInterceptor.OnInserted(insertedRow, statement, context, connection, transaction);
+                        }
                     }
-
-                    foreach (var insertInterceptor in context.InsertInterceptors)
+                    catch (Exception ex)
                     {
-                        await insertInterceptor.OnInsert(statement, context, connection, transaction);
-                    }
-
-                    var insertedRow = await Insert(statement, connection, transaction);
-
-                    foreach (var insertInterceptor in context.InsertInterceptors)
-                    {
-                        await insertInterceptor.OnInserted(insertedRow, statement, context, connection, transaction);
+                        throw new HandlerException($"Insertion into table {insert.TableName} failed", ex);
                     }
                 }
                 else
                 {
-                    throw new System.Exception($"Could not find table {insert.TableName} in schema");
+                    throw new HandlerException($"Could not find table {insert.TableName} in schema");
                 }
 
                 return new HandleInstructionResult(true);
@@ -72,7 +80,7 @@ namespace DataDude.Instructions.Insert
             }
             else
             {
-                throw new System.Exception("Could not parse inserted row as dictionary");
+                throw new HandlerException("Could not parse inserted row as dictionary");
             }
         }
 
