@@ -6,26 +6,31 @@ using DataDude.SqlServer;
 
 namespace DataDude
 {
-    public class DataDude : DataDudeContext
+    public class DataDude
     {
         private readonly ISchemaLoader _schemaLoader;
 
         public DataDude(ISchemaLoader? schemaLoader = null)
         {
+            Context = new DataDudeContext();
             _schemaLoader = schemaLoader ?? new SqlServerSchemaLoader();
         }
 
+        protected DataDudeContext Context { get; }
+
+        public void Configure(Action<DataDudeContext> configure) => configure?.Invoke(Context);
+
         public async Task Go(IDbConnection connection, IDbTransaction? transaction = null)
         {
-            Schema = await _schemaLoader.Load(connection, transaction);
-            foreach (var instruction in Instructions)
+            Context.Schema = await _schemaLoader.Load(connection, transaction);
+            foreach (var instruction in Context.Instructions)
             {
                 bool wasHandled = false;
-                foreach (var handler in InstructionHandlers)
+                foreach (var handler in Context.InstructionHandlers)
                 {
                     try
                     {
-                        var result = await handler.Handle(instruction, this, connection, transaction);
+                        var result = await handler.Handle(instruction, Context, connection, transaction);
                         if (result is { Handled: true })
                         {
                             wasHandled = true;

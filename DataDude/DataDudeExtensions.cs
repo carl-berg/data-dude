@@ -8,19 +8,19 @@ namespace DataDude
     {
         public static DataDude Execute(this DataDude dude, string sql, object? parameters = null)
         {
-            dude.Instructions.Add(new ExecuteInstruction(sql, parameters));
+            dude.Configure(x => x.Instructions.Add(new ExecuteInstruction(sql, parameters)));
             return dude;
         }
 
         public static DataDude Insert(this DataDude dude, string table, object? data = null)
         {
-            dude.Instructions.Add(new InsertInstruction(table, data));
+            dude.Configure(x => x.Instructions.Add(new InsertInstruction(table, data)));
             return dude;
         }
 
         public static DataDude EnableAutomaticForeignKeys(this DataDude dude)
         {
-            dude.InsertInterceptors.Add(new ForeignKeyInterceptor());
+            dude.Configure(x => x.InsertInterceptors.Add(new ForeignKeyInterceptor()));
             return dude;
         }
     }
