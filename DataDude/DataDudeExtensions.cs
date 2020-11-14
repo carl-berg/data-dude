@@ -1,5 +1,6 @@
-﻿using DataDude.Handlers.Insert.Interception;
-using DataDude.Instructions;
+﻿using DataDude.Instructions.Execute;
+using DataDude.Instructions.Insert;
+using DataDude.Instructions.Insert.Interception;
 
 namespace DataDude
 {

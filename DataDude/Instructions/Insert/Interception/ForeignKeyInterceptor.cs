@@ -3,9 +3,9 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace DataDude.Handlers.Insert.Interception
+namespace DataDude.Instructions.Insert.Interception
 {
-    public class ForeignKeyInterceptor : IDataDudeInsertInterceptor
+    public class ForeignKeyInterceptor : IInsertInterceptor
     {
         public Task OnInsert(InsertStatement statement, DataDudeContext context, IDbConnection connection, IDbTransaction? transaction = null)
         {
@@ -14,7 +14,7 @@ namespace DataDude.Handlers.Insert.Interception
                 var key = $"Inserted_{fk.ReferencedTable.Schema}.{fk.ReferencedTable.Name}";
                 if (context.Get<IList<IDictionary<string, object>>>(key) is { } inserted && inserted.LastOrDefault() is { } lastInsert)
                 {
-                    foreach (var (insertValue, referencedColumn) in fk.Columns.Select(c => (statement[c.Column], c.ReferencedColumn)))
+                    foreach (var (insertValue, referencedColumn) in fk.Columns.Select(c => (statement.Data[c.Column], c.ReferencedColumn)))
                     {
                         insertValue.Set(new ColumnValue(lastInsert[referencedColumn.Name]));
                     }

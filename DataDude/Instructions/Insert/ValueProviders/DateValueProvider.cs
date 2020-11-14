@@ -1,9 +1,9 @@
 ﻿using System;
 using DataDude.Schema;
 
-namespace DataDude.Handlers.Insert.DefaultValueHandlers
+namespace DataDude.Instructions.Insert.ValueProviders
 {
-    public class DateDefaultValueHandler : DefaultValueHandler
+    public class DateValueProvider : DefaultValueProvider
     {
         protected override ColumnValue? GetDefaultValue(TableInformation table, ColumnInformation column, ColumnValue value)
         {

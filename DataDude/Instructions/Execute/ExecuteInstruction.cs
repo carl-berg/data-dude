@@ -1,8 +1,8 @@
 ﻿using Dapper;
 
-namespace DataDude.Instructions
+namespace DataDude.Instructions.Execute
 {
-    public class ExecuteInstruction : IDataDudeInstruction
+    public class ExecuteInstruction : IInstruction
     {
         public ExecuteInstruction(string sql, object? parameters = null)
         {

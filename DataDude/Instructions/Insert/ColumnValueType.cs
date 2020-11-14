@@ -1,4 +1,4 @@
-﻿namespace DataDude.Handlers.Insert
+﻿namespace DataDude.Instructions.Insert
 {
     public enum ColumnValueType
     {

@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace DataDude.Handlers.Insert
+namespace DataDude.Instructions.Insert
 {
     public class ColumnValue
     {
@@ -10,23 +10,22 @@ namespace DataDude.Handlers.Insert
             Value = value;
         }
 
-        private ColumnValue(ColumnValueType type, object? value = null)
+        private ColumnValue(ColumnValueType type)
         {
             Type = type;
-            Value = value;
         }
 
         public static ColumnValue Ignore => new ColumnValue(ColumnValueType.Ignore);
         public static ColumnValue NotSet => new ColumnValue(ColumnValueType.NotSet);
         public object? Value { get; private set; }
         public ColumnValueType Type { get; private set; }
-        public DbType? DbType { get; private set; }
+        public DbType? DbType { get; set; }
         public static ColumnValue Null(DbType dbType) => new ColumnValue(ColumnValueType.Set) { DbType = dbType };
-
-        public void Set(ColumnValue value)
+        public void Set(ColumnValue newValue)
         {
-            Value = value.Value;
-            Type = value.Type;
+            Value = newValue.Value;
+            Type = newValue.Type;
+            DbType = newValue.DbType;
         }
     }
 }

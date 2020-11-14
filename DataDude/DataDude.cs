@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Threading.Tasks;
-using DataDude.Handlers;
 using DataDude.Instructions;
 using DataDude.SqlServer;
 
@@ -19,9 +18,9 @@ namespace DataDude
 
         public DataDudeContext Context { get; }
 
-        public void AddInstruction(IDataDudeInstruction instruction) => Context.Instructions.Add(instruction);
+        public void AddInstruction(IInstruction instruction) => Context.Instructions.Add(instruction);
 
-        public void AddHandler(IDataDudeInstructionHandler handler) => Context.InstructionHandlers.Add(handler);
+        public void AddHandler(IInstructionHandler handler) => Context.InstructionHandlers.Add(handler);
 
         public async Task Go(IDbConnection connection, IDbTransaction? transaction = null)
         {

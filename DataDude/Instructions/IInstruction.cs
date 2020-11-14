@@ -1,6 +1,6 @@
 ﻿namespace DataDude.Instructions
 {
-    public interface IDataDudeInstruction
+    public interface IInstruction
     {
     }
 }

@@ -3,13 +3,12 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using DataDude.Instructions;
 
-namespace DataDude.Handlers.Insert
+namespace DataDude.Instructions.Insert
 {
-    public class InsertInstructionHandler : IDataDudeInstructionHandler
+    public class InsertInstructionHandler : IInstructionHandler
     {
-        public virtual async Task<DataDudeInstructionHandlerResult> Handle(IDataDudeInstruction instruction, DataDudeContext context, IDbConnection connection, IDbTransaction? transaction = null)
+        public virtual async Task<HandleInstructionResult> Handle(IInstruction instruction, DataDudeContext context, IDbConnection connection, IDbTransaction? transaction = null)
         {
             if (instruction is InsertInstruction insert)
             {
@@ -17,9 +16,9 @@ namespace DataDude.Handlers.Insert
                 {
                     var statement = new InsertStatement(table, insert);
 
-                    foreach (var valueHandler in context.InsertValueHandlers)
+                    foreach (var valueHandler in context.InsertValueProviders)
                     {
-                        statement.InvokeValueHandler(valueHandler);
+                        statement.InvokeValueProvider(valueHandler);
                     }
 
                     foreach (var insertInterceptor in context.InsertInterceptors)
@@ -39,23 +38,23 @@ namespace DataDude.Handlers.Insert
                     throw new System.Exception($"Could not find table {insert.TableName} in schema");
                 }
 
-                return new DataDudeInstructionHandlerResult(true);
+                return new HandleInstructionResult(true);
             }
 
-            return new DataDudeInstructionHandlerResult(false);
+            return new HandleInstructionResult(false);
         }
 
-        public Task PreProcess(IDataDudeInstruction instruction, DataDudeContext context) => Task.CompletedTask;
+        public Task PreProcess(IInstruction instruction, DataDudeContext context) => Task.CompletedTask;
 
         protected virtual async Task<IDictionary<string, object>> Insert(InsertStatement statement, IDbConnection connection, IDbTransaction? transaction = null)
         {
-            var columnsToInsert = statement.Where(x => x.Value.Type == ColumnValueType.Set);
-            var columns = string.Join(", ", columnsToInsert.Select(x => x.Key.Name));
-            var values = string.Join(", ", columnsToInsert.Select(x => $"@{x.Key.Name}"));
+            var columnsToInsert = statement.Data.Where(x => x.Value.Type == ColumnValueType.Set);
+            var columns = string.Join(", ", columnsToInsert.Select(x => x.Column.Name));
+            var values = string.Join(", ", columnsToInsert.Select(x => $"@{x.Column.Name}"));
             var parameters = new DynamicParameters();
-            foreach (var p in columnsToInsert)
+            foreach (var (column, value) in columnsToInsert)
             {
-                parameters.Add(p.Key.Name, p.Value.Value, p.Value.DbType);
+                parameters.Add(column.Name, value.Value, value.DbType);
             }
 
             // How do we best handle fetching inserted row? This won't work if there are triggers on the table, they will need to be disabled during this execution

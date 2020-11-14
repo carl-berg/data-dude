@@ -1,8 +1,8 @@
 ﻿using DataDude.Schema;
 
-namespace DataDude.Handlers.Insert.DefaultValueHandlers
+namespace DataDude.Instructions.Insert.ValueProviders
 {
-    public class VersionDefaultHandler : DefaultValueHandler
+    public class VersionValueProvider : DefaultValueProvider
     {
         protected override ColumnValue? GetDefaultValue(TableInformation table, ColumnInformation column, ColumnValue value)
         {

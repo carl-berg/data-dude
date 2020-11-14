@@ -1,14 +1,14 @@
 ﻿using DataDude.Schema;
 
-namespace DataDude.Handlers.Insert.DefaultValueHandlers
+namespace DataDude.Instructions.Insert.ValueProviders
 {
-    public class BinaryDefaultHandler : DefaultValueHandler
+    public class BoolValueProvider : DefaultValueProvider
     {
         protected override ColumnValue? GetDefaultValue(TableInformation table, ColumnInformation column, ColumnValue value)
         {
-            if (column.DataType is "varbinary")
+            if (column.DataType is "bit")
             {
-                return new ColumnValue(new byte[0]);
+                return new ColumnValue(false);
             }
 
             return null;

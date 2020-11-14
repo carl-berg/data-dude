@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace DataDude.Instructions
+namespace DataDude.Instructions.Insert
 {
-    public class InsertInstruction : IDataDudeInstruction
+    public class InsertInstruction : IInstruction
     {
         public InsertInstruction(string tableName, object? columnData = null)
         {

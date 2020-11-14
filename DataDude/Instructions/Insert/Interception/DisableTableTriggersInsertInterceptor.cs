@@ -5,12 +5,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 
-namespace DataDude.Handlers.Insert.Interception
+namespace DataDude.Instructions.Insert.Interception
 {
     /// <summary>
     /// This interceptor is needed as long as we use OUTPUT inserted.* to get inserted row data.
     /// </summary>
-    public class DisableTableTriggersInsertInterceptor : IDataDudeInsertInterceptor
+    public class DisableTableTriggersInsertInterceptor : IInsertInterceptor
     {
         public async Task OnInsert(InsertStatement statement, DataDudeContext context, IDbConnection connection, IDbTransaction? transaction = null)
         {

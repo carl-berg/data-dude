@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using DataDude.Handlers;
-using DataDude.Handlers.Insert;
-using DataDude.Handlers.Insert.DefaultValueHandlers;
-using DataDude.Handlers.Insert.Interception;
 using DataDude.Instructions;
+using DataDude.Instructions.Execute;
+using DataDude.Instructions.Insert;
+using DataDude.Instructions.Insert.Interception;
+using DataDude.Instructions.Insert.ValueProviders;
 using DataDude.Schema;
 
 namespace DataDude
@@ -13,28 +13,28 @@ namespace DataDude
         private Dictionary<string, object> _store;
         public DataDudeContext() => _store = new Dictionary<string, object>();
 
-        public IList<IDataDudeInstruction> Instructions { get; } = new List<IDataDudeInstruction>();
+        public IList<IInstruction> Instructions { get; } = new List<IInstruction>();
 
-        public IList<IDataDudeInstructionHandler> InstructionHandlers { get; } = new List<IDataDudeInstructionHandler>
+        public IList<IInstructionHandler> InstructionHandlers { get; } = new List<IInstructionHandler>
         {
             new ExecuteInstructionHandler(),
             new InsertInstructionHandler(),
         };
 
-        public IList<IDataDudeInsertInterceptor> InsertInterceptors { get; } = new List<IDataDudeInsertInterceptor>
+        public IList<IInsertInterceptor> InsertInterceptors { get; } = new List<IInsertInterceptor>
         {
             new DisableTableTriggersInsertInterceptor(),
             new IndentityInsertInterceptor(),
         };
 
-        public IList<IDataDudeInsertValueHandler> InsertValueHandlers { get; } = new List<IDataDudeInsertValueHandler>
+        public IList<IInsertValueProvider> InsertValueProviders { get; } = new List<IInsertValueProvider>
         {
-            new StringDefaultValueHandler(),
-            new NumericDefaultValueHandler(),
-            new BinaryDefaultHandler(),
-            new DateDefaultValueHandler(),
-            new BoolDefaultHandler(),
-            new VersionDefaultHandler(),
+            new StringValueProvider(),
+            new NumericValueProvider(),
+            new BinaryValueProvider(),
+            new DateValueProvider(),
+            new BoolValueProvider(),
+            new VersionValueProvider(),
         };
 
         public SchemaInformation? Schema { get; internal set; }
