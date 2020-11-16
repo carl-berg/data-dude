@@ -65,7 +65,7 @@ namespace DataDude.Instructions.Insert.Insertion
             }
         }
 
-        private IEnumerable<(string SQL, string ColumnName)> GetDatabaseGenratedValuePairs(InsertStatement statement)
+        protected virtual IEnumerable<(string SQL, string ColumnName)> GetDatabaseGenratedValuePairs(InsertStatement statement)
         {
             foreach (var (column, value) in statement.Data.Where(x => x.Column.IsPrimaryKey))
             {
@@ -80,7 +80,7 @@ namespace DataDude.Instructions.Insert.Insertion
             }
         }
 
-        private bool CanHandleInsertOfPKColumn(TableInformation table, ColumnInformation column, ColumnValue value)
+        protected virtual bool CanHandleInsertOfPKColumn(TableInformation table, ColumnInformation column, ColumnValue value)
         {
             if (value.Type == ColumnValueType.Set)
             {
