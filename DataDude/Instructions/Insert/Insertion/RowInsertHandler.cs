@@ -7,10 +7,10 @@ using DataDude.Schema;
 
 namespace DataDude.Instructions.Insert.Insertion
 {
-    public abstract class RowInsertHandler : IRowInsertHandler
+    public abstract class RowInsertHandler : IInsertRowHandler
     {
-        public abstract Task<bool> CanHandleInsert(InsertStatement statement);
-        public abstract Task<IDictionary<string, object>> Insert(InsertStatement statement, IDbConnection connection, IDbTransaction? transaction = null);
+        public abstract bool CanHandleInsert(InsertStatement statement);
+        public abstract Task<InsertedRow> Insert(InsertStatement statement, IDbConnection connection, IDbTransaction? transaction = null);
 
         protected (string columns, string values, DynamicParameters parameters) GetInsertInformation(InsertStatement statement)
         {

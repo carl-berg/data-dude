@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
+using DataDude.Instructions.Insert.Insertion;
 using DataDude.Schema;
 
 namespace DataDude.Instructions.Insert
@@ -30,11 +31,18 @@ namespace DataDude.Instructions.Insert
                             await insertInterceptor.OnInsert(statement, context, connection, transaction);
                         }
 
-                        var insertedRow = await Insert(statement, connection, transaction);
-
-                        foreach (var insertInterceptor in context.InsertInterceptors)
+                        if (context.InsertRowHandlers.FirstOrDefault(x => x.CanHandleInsert(statement)) is IInsertRowHandler handler)
                         {
-                            await insertInterceptor.OnInserted(insertedRow, statement, context, connection, transaction);
+                            var insertedRow = await handler.Insert(statement, connection, transaction);
+
+                            foreach (var insertInterceptor in context.InsertInterceptors)
+                            {
+                                await insertInterceptor.OnInserted(insertedRow, statement, context, connection, transaction);
+                            }
+                        }
+                        else
+                        {
+                            throw new HandlerException($"Could not resolve a row handler for insertion of a row in {insert.TableName}");
                         }
                     }
                     catch (Exception ex)
@@ -51,47 +59,6 @@ namespace DataDude.Instructions.Insert
             }
 
             return new HandleInstructionResult(false);
-        }
-
-        protected virtual async Task<IDictionary<string, object>> Insert(InsertStatement statement, IDbConnection connection, IDbTransaction? transaction = null)
-        {
-            var columnsToInsert = statement.Data.Where(x => x.Value.Type == ColumnValueType.Set);
-            var columns = string.Join(", ", columnsToInsert.Select(x => x.Column.Name));
-            var values = string.Join(", ", columnsToInsert.Select(x => GetParameterNameOrRawSql(x.Column, x.Value)));
-            var parameters = new DynamicParameters();
-            foreach (var (column, value) in columnsToInsert)
-            {
-                if (!(value.Value is RawSql))
-                {
-                    parameters.Add(column.Name, value.Value, value.DbType);
-                }
-            }
-
-            // How do we best handle fetching inserted row? This won't work if there are triggers on the table, they will need to be disabled during this execution
-            // which is feasible, but maybe not expected?
-            var insertedRow = await connection.QuerySingleAsync<dynamic>(
-                $@"INSERT INTO {statement.Table.Schema}.{statement.Table.Name}({columns}) OUTPUT inserted.* VALUES({values})",
-                parameters,
-                transaction);
-
-            if (insertedRow is IDictionary<string, object> { } typedRow)
-            {
-                return typedRow;
-            }
-            else
-            {
-                throw new HandlerException("Could not parse inserted row as dictionary");
-            }
-        }
-
-        private string GetParameterNameOrRawSql(ColumnInformation column, ColumnValue columnValue)
-        {
-            if (columnValue.Value is RawSql rawSql)
-            {
-                return rawSql.ToString();
-            }
-
-            return $"@{column.Name}";
         }
     }
 }

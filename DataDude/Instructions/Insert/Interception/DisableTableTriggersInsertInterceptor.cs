@@ -24,7 +24,7 @@ namespace DataDude.Instructions.Insert.Interception
             }
         }
 
-        public async Task OnInserted(IDictionary<string, object> insertedRow, InsertStatement statement, DataDudeContext context, IDbConnection connection, IDbTransaction? transaction = null)
+        public async Task OnInserted(InsertedRow insertedRow, InsertStatement statement, DataDudeContext context, IDbConnection connection, IDbTransaction? transaction = null)
         {
             var enableTriggerStatements = statement.Table.Triggers
                 .Where(x => !x.IsDisabled)

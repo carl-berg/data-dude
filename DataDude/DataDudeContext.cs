@@ -2,6 +2,7 @@
 using DataDude.Instructions;
 using DataDude.Instructions.Execute;
 using DataDude.Instructions.Insert;
+using DataDude.Instructions.Insert.Insertion;
 using DataDude.Instructions.Insert.Interception;
 using DataDude.Instructions.Insert.ValueProviders;
 using DataDude.Schema;
@@ -35,6 +36,12 @@ namespace DataDude
             new DateValueProvider(),
             new BoolValueProvider(),
             new VersionValueProvider(),
+        };
+
+        public IList<IInsertRowHandler> InsertRowHandlers { get; } = new List<IInsertRowHandler>
+        {
+            new IdentityInsertRowHandler(),
+            new OutputInsertRowHandler(),
         };
 
         public SchemaInformation? Schema { get; internal set; }
