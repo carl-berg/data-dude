@@ -40,7 +40,7 @@ namespace DataDude
 
         public IList<IInsertRowHandler> InsertRowHandlers { get; } = new List<IInsertRowHandler>
         {
-            new IdentityInsertRowHandler(),
+            new IdentityInsertRowHandler(new UniqueValueGenerator()),
             new OutputInsertRowHandler(),
         };
 

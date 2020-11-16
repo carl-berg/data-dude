@@ -10,7 +10,10 @@ namespace DataDude.Instructions.Insert.Insertion
     public abstract class RowInsertHandler : IInsertRowHandler
     {
         public abstract bool CanHandleInsert(InsertStatement statement);
+
         public abstract Task<InsertedRow> Insert(InsertStatement statement, IDbConnection connection, IDbTransaction? transaction = null);
+
+        public virtual Task PreProcessStatement(InsertStatement statement, IDbConnection connection, IDbTransaction? transaction = null) => Task.CompletedTask;
 
         protected (string columns, string values, DynamicParameters parameters) GetInsertInformation(InsertStatement statement)
         {
