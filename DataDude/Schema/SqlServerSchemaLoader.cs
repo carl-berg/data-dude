@@ -21,6 +21,7 @@ namespace DataDude.SqlServer
                     table.Select(x => new ColumnInformation(
                         x.ColumnName,
                         x.DataType,
+                        x.IsPrimaryKey,
                         x.IsIdentity,
                         x.IsNullable,
                         x.IsComputed,
@@ -86,17 +87,20 @@ namespace DataDude.SqlServer
                     t.name as TableName,
                     c.name as ColumnName,
                     y.name as DataType,
-                    c.is_nullable As IsNullable,
-                    c.is_identity as IsIdentity,
+	                ISNULL(i.is_primary_key, 0) AS IsPrimaryKey,
+	                c.is_nullable As IsNullable,
+	                c.is_identity as IsIdentity,
                     c.is_computed as IsComputed,
                     OBJECT_DEFINITION(c.default_object_id) as DefaultValue,
                     c.max_length AS MaxLength,
                     c.precision as Precision,
                     c.Scale as Scale
                 FROM sys.tables t
-                inner join sys.columns c on c.object_id = t.object_id
-                inner join sys.types y ON c.user_type_id = y.user_type_id
-                inner join sys.schemas s ON s.schema_id = t.schema_id
+                INNER JOIN sys.columns c on c.object_id = t.object_id
+                INNER JOIN sys.types y ON c.user_type_id = y.user_type_id
+                INNER JOIN sys.schemas s ON s.schema_id = t.schema_id
+                LEFT JOIN sys.index_columns ic ON c.column_id = ic.column_id AND ic.object_id = c.object_id
+                LEFT JOIN sys.indexes i ON i.object_id = ic.object_id AND i.index_id = ic.index_id AND i.is_primary_key = 1
                 ORDER BY s.name, t.name
 
                 SELECT 
@@ -132,8 +136,9 @@ namespace DataDude.SqlServer
             public string TableName { get; set; } = default!;
             public string ColumnName { get; set; } = default!;
             public string DataType { get; set; } = default!;
-            public bool IsNullable { get; set; }
+            public bool IsPrimaryKey { get; set; }
             public bool IsIdentity { get; set; }
+            public bool IsNullable { get; set; }
             public bool IsComputed { get; set; }
             public string? DefaultValue { get; set; }
             public int MaxLength { get; set; }

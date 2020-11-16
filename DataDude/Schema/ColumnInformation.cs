@@ -5,6 +5,7 @@
         public ColumnInformation(
             string name,
             string dataType,
+            bool isPrimaryKey,
             bool isIdentity,
             bool isNullable,
             bool isComputed,
@@ -15,6 +16,7 @@
         {
             Name = name;
             DataType = dataType;
+            IsPrimaryKey = isPrimaryKey;
             IsIdentity = isIdentity;
             IsNullable = isNullable;
             IsComputed = isComputed;
@@ -26,6 +28,7 @@
 
         public string Name { get; }
         public string DataType { get; } = default!;
+        public bool IsPrimaryKey { get; }
         public bool IsIdentity { get; }
         public bool IsNullable { get; }
         public bool IsComputed { get; }
