@@ -7,7 +7,7 @@ using Dapper;
 namespace DataDude.Instructions.Insert.Insertion
 {
     /// <summary>
-    /// Insert handler that can handle an insert where all primary keys have been set (but not with rawsql).
+    /// Insert handler that can handle an insert where all primary keys already are set (but not with rawsql).
     /// </summary>
     public class IdentityInsertRowHandler : RowInsertHandler
     {

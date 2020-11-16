@@ -7,9 +7,8 @@ namespace DataDude.Instructions.Insert.Insertion
 {
     /// <summary>
     /// Insert handler that uses OUTPUT inserted.* to retrieve the inserted row.
-    /// This requires any DDL triggers on the table to be disabled before the insert,
-    /// therefore the insert handler will disable all table triggers before the insert
-    /// and enable them afterwards.
+    /// This strategy requires DDL triggers on the table to be disabled before the insert,
+    /// therefore this insert handler will disable all table triggers before the insert and enable them afterwards.
     /// </summary>
     public class OutputInsertRowHandler : RowInsertHandler
     {
