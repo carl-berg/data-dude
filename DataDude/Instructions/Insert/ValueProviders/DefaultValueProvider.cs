@@ -9,8 +9,9 @@ namespace DataDude.Instructions.Insert.ValueProviders
         public void Process(TableInformation table, ColumnInformation column, ColumnValue value)
         {
             if (column.DefaultValue is { Length: > 0 } ||
-                column.IsComputed ||
+                column.IsPrimaryKey ||
                 column.IsIdentity ||
+                column.IsComputed ||
                 value.Type is ColumnValueType.Ignore or ColumnValueType.Set)
             {
                 return;
