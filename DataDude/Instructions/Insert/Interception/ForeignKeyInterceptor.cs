@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using DataDude.Instructions.Insert.Insertion;
 
 namespace DataDude.Instructions.Insert.Interception
 {
@@ -11,8 +11,7 @@ namespace DataDude.Instructions.Insert.Interception
         {
             foreach (var fk in statement.Table.ForeignKeys)
             {
-                var key = $"Inserted_{fk.ReferencedTable.Schema}.{fk.ReferencedTable.Name}";
-                if (context.Get<IList<InsertedRow>>(key) is { } inserted && inserted.LastOrDefault() is { } lastInsert)
+                if (context.InsertedRows.Where(x => x.Table == fk.ReferencedTable).LastOrDefault() is { } lastInsert)
                 {
                     foreach (var (insertValue, referencedColumn) in fk.Columns.Select(c => (statement.Data[c.Column], c.ReferencedColumn)))
                     {
@@ -24,13 +23,13 @@ namespace DataDude.Instructions.Insert.Interception
             return Task.CompletedTask;
         }
 
-        public Task OnInserted(InsertedRow insertedRow, InsertStatement statement, DataDudeContext context, IDbConnection connection, IDbTransaction? transaction = null)
-        {
-            var key = $"Inserted_{statement.Table.Schema}.{statement.Table.Name}";
-            var inserted = context.Get<IList<InsertedRow>>(key) ?? new List<InsertedRow>();
-            inserted.Add(insertedRow);
-            context.Set(key, inserted);
-            return Task.CompletedTask;
-        }
+        public Task OnInserted(
+            InsertedRow insertedRow,
+            InsertStatement statement,
+            DataDudeContext context,
+            IDbConnection connection,
+            IDbTransaction? transaction = null) => Task.CompletedTask;
+
+        public virtual bool ShouldBeInvoked(InsertStatement statement, IInsertRowHandler handler) => statement.Table.ForeignKeys.Any();
     }
 }

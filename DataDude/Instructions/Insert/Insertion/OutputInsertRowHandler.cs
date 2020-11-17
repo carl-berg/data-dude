@@ -12,9 +12,9 @@ namespace DataDude.Instructions.Insert.Insertion
     /// </summary>
     public class OutputInsertRowHandler : RowInsertHandler
     {
-        public override bool CanHandleInsert(InsertStatement statement) => true;
+        public override bool CanHandleInsert(InsertStatement statement, DataDudeContext context) => true;
 
-        public override async Task<InsertedRow> Insert(InsertStatement statement, IDbConnection connection, IDbTransaction? transaction = null)
+        public override async Task<InsertedRow> Insert(InsertStatement statement, DataDudeContext context, IDbConnection connection, IDbTransaction? transaction = null)
         {
             var (columns, values, parameters) = GetInsertInformation(statement);
             var insertedRow = await connection.QuerySingleAsync<dynamic>(
@@ -24,11 +24,11 @@ namespace DataDude.Instructions.Insert.Insertion
 
             if (insertedRow is IReadOnlyDictionary<string, object> { } typedRow)
             {
-                return new InsertedRow(typedRow, this);
+                return new InsertedRow(statement.Table, typedRow, this);
             }
             else
             {
-                throw new HandlerException("Could not parse inserted row as dictionary");
+                throw new InsertHandlerException("Could not parse inserted row as dictionary", statement: statement);
             }
         }
     }

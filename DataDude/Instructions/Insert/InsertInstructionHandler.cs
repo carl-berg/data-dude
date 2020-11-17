@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
 using DataDude.Instructions.Insert.Insertion;
-using DataDude.Schema;
 
 namespace DataDude.Instructions.Insert
 {
@@ -26,35 +23,38 @@ namespace DataDude.Instructions.Insert
                             statement.InvokeValueProvider(valueHandler);
                         }
 
-                        if (context.InsertRowHandlers.FirstOrDefault(x => x.CanHandleInsert(statement)) is IInsertRowHandler handler)
+                        if (context.InsertRowHandlers.FirstOrDefault(x => x.CanHandleInsert(statement, context)) is IInsertRowHandler handler)
                         {
-                            await handler.PreProcessStatement(statement, connection, transaction);
+                            await handler.PreProcessStatement(statement, context, connection, transaction);
 
-                            foreach (var insertInterceptor in context.InsertInterceptors)
+                            foreach (var insertInterceptor in context.InsertInterceptors.Where(x => x.ShouldBeInvoked(statement, handler)))
                             {
                                 await insertInterceptor.OnInsert(statement, context, connection, transaction);
                             }
 
-                            var insertedRow = await handler.Insert(statement, connection, transaction);
+                            var insertedRow = await handler.Insert(statement, context, connection, transaction);
+                            context.InsertedRows.Add(insertedRow);
 
-                            foreach (var insertInterceptor in context.InsertInterceptors)
+                            foreach (var insertInterceptor in context.InsertInterceptors.Where(x => x.ShouldBeInvoked(statement, handler)))
                             {
                                 await insertInterceptor.OnInserted(insertedRow, statement, context, connection, transaction);
                             }
                         }
                         else
                         {
-                            throw new HandlerException($"Could not resolve a row handler for insertion of a row in {insert.TableName}");
+                            throw new InsertHandlerException(
+                                $"Could not resolve a row handler for insertion of a row in {insert.TableName}",
+                                statement: statement);
                         }
                     }
                     catch (Exception ex)
                     {
-                        throw new HandlerException($"Insertion into table {insert.TableName} failed", ex);
+                        throw new InsertHandlerException($"Insertion into table {insert.TableName} failed", ex, statement);
                     }
                 }
                 else
                 {
-                    throw new HandlerException($"Could not find table {insert.TableName} in schema");
+                    throw new InsertHandlerException($"Could not find table {insert.TableName} in schema");
                 }
 
                 return new HandleInstructionResult(true);

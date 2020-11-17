@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
+using DataDude.Instructions.Insert.Insertion;
 
 namespace DataDude.Instructions.Insert.Interception
 {
@@ -34,6 +35,11 @@ namespace DataDude.Instructions.Insert.Interception
                 var sql = string.Join(Environment.NewLine, enableTriggerStatements);
                 await connection.ExecuteAsync(sql, transaction: transaction);
             }
+        }
+
+        public virtual bool ShouldBeInvoked(InsertStatement statement, IInsertRowHandler handler)
+        {
+            return handler is OutputInsertRowHandler && statement.Table.Triggers.Any(x => !x.IsDisabled);
         }
     }
 }

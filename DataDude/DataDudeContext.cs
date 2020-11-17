@@ -40,11 +40,16 @@ namespace DataDude
 
         public IList<IInsertRowHandler> InsertRowHandlers { get; } = new List<IInsertRowHandler>
         {
-            new IdentityInsertRowHandler(new UniqueValueGenerator()),
+            new IdentityInsertRowHandler(),
+            new GeneratingInsertRowHandler(),
             new OutputInsertRowHandler(),
         };
 
+        public IList<InsertedRow> InsertedRows { get; } = new List<InsertedRow>();
+
         public SchemaInformation? Schema { get; internal set; }
+
+        public UniqueValueGenerator PrimaryKeyValueGenerator { get; set; }
 
         public T? Get<T>(string key)
         {

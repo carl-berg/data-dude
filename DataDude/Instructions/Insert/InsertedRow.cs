@@ -1,18 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using DataDude.Instructions.Insert.Insertion;
+using DataDude.Schema;
 
 namespace DataDude.Instructions.Insert
 {
     public sealed class InsertedRow : IEnumerable<(string Column, object Value)>
     {
         private readonly IReadOnlyDictionary<string, object> _insertedRow;
-        public InsertedRow(IReadOnlyDictionary<string, object> insertedRow, IInsertRowHandler handler)
+        public InsertedRow(TableInformation table, IReadOnlyDictionary<string, object> insertedRow, IInsertRowHandler handler)
         {
-            _insertedRow = insertedRow;
+            Table = table;
             Handler = handler;
+            _insertedRow = insertedRow;
         }
 
+        public TableInformation Table { get; }
         public IInsertRowHandler Handler { get; }
         public int Count => _insertedRow.Count;
         public object this[string key] => _insertedRow[key];

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
@@ -9,11 +8,11 @@ namespace DataDude.Instructions.Insert.Insertion
 {
     public abstract class RowInsertHandler : IInsertRowHandler
     {
-        public abstract bool CanHandleInsert(InsertStatement statement);
+        public abstract bool CanHandleInsert(InsertStatement statement, DataDudeContext context);
 
-        public abstract Task<InsertedRow> Insert(InsertStatement statement, IDbConnection connection, IDbTransaction? transaction = null);
+        public abstract Task<InsertedRow> Insert(InsertStatement statement, DataDudeContext context, IDbConnection connection, IDbTransaction? transaction = null);
 
-        public virtual Task PreProcessStatement(InsertStatement statement, IDbConnection connection, IDbTransaction? transaction = null) => Task.CompletedTask;
+        public virtual Task PreProcessStatement(InsertStatement statement, DataDudeContext context, IDbConnection connection, IDbTransaction? transaction = null) => Task.CompletedTask;
 
         protected (string columns, string values, DynamicParameters parameters) GetInsertInformation(InsertStatement statement)
         {
