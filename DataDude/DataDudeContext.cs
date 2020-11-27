@@ -24,7 +24,6 @@ namespace DataDude
 
         public IList<IInsertInterceptor> InsertInterceptors { get; } = new List<IInsertInterceptor>
         {
-            new DisableTableTriggersInsertInterceptor(),
             new IndentityInsertInterceptor(),
         };
 
@@ -42,7 +41,6 @@ namespace DataDude
         {
             new IdentityInsertRowHandler(),
             new GeneratingInsertRowHandler(),
-            new OutputInsertRowHandler(),
         };
 
         public IList<InsertedRow> InsertedRows { get; } = new List<InsertedRow>();

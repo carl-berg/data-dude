@@ -8,6 +8,5 @@ namespace DataDude.Instructions.Insert.Interception
     {
         Task OnInsert(InsertStatement statement, DataDudeContext context, IDbConnection connection, IDbTransaction? transaction = null);
         Task OnInserted(InsertedRow insertedRow, InsertStatement statement, DataDudeContext context, IDbConnection connection, IDbTransaction? transaction = null);
-        bool ShouldBeInvoked(InsertStatement statement, IInsertRowHandler handler);
     }
 }

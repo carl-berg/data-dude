@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
-using DataDude.Instructions.Insert.Insertion;
 
 namespace DataDude.Instructions.Insert.Interception
 {
@@ -29,7 +28,5 @@ namespace DataDude.Instructions.Insert.Interception
             DataDudeContext context,
             IDbConnection connection,
             IDbTransaction? transaction = null) => Task.CompletedTask;
-
-        public virtual bool ShouldBeInvoked(InsertStatement statement, IInsertRowHandler handler) => statement.Table.ForeignKeys.Any();
     }
 }

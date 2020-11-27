@@ -23,19 +23,19 @@ namespace DataDude.Instructions.Insert
                             statement.InvokeValueProvider(valueHandler);
                         }
 
+                        foreach (var insertInterceptor in context.InsertInterceptors)
+                        {
+                            await insertInterceptor.OnInsert(statement, context, connection, transaction);
+                        }
+
                         if (context.InsertRowHandlers.FirstOrDefault(x => x.CanHandleInsert(statement, context)) is IInsertRowHandler handler)
                         {
                             await handler.PreProcessStatement(statement, context, connection, transaction);
 
-                            foreach (var insertInterceptor in context.InsertInterceptors.Where(x => x.ShouldBeInvoked(statement, handler)))
-                            {
-                                await insertInterceptor.OnInsert(statement, context, connection, transaction);
-                            }
-
                             var insertedRow = await handler.Insert(statement, context, connection, transaction);
                             context.InsertedRows.Add(insertedRow);
 
-                            foreach (var insertInterceptor in context.InsertInterceptors.Where(x => x.ShouldBeInvoked(statement, handler)))
+                            foreach (var insertInterceptor in context.InsertInterceptors)
                             {
                                 await insertInterceptor.OnInserted(insertedRow, statement, context, connection, transaction);
                             }

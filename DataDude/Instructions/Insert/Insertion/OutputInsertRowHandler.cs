@@ -17,10 +17,12 @@ namespace DataDude.Instructions.Insert.Insertion
         public override async Task<InsertedRow> Insert(InsertStatement statement, DataDudeContext context, IDbConnection connection, IDbTransaction? transaction = null)
         {
             var (columns, values, parameters) = GetInsertInformation(statement);
+            await statement.Table.DisableTriggers(connection, transaction);
             var insertedRow = await connection.QuerySingleAsync<dynamic>(
                 $@"INSERT INTO {statement.Table.Schema}.{statement.Table.Name}({columns}) OUTPUT inserted.* VALUES({values})",
                 parameters,
                 transaction);
+            await statement.Table.EnableTriggers(connection, transaction);
 
             if (insertedRow is IReadOnlyDictionary<string, object> { } typedRow)
             {
