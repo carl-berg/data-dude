@@ -65,7 +65,7 @@ These are the handlers that do the actual insertion. Only the first insert handl
 - `IdentityInsertRowHandler` handles insertion when there is only one primary key with identity. The inserted row retrieved using `SCOPE_IDENTITY()`
 - `GeneratingInsertRowHandler` handes inserts by generating unspecified primary keys when possible*
 
-*) Uses specified default column values if possible, if not available will generate keys if data type is one if `uniqueidentifier`, `nvarchar`, `varchar`, shortint`, `int`, `bigint`.
+*) Uses specified default column values if possible, if not available will generate keys if data type is one if `uniqueidentifier`, `nvarchar`, `varchar`, `shortint`, `int`, `bigint`.
 
 There is one other insert handler available, `OutputInsertRowHandler` which uses `OUTPUT identity.*` to get ahold of the inserted row, is not enabled by default since the default two should cover most bases and since it it also needs to disable any table triggers in order to perform the insert, which might not be what you want. If you do want to use it, it can be plugged in like this:
 ```csharp
