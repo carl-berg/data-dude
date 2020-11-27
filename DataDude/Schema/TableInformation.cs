@@ -21,6 +21,7 @@ namespace DataDude.Schema
 
         public string Schema { get; }
         public string Name { get; }
+        public string FullName => $"{Schema}.{Name}";
         public IEnumerable<ForeignKeyInformation> ForeignKeys => _foreignKeys;
         public IEnumerable<TriggerInformation> Triggers => _triggers;
         public ColumnInformation? this[string name] => _columns.TryGetValue(name, out var column) ? column : null;

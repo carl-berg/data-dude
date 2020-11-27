@@ -13,7 +13,7 @@ namespace DataDude.Instructions
         {
             var disableTriggerStatements = table.Triggers
                 .Where(x => !x.IsDisabled)
-                .Select(x => $"DISABLE TRIGGER {x.Name} ON {table.Schema}.{table.Name}");
+                .Select(x => $"DISABLE TRIGGER {x.Name} ON {table.FullName}");
             if (disableTriggerStatements.Any())
             {
                 var sql = string.Join(Environment.NewLine, disableTriggerStatements);
@@ -25,7 +25,7 @@ namespace DataDude.Instructions
         {
             var enableTriggerStatements = table.Triggers
                 .Where(x => !x.IsDisabled)
-                .Select(x => $"ENABLE TRIGGER {x.Name} ON {table.Schema}.{table.Name}");
+                .Select(x => $"ENABLE TRIGGER {x.Name} ON {table.FullName}");
             if (enableTriggerStatements.Any())
             {
                 var sql = string.Join(Environment.NewLine, enableTriggerStatements);

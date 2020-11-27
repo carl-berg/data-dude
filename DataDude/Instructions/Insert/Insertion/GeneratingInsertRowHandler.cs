@@ -23,8 +23,8 @@ namespace DataDude.Instructions.Insert.Insertion
             var identityFilters = statement.Table.Where(x => x.IsPrimaryKey).Select(x => $"{x.Name} = {GetParameterNameOrRawSql(x, statement.Data[x])}");
             var identityFilter = string.Join(" AND ", identityFilters);
             var insertedRow = await connection.QuerySingleAsync<object>(
-                $@"INSERT INTO {statement.Table.Schema}.{statement.Table.Name}({columns}) VALUES({values})
-                SELECT * FROM {statement.Table.Schema}.{statement.Table.Name} WHERE {identityFilter}",
+                $@"INSERT INTO {statement.Table.FullName}({columns}) VALUES({values})
+                SELECT * FROM {statement.Table.FullName} WHERE {identityFilter}",
                 parameters,
                 transaction);
 

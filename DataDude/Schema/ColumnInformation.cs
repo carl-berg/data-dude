@@ -30,6 +30,7 @@
 
         public TableInformation Table { get; }
         public string Name { get; }
+        public string FullName => $"{Table.FullName}.{Name}";
         public string DataType { get; } = default!;
         public bool IsPrimaryKey { get; }
         public bool IsIdentity { get; }

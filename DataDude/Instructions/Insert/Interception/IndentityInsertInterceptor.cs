@@ -11,7 +11,7 @@ namespace DataDude.Instructions.Insert.Interception
         {
             if (statement.Data.Any(x => x.Value.Type == ColumnValueType.Set && x.Column.IsIdentity))
             {
-                await connection.ExecuteAsync($"SET IDENTITY_INSERT {statement.Table.Schema}.{statement.Table.Name} ON", transaction: transaction);
+                await connection.ExecuteAsync($"SET IDENTITY_INSERT {statement.Table.FullName} ON", transaction: transaction);
             }
         }
 
@@ -19,7 +19,7 @@ namespace DataDude.Instructions.Insert.Interception
         {
             if (statement.Data.Any(x => x.Value.Type == ColumnValueType.Set && x.Column.IsIdentity))
             {
-                await connection.ExecuteAsync($"SET IDENTITY_INSERT {statement.Table.Schema}.{statement.Table.Name} OFF", transaction: transaction);
+                await connection.ExecuteAsync($"SET IDENTITY_INSERT {statement.Table.FullName} OFF", transaction: transaction);
             }
         }
     }

@@ -19,7 +19,7 @@ namespace DataDude.Instructions.Insert.Insertion
             var (columns, values, parameters) = GetInsertInformation(statement);
             await statement.Table.DisableTriggers(connection, transaction);
             var insertedRow = await connection.QuerySingleAsync<dynamic>(
-                $@"INSERT INTO {statement.Table.Schema}.{statement.Table.Name}({columns}) OUTPUT inserted.* VALUES({values})",
+                $@"INSERT INTO {statement.Table.FullName}({columns}) OUTPUT inserted.* VALUES({values})",
                 parameters,
                 transaction);
             await statement.Table.EnableTriggers(connection, transaction);

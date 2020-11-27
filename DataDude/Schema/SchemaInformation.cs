@@ -8,7 +8,7 @@ namespace DataDude.Schema
     {
         private readonly IDictionary<string, TableInformation> _tables;
         public SchemaInformation(IEnumerable<TableInformation> tables) => _tables = tables
-            .ToDictionary(x => $"{x.Schema}.{x.Name}", x => x);
+            .ToDictionary(x => $"{x.FullName}", x => x);
 
         public TableInformation? this[string tableName]
         {
