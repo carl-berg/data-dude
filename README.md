@@ -16,10 +16,10 @@ Data dude is at its core an instruction handler, which means that it handles ins
 Inserts are what Data dude does best. It can insert rows based on schema-knowledge and configurable handling. That way you should be able to just specify the data you acually care about. Other column values should be taken care of by the dude. With its default configuration it should be able to handle most cases, but when you encounter edge cases or want to re-configure the default behavior, there are some knobs to tweak:
 
 #### InsertValueProviders
-They provide default column values for the usual data types before an insert is made. If you want to add your own default values, you can configure them like this:
+They provide default column values for the usual data types before an insert is made. If you want to add your own default values, you can configure them using shorthand like this:
 ```csharp
 await new DataDude()
-    .ConfigureCustomColumnValues(((column, _) => column.Name == "Name",  "Jane Doe"))
+    .ConfigureCustomColumnValues(((column, value) => column.Name == "Name",  "Jane Doe"))
     .Insert("Employee")
     .Go(connection);
 ```
