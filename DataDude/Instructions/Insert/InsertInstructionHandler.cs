@@ -30,8 +30,6 @@ namespace DataDude.Instructions.Insert
 
                         if (context.InsertRowHandlers.FirstOrDefault(x => x.CanHandleInsert(statement, context)) is IInsertRowHandler handler)
                         {
-                            await handler.PreProcessStatement(statement, context, connection, transaction);
-
                             var insertedRow = await handler.Insert(statement, context, connection, transaction);
                             context.InsertedRows.Add(insertedRow);
 

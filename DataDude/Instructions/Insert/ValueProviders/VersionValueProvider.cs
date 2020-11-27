@@ -2,7 +2,7 @@
 
 namespace DataDude.Instructions.Insert.ValueProviders
 {
-    public class VersionValueProvider : DefaultValueProvider
+    public class VersionValueProvider : ValueProvider
     {
         protected override ColumnValue? GetDefaultValue(TableInformation table, ColumnInformation column, ColumnValue value)
         {

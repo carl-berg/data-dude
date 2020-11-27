@@ -4,7 +4,7 @@ using DataDude.Schema;
 
 namespace DataDude.Instructions.Insert.ValueProviders
 {
-    public abstract class DefaultValueProvider : IInsertValueProvider
+    public abstract class ValueProvider : IInsertValueProvider
     {
         public void Process(TableInformation table, ColumnInformation column, ColumnValue value)
         {

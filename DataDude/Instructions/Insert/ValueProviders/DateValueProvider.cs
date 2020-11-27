@@ -3,7 +3,7 @@ using DataDude.Schema;
 
 namespace DataDude.Instructions.Insert.ValueProviders
 {
-    public class DateValueProvider : DefaultValueProvider
+    public class DateValueProvider : ValueProvider
     {
         protected override ColumnValue? GetDefaultValue(TableInformation table, ColumnInformation column, ColumnValue value)
         {

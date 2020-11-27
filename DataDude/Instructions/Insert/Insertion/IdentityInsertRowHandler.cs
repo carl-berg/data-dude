@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
@@ -21,20 +20,13 @@ namespace DataDude.Instructions.Insert.Insertion
         {
             var (columns, values, parameters) = GetInsertInformation(statement);
             var primaryKey = statement.Table.Single(x => x.IsPrimaryKey && x.IsIdentity);
-            var insertedRow = await connection.QuerySingleAsync<dynamic>(
+            var insertedRow = await connection.QuerySingleAsync<object>(
                 $@"INSERT INTO {statement.Table.Schema}.{statement.Table.Name}({columns}) VALUES({values})
                 SELECT * FROM {statement.Table.Schema}.{statement.Table.Name} WHERE {primaryKey.Name} = SCOPE_IDENTITY()",
                 parameters,
                 transaction);
 
-            if (insertedRow is IReadOnlyDictionary<string, object> { } typedRow)
-            {
-                return new InsertedRow(statement.Table, typedRow, this);
-            }
-            else
-            {
-                throw new InsertHandlerException("Could not parse inserted row as dictionary", statement: statement);
-            }
+            return MakeInsertedRow(statement, insertedRow);
         }
     }
 }
