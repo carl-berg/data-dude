@@ -5,7 +5,7 @@ using Dapper;
 
 namespace DataDude.Instructions.Insert.Interception
 {
-    public class IndentityInsertInterceptor : IInsertInterceptor
+    public class IdentityInsertInterceptor : IInsertInterceptor
     {
         public async Task OnInsert(InsertStatement statement, InsertContext context, IDbConnection connection, IDbTransaction? transaction = null)
         {
