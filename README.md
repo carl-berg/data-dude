@@ -5,7 +5,7 @@ Get started with Data dude:
 ```csharp
 await new DataDude()
     .Insert("Department")
-    .Insert("Employee", new { Name = "John Doe"})
+    .Insert("Employee", new { Name = "John Doe" })
     .Go(connection);
 ```
 
@@ -67,7 +67,7 @@ These are the handlers that do the actual insertion. Only the first insert handl
 
 *) Uses specified default column values if possible, if not available will generate keys if data type is one if `uniqueidentifier`, `nvarchar`, `varchar`, `shortint`, `int`, `bigint`.
 
-There is one other insert handler available, `OutputInsertRowHandler` which uses `OUTPUT identity.*` to get ahold of the inserted row, is not enabled by default since the default two should cover most bases and since it it also needs to disable any table triggers in order to perform the insert, which might not be what you want. If you do want to use it, it can be plugged in like this:
+There is one other insert handler available, `OutputInsertRowHandler` which uses `OUTPUT identity.*` to get ahold of the inserted row, not enabled by default since the default two should cover most bases and since it it also needs to disable any table triggers in order to perform the insert, which might not be what you want. If you do want to use it, it can be plugged in like this:
 ```csharp
 dude.ConfigureInsert(x => x.InsertRowHandlers.Add(new OutputInsertRowHandler()));
 ```
