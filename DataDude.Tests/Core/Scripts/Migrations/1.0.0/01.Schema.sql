@@ -44,6 +44,20 @@ CREATE TABLE Buildings.OfficeExtension (
 )
 GO
 
+CREATE TABLE Test_Generated_PK_Scenario_1(
+	Id1 INT NOT NULL,
+	Id2 INT NOT NULL,
+	CONSTRAINT PK_Test_PK_Scenarios_1 PRIMARY KEY (Id1, Id2),
+)
+GO
+
+CREATE TABLE Test_Generated_PK_Scenario_2(
+	Id1 INT NOT NULL,
+	Id2 UNIQUEIDENTIFIER DEFAULT(newid()),
+	CONSTRAINT PK_Test_PK_Scenarios_2 PRIMARY KEY (Id1, Id2),
+)
+GO
+
 CREATE TRIGGER People.EmployeeUpdatedAt ON People.Employee AFTER UPDATE AS BEGIN
 	UPDATE People.Employee 
 		SET People.Employee.UpdatedAt = GETDATE()
