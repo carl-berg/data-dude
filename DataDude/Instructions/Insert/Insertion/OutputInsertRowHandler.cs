@@ -12,9 +12,9 @@ namespace DataDude.Instructions.Insert.Insertion
     /// </summary>
     public class OutputInsertRowHandler : RowInsertHandler
     {
-        public override bool CanHandleInsert(InsertStatement statement, DataDudeContext context) => true;
+        public override bool CanHandleInsert(InsertStatement statement, InsertContext context) => true;
 
-        public override async Task<InsertedRow> Insert(InsertStatement statement, DataDudeContext context, IDbConnection connection, IDbTransaction? transaction = null)
+        public override async Task<InsertedRow> Insert(InsertStatement statement, InsertContext context, IDbConnection connection, IDbTransaction? transaction = null)
         {
             var (columns, values, parameters) = GetInsertInformation(statement);
             await statement.Table.DisableTriggers(connection, transaction);

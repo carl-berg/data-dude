@@ -26,7 +26,7 @@ namespace DataDude
 
         public static DataDude EnableAutomaticForeignKeys(this DataDude dude)
         {
-            dude.Configure(x => x.InsertInterceptors.Add(new ForeignKeyInterceptor()));
+            dude.Configure(x => InsertContext.Get(x)?.InsertInterceptors.Add(new ForeignKeyInterceptor()));
             return dude;
         }
 

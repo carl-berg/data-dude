@@ -6,7 +6,7 @@ namespace DataDude.Instructions.Insert.Interception
 {
     public class ForeignKeyInterceptor : IInsertInterceptor
     {
-        public Task OnInsert(InsertStatement statement, DataDudeContext context, IDbConnection connection, IDbTransaction? transaction = null)
+        public Task OnInsert(InsertStatement statement, InsertContext context, IDbConnection connection, IDbTransaction? transaction = null)
         {
             foreach (var fk in statement.Table.ForeignKeys)
             {
@@ -25,7 +25,7 @@ namespace DataDude.Instructions.Insert.Interception
         public Task OnInserted(
             InsertedRow insertedRow,
             InsertStatement statement,
-            DataDudeContext context,
+            InsertContext context,
             IDbConnection connection,
             IDbTransaction? transaction = null) => Task.CompletedTask;
     }

@@ -12,11 +12,11 @@ namespace DataDude.Instructions.Insert.Insertion
     /// </summary>
     public class GeneratingInsertRowHandler : RowInsertHandler
     {
-        public override bool CanHandleInsert(InsertStatement statement, DataDudeContext context) => statement.Data
+        public override bool CanHandleInsert(InsertStatement statement, InsertContext context) => statement.Data
             .Where(x => x.Column.IsPrimaryKey)
             .All(x => CanHandleInsertOfPKColumn(statement.Table, x.Column, x.Value, context));
 
-        public override async Task<InsertedRow> Insert(InsertStatement statement, DataDudeContext context, IDbConnection connection, IDbTransaction? transaction = null)
+        public override async Task<InsertedRow> Insert(InsertStatement statement, InsertContext context, IDbConnection connection, IDbTransaction? transaction = null)
         {
             await PreProcessStatement(statement, context, connection, transaction);
             var (columns, values, parameters) = GetInsertInformation(statement);
@@ -46,7 +46,7 @@ namespace DataDude.Instructions.Insert.Insertion
             }
         }
 
-        protected virtual bool CanHandleInsertOfPKColumn(TableInformation table, ColumnInformation column, ColumnValue value, DataDudeContext context)
+        protected virtual bool CanHandleInsertOfPKColumn(TableInformation table, ColumnInformation column, ColumnValue value, InsertContext context)
         {
             if (value.Type == ColumnValueType.Set)
             {
@@ -61,7 +61,7 @@ namespace DataDude.Instructions.Insert.Insertion
             return column.DefaultValue is { } || context.PrimaryKeyValueGenerator.CanHandle(table, column);
         }
 
-        protected virtual async Task PreProcessStatement(InsertStatement statement, DataDudeContext context, IDbConnection connection, IDbTransaction? transaction = null)
+        protected virtual async Task PreProcessStatement(InsertStatement statement, InsertContext context, IDbConnection connection, IDbTransaction? transaction = null)
         {
             // Attempt to use specified raw-sql values or default values
             if (GetDatabaseGenratedValuePairs(statement) is { } fetch && fetch.Count() > 0)

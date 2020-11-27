@@ -8,6 +8,13 @@ namespace DataDude.Instructions.Insert
 {
     public class InsertInstructionHandler : IInstructionHandler
     {
+        public InsertInstructionHandler(DataDudeContext context)
+        {
+            Context = new InsertContext(context);
+        }
+
+        private InsertContext Context { get; }
+
         public virtual async Task<HandleInstructionResult> Handle(IInstruction instruction, DataDudeContext context, IDbConnection connection, IDbTransaction? transaction = null)
         {
             if (instruction is InsertInstruction insert)
@@ -18,24 +25,24 @@ namespace DataDude.Instructions.Insert
 
                     try
                     {
-                        foreach (var valueHandler in context.InsertValueProviders)
+                        foreach (var valueHandler in Context.InsertValueProviders)
                         {
                             statement.InvokeValueProvider(valueHandler);
                         }
 
-                        foreach (var insertInterceptor in context.InsertInterceptors)
+                        foreach (var insertInterceptor in Context.InsertInterceptors)
                         {
-                            await insertInterceptor.OnInsert(statement, context, connection, transaction);
+                            await insertInterceptor.OnInsert(statement, Context, connection, transaction);
                         }
 
-                        if (context.InsertRowHandlers.FirstOrDefault(x => x.CanHandleInsert(statement, context)) is IInsertRowHandler handler)
+                        if (Context.InsertRowHandlers.FirstOrDefault(x => x.CanHandleInsert(statement, Context)) is IInsertRowHandler handler)
                         {
-                            var insertedRow = await handler.Insert(statement, context, connection, transaction);
-                            context.InsertedRows.Add(insertedRow);
+                            var insertedRow = await handler.Insert(statement, Context, connection, transaction);
+                            Context.InsertedRows.Add(insertedRow);
 
-                            foreach (var insertInterceptor in context.InsertInterceptors)
+                            foreach (var insertInterceptor in Context.InsertInterceptors)
                             {
-                                await insertInterceptor.OnInserted(insertedRow, statement, context, connection, transaction);
+                                await insertInterceptor.OnInserted(insertedRow, statement, Context, connection, transaction);
                             }
                         }
                         else

@@ -10,13 +10,13 @@ namespace DataDude.Instructions.Insert.Insertion
     /// </summary>
     public class IdentityInsertRowHandler : RowInsertHandler
     {
-        public override bool CanHandleInsert(InsertStatement statement, DataDudeContext context)
+        public override bool CanHandleInsert(InsertStatement statement, InsertContext context)
         {
             var primaryKeys = statement.Table.Where(x => x.IsPrimaryKey);
             return primaryKeys.Count() == 1 && primaryKeys.All(x => x.IsIdentity);
         }
 
-        public override async Task<InsertedRow> Insert(InsertStatement statement, DataDudeContext context, IDbConnection connection, IDbTransaction? transaction = null)
+        public override async Task<InsertedRow> Insert(InsertStatement statement, InsertContext context, IDbConnection connection, IDbTransaction? transaction = null)
         {
             var (columns, values, parameters) = GetInsertInformation(statement);
             var primaryKey = statement.Table.Single(x => x.IsPrimaryKey && x.IsIdentity);
