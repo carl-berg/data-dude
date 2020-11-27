@@ -37,6 +37,13 @@ CREATE TABLE People.OfficeOccupancy (
 )
 GO
 
+CREATE TABLE Buildings.OfficeExtension (
+	Id INT IDENTITY PRIMARY KEY,
+	ExtensionsNumber NVARCHAR(50) NOT NULL,
+	CONSTRAINT FK_OfficeExtension_Office FOREIGN KEY (Id) references Buildings.Office(Id),
+)
+GO
+
 CREATE TRIGGER People.EmployeeUpdatedAt ON People.Employee AFTER UPDATE AS BEGIN
 	UPDATE People.Employee 
 		SET People.Employee.UpdatedAt = GETDATE()

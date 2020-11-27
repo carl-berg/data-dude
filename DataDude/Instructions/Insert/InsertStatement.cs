@@ -1,8 +1,10 @@
-﻿using DataDude.Instructions.Insert.ValueProviders;
+﻿using System.Diagnostics;
+using DataDude.Instructions.Insert.ValueProviders;
 using DataDude.Schema;
 
 namespace DataDude.Instructions.Insert
 {
+    [DebuggerDisplay("INSERT {Table}")]
     public class InsertStatement
     {
         public InsertStatement(TableInformation table, InsertInstruction instruction)

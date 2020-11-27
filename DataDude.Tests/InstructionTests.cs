@@ -85,6 +85,21 @@ namespace DataDude.Tests
         }
 
         [Fact]
+        public async Task Test_Can_Insert_With_Automatic_Foreign_Keys_PK_Is_Also_FK()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await new DataDude()
+                .EnableAutomaticForeignKeys()
+                .Insert("Office")
+                .Insert("OfficeExtension")
+                .Go(connection);
+
+            var extensions = await connection.QueryAsync<dynamic>("SELECT * FROM Buildings.OfficeExtension");
+            extensions.ShouldHaveSingleItem();
+        }
+
+        [Fact]
         public async Task Test_Can_Insert_With_Raw_SQL()
         {
             using var connection = Fixture.CreateNewConnection();
