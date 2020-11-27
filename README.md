@@ -1,5 +1,5 @@
 # Data dude
-Data Dude is a library to help create test data based on the database schema. Data dude borrows heavily from [CaptainData](https://github.com/mattiasnordqvist/Captain-Data) but its internals and strategy differs a bit which is supposed to make it more extendable and configurable.
+Data Dude is a library to help create test data based on the database schema. Data dude is inspired by [CaptainData](https://github.com/mattiasnordqvist/Captain-Data) but its internals and strategy differs a bit which is supposed to make it more extendable and configurable.
 
 Get started with Data dude:
 ```csharp
