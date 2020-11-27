@@ -143,5 +143,19 @@ namespace DataDude.Tests
             var name = await connection.QuerySingleAsync<string>("SELECT Name FROM Buildings.Office");
             name.ShouldBe("ABC");
         }
+
+        [Fact]
+        public async Task Test_Can_Specify_Custom_Defaults()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await new DataDude()
+                .ConfigureCustomColumnValues(((column, _) => column.Name == "Name",  "Custom default"))
+                .Insert("Office")
+                .Go(connection);
+
+            var name = await connection.QuerySingleAsync<string>("SELECT Name FROM Buildings.Office");
+            name.ShouldBe("Custom default");
+        }
     }
 }
