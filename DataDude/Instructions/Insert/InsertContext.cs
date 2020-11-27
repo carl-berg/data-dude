@@ -10,7 +10,6 @@ namespace DataDude.Instructions.Insert
         public InsertContext(DataDudeContext context)
         {
             context.Set("InsertContext", this);
-            PrimaryKeyValueGenerator = new UniqueValueGenerator();
         }
 
         public IList<IInsertInterceptor> InsertInterceptors { get; } = new List<IInsertInterceptor>
@@ -31,11 +30,10 @@ namespace DataDude.Instructions.Insert
         public IList<IInsertRowHandler> InsertRowHandlers { get; } = new List<IInsertRowHandler>
         {
             new IdentityInsertRowHandler(),
-            new GeneratingInsertRowHandler(),
+            new GeneratingInsertRowHandler(new UniqueValueGenerator()),
         };
 
         public IList<InsertedRow> InsertedRows { get; } = new List<InsertedRow>();
-        public UniqueValueGenerator PrimaryKeyValueGenerator { get; set; }
 
         public static InsertContext? Get(DataDudeContext context) => context.Get<InsertContext>("InsertContext");
     }

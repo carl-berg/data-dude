@@ -12,6 +12,13 @@ namespace DataDude.Instructions.Insert.Insertion
     /// </summary>
     public class GeneratingInsertRowHandler : RowInsertHandler
     {
+        public GeneratingInsertRowHandler(UniqueValueGenerator uniqueValueGenerator)
+        {
+            PrimaryKeyValueGenerator = uniqueValueGenerator;
+        }
+
+        public UniqueValueGenerator PrimaryKeyValueGenerator { get; set; }
+
         public override bool CanHandleInsert(InsertStatement statement, InsertContext context) => statement.Data
             .Where(x => x.Column.IsPrimaryKey)
             .All(x => CanHandleInsertOfPKColumn(x.Column, x.Value, context));
@@ -58,7 +65,7 @@ namespace DataDude.Instructions.Insert.Insertion
                 return false;
             }
 
-            return column.DefaultValue is { } || context.PrimaryKeyValueGenerator.CanHandle(column);
+            return column.DefaultValue is { } || PrimaryKeyValueGenerator.CanHandle(column);
         }
 
         protected virtual async Task PreProcessStatement(InsertStatement statement, InsertContext context, IDbConnection connection, IDbTransaction? transaction = null)
@@ -80,30 +87,10 @@ namespace DataDude.Instructions.Insert.Insertion
                 }
             }
 
-            // Attempt to generate new id's based on previously inserted rows
-            if (context.InsertedRows.Where(x => x.Table == statement.Table).LastOrDefault() is { } lastInsert)
-            {
-                foreach (var (column, value) in statement.Data.Where(x => x.Column.IsPrimaryKey && x.Value.Type == ColumnValueType.NotSet))
-                {
-                    if (lastInsert?[column.Name] is int intValue)
-                    {
-                        statement.Data[column].Set(new ColumnValue(intValue + 1));
-                    }
-                    else if (lastInsert?[column.Name] is long longValue)
-                    {
-                        statement.Data[column].Set(new ColumnValue(longValue + 1));
-                    }
-                    else if (lastInsert?[column.Name] is short shortValue)
-                    {
-                        statement.Data[column].Set(new ColumnValue(shortValue + 1));
-                    }
-                }
-            }
-
             // Attempt to generate new id's using unique value generator
             foreach (var (column, value) in statement.Data.Where(x => x.Column.IsPrimaryKey && x.Value.Type == ColumnValueType.NotSet))
             {
-                var generatedValue = context.PrimaryKeyValueGenerator.GenerateValue(column);
+                var generatedValue = PrimaryKeyValueGenerator.GenerateValue(context, column);
                 statement.Data[column].Set(new ColumnValue(generatedValue));
             }
         }
