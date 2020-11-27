@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 
 namespace DataDude.Instructions.Insert.Interception
 {
+    /// <summary>
+    /// Attempts to set fk columns based on last previous inserted row if possible.
+    /// </summary>
     public class ForeignKeyInterceptor : IInsertInterceptor
     {
         public Task OnInsert(InsertStatement statement, InsertContext context, IDbConnection connection, IDbTransaction? transaction = null)

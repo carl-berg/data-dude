@@ -26,32 +26,20 @@ namespace DataDude
 
         public static DataDude EnableAutomaticForeignKeys(this DataDude dude)
         {
-            dude.Configure(x => InsertContext.Get(x)?.InsertInterceptors.Add(new ForeignKeyInterceptor()));
+            dude.ConfigureInsert(x => x.InsertInterceptors.Add(new ForeignKeyInterceptor()));
             return dude;
         }
 
-        public static async Task DisableTriggers(this TableInformation table, IDbConnection connection, IDbTransaction? transaction = null)
+        public static DataDude ConfigureInsert(this DataDude dude, Action<InsertContext> configure)
         {
-            var disableTriggerStatements = table.Triggers
-                .Where(x => !x.IsDisabled)
-                .Select(x => $"DISABLE TRIGGER {x.Name} ON {table.Schema}.{table.Name}");
-            if (disableTriggerStatements.Any())
+            dude.Configure(x =>
             {
-                var sql = string.Join(Environment.NewLine, disableTriggerStatements);
-                await connection.ExecuteAsync(sql, transaction: transaction);
-            }
-        }
-
-        public static async Task EnableTriggers(this TableInformation table, IDbConnection connection, IDbTransaction? transaction = null)
-        {
-            var enableTriggerStatements = table.Triggers
-                .Where(x => !x.IsDisabled)
-                .Select(x => $"ENABLE TRIGGER {x.Name} ON {table.Schema}.{table.Name}");
-            if (enableTriggerStatements.Any())
-            {
-                var sql = string.Join(Environment.NewLine, enableTriggerStatements);
-                await connection.ExecuteAsync(sql, transaction: transaction);
-            }
+                if (InsertContext.Get(x) is { } context)
+                {
+                    configure(context);
+                }
+            });
+            return dude;
         }
     }
 }
