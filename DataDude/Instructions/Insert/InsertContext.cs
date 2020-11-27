@@ -18,7 +18,7 @@ namespace DataDude.Instructions.Insert
             new IndentityInsertInterceptor(),
         };
 
-        public IList<IInsertValueProvider> InsertValueProviders { get; } = new List<IInsertValueProvider>
+        public IList<IValueProvider> InsertValueProviders { get; } = new List<IValueProvider>
         {
             new StringValueProvider(),
             new NumericValueProvider(),

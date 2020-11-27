@@ -3,6 +3,7 @@
     public class ColumnInformation
     {
         public ColumnInformation(
+            TableInformation table,
             string name,
             string dataType,
             bool isPrimaryKey,
@@ -14,6 +15,7 @@
             int precision,
             int scale)
         {
+            Table = table;
             Name = name;
             DataType = dataType;
             IsPrimaryKey = isPrimaryKey;
@@ -26,6 +28,7 @@
             Scale = scale;
         }
 
+        public TableInformation Table { get; }
         public string Name { get; }
         public string DataType { get; } = default!;
         public bool IsPrimaryKey { get; }

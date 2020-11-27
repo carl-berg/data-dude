@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,11 +10,11 @@ namespace DataDude.Schema
         private readonly IDictionary<string, ColumnInformation> _columns;
         private readonly IList<ForeignKeyInformation> _foreignKeys;
         private readonly IList<TriggerInformation> _triggers;
-        public TableInformation(string schema, string name, IEnumerable<ColumnInformation> columns)
+        public TableInformation(string schema, string name, Func<TableInformation, IEnumerable<ColumnInformation>> getColumns)
         {
             Schema = schema;
             Name = name;
-            _columns = columns.ToDictionary(x => x.Name, x => x);
+            _columns = getColumns(this).ToDictionary(x => x.Name, x => x);
             _foreignKeys = new List<ForeignKeyInformation>();
             _triggers = new List<TriggerInformation>();
         }

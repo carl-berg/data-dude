@@ -18,7 +18,8 @@ namespace DataDude.SqlServer
                 .Select(table => new TableInformation(
                     table.Key.TableSchema,
                     table.Key.TableName,
-                    table.Select(x => new ColumnInformation(
+                    t => table.Select(x => new ColumnInformation(
+                        t,
                         x.ColumnName,
                         x.DataType,
                         x.IsPrimaryKey,

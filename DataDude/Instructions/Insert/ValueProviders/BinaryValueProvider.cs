@@ -4,7 +4,7 @@ namespace DataDude.Instructions.Insert.ValueProviders
 {
     public class BinaryValueProvider : ValueProvider
     {
-        protected override ColumnValue? GetDefaultValue(TableInformation table, ColumnInformation column, ColumnValue value)
+        protected override ColumnValue? GetDefaultValue(ColumnInformation column, ColumnValue value)
         {
             if (column.DataType is "varbinary")
             {

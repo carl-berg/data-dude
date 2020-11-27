@@ -14,7 +14,7 @@ namespace DataDude.Instructions.Insert.Insertion
     {
         public override bool CanHandleInsert(InsertStatement statement, InsertContext context) => statement.Data
             .Where(x => x.Column.IsPrimaryKey)
-            .All(x => CanHandleInsertOfPKColumn(statement.Table, x.Column, x.Value, context));
+            .All(x => CanHandleInsertOfPKColumn(x.Column, x.Value, context));
 
         public override async Task<InsertedRow> Insert(InsertStatement statement, InsertContext context, IDbConnection connection, IDbTransaction? transaction = null)
         {
@@ -46,19 +46,19 @@ namespace DataDude.Instructions.Insert.Insertion
             }
         }
 
-        protected virtual bool CanHandleInsertOfPKColumn(TableInformation table, ColumnInformation column, ColumnValue value, InsertContext context)
+        protected virtual bool CanHandleInsertOfPKColumn(ColumnInformation column, ColumnValue value, InsertContext context)
         {
             if (value.Type == ColumnValueType.Set)
             {
                 return true;
             }
-            else if (table.ForeignKeys.Any(x => x.Columns.Any(x => x.Column == column)))
+            else if (column.Table.ForeignKeys.Any(x => x.Columns.Any(x => x.Column == column)))
             {
                 // Don't attempt to generate keys for FK columns
                 return false;
             }
 
-            return column.DefaultValue is { } || context.PrimaryKeyValueGenerator.CanHandle(table, column);
+            return column.DefaultValue is { } || context.PrimaryKeyValueGenerator.CanHandle(column);
         }
 
         protected virtual async Task PreProcessStatement(InsertStatement statement, InsertContext context, IDbConnection connection, IDbTransaction? transaction = null)
@@ -103,7 +103,7 @@ namespace DataDude.Instructions.Insert.Insertion
             // Attempt to generate new id's using unique value generator
             foreach (var (column, value) in statement.Data.Where(x => x.Column.IsPrimaryKey && x.Value.Type == ColumnValueType.NotSet))
             {
-                var generatedValue = context.PrimaryKeyValueGenerator.GenerateValue(statement.Table, column);
+                var generatedValue = context.PrimaryKeyValueGenerator.GenerateValue(column);
                 statement.Data[column].Set(new ColumnValue(generatedValue));
             }
         }

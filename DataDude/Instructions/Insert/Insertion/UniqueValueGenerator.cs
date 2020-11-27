@@ -22,7 +22,7 @@ namespace DataDude.Instructions.Insert.Insertion
 
         protected Dictionary<string, Func<object>> Maps { get; }
 
-        public virtual bool CanHandle(TableInformation table, ColumnInformation column) => Maps.ContainsKey(column.DataType);
-        public virtual object GenerateValue(TableInformation table, ColumnInformation column) => Maps[column.DataType]();
+        public virtual bool CanHandle(ColumnInformation column) => Maps.ContainsKey(column.DataType);
+        public virtual object GenerateValue(ColumnInformation column) => Maps[column.DataType]();
     }
 }

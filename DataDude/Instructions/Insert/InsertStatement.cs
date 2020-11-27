@@ -1,4 +1,5 @@
-﻿using DataDude.Schema;
+﻿using DataDude.Instructions.Insert.ValueProviders;
+using DataDude.Schema;
 
 namespace DataDude.Instructions.Insert
 {
@@ -13,11 +14,11 @@ namespace DataDude.Instructions.Insert
         public TableInformation Table { get; }
         public InsertData Data { get; }
 
-        public void InvokeValueProvider(IInsertValueProvider provider)
+        public void InvokeValueProvider(IValueProvider provider)
         {
             foreach (var (column, value) in Data)
             {
-                provider.Process(Table, column, value);
+                provider.Process(column, value);
             }
         }
     }
