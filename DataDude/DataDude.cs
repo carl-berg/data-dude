@@ -36,7 +36,7 @@ namespace DataDude
                             wasHandled = true;
                         }
                     }
-                    catch (Exception ex)
+                    catch (Exception ex) when (ex is not HandlerException)
                     {
                         throw new HandlerException($"Data dude failed while processing an instruction of type '{instruction.GetType()}'", ex);
                     }

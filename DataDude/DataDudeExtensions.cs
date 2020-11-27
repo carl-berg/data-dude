@@ -1,6 +1,12 @@
-﻿using DataDude.Instructions.Execute;
+﻿using System;
+using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
+using Dapper;
+using DataDude.Instructions.Execute;
 using DataDude.Instructions.Insert;
 using DataDude.Instructions.Insert.Interception;
+using DataDude.Schema;
 
 namespace DataDude
 {
@@ -20,7 +26,20 @@ namespace DataDude
 
         public static DataDude EnableAutomaticForeignKeys(this DataDude dude)
         {
-            dude.Configure(x => x.InsertInterceptors.Add(new ForeignKeyInterceptor()));
+            // Insert first in order to run before identity insert interceptor
+            dude.ConfigureInsert(x => x.InsertInterceptors.Insert(0, new ForeignKeyInterceptor()));
+            return dude;
+        }
+
+        public static DataDude ConfigureInsert(this DataDude dude, Action<InsertContext> configure)
+        {
+            dude.Configure(x =>
+            {
+                if (InsertContext.Get(x) is { } context)
+                {
+                    configure(context);
+                }
+            });
             return dude;
         }
     }

@@ -4,13 +4,14 @@ using DataDude.Schema;
 
 namespace DataDude.Instructions.Insert.ValueProviders
 {
-    public abstract class DefaultValueProvider : IInsertValueProvider
+    public abstract class ValueProvider : IValueProvider
     {
-        public void Process(TableInformation table, ColumnInformation column, ColumnValue value)
+        public void Process(ColumnInformation column, ColumnValue value)
         {
             if (column.DefaultValue is { Length: > 0 } ||
-                column.IsComputed ||
+                column.IsPrimaryKey ||
                 column.IsIdentity ||
+                column.IsComputed ||
                 value.Type is ColumnValueType.Ignore or ColumnValueType.Set)
             {
                 return;
@@ -19,13 +20,13 @@ namespace DataDude.Instructions.Insert.ValueProviders
             {
                 value.Set(ColumnValue.Null(GetNullDbType(column.DataType)));
             }
-            else if (GetDefaultValue(table, column, value) is { } newValue)
+            else if (GetDefaultValue(column, value) is { } newValue)
             {
                 value.Set(newValue);
             }
         }
 
-        protected abstract ColumnValue? GetDefaultValue(TableInformation table, ColumnInformation column, ColumnValue value);
+        protected abstract ColumnValue? GetDefaultValue(ColumnInformation column, ColumnValue value);
 
         private DbType GetNullDbType(string dataType) => dataType switch
         {

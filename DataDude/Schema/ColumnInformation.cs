@@ -3,8 +3,10 @@
     public class ColumnInformation
     {
         public ColumnInformation(
+            TableInformation table,
             string name,
             string dataType,
+            bool isPrimaryKey,
             bool isIdentity,
             bool isNullable,
             bool isComputed,
@@ -13,8 +15,10 @@
             int precision,
             int scale)
         {
+            Table = table;
             Name = name;
             DataType = dataType;
+            IsPrimaryKey = isPrimaryKey;
             IsIdentity = isIdentity;
             IsNullable = isNullable;
             IsComputed = isComputed;
@@ -24,8 +28,11 @@
             Scale = scale;
         }
 
+        public TableInformation Table { get; }
         public string Name { get; }
+        public string FullName => $"{Table.FullName}.{Name}";
         public string DataType { get; } = default!;
+        public bool IsPrimaryKey { get; }
         public bool IsIdentity { get; }
         public bool IsNullable { get; }
         public bool IsComputed { get; }

@@ -2,9 +2,9 @@
 
 namespace DataDude.Instructions.Insert.ValueProviders
 {
-    public class NumericValueProvider : DefaultValueProvider
+    public class NumericValueProvider : ValueProvider
     {
-        protected override ColumnValue? GetDefaultValue(TableInformation table, ColumnInformation column, ColumnValue value)
+        protected override ColumnValue? GetDefaultValue(ColumnInformation column, ColumnValue value)
         {
             if (column.DataType is "int" or "smallint" or "bigint" or "decimal" or "numeric")
             {

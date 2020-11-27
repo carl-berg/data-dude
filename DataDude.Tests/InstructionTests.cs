@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Dapper;
 using DataDude.Instructions.Insert;
 using DataDude.Tests.Core;
@@ -82,6 +83,51 @@ namespace DataDude.Tests
 
             var occupants = await connection.QueryAsync<dynamic>("SELECT * FROM Buildings.OfficeOccupant");
             occupants.ShouldHaveSingleItem();
+        }
+
+        [Fact]
+        public async Task Test_Can_Insert_With_Automatic_Foreign_Keys_PK_Is_Also_FK()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await new DataDude()
+                .EnableAutomaticForeignKeys()
+                .Insert("Office")
+                .Insert("OfficeExtension")
+                .Go(connection);
+
+            var extensions = await connection.QueryAsync<dynamic>("SELECT * FROM Buildings.OfficeExtension");
+            extensions.ShouldHaveSingleItem();
+        }
+
+        [Fact]
+        public async Task Test_Can_Insert_With_Generated_PK_Scenario_1()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await new DataDude()
+                .EnableAutomaticForeignKeys()
+                .Insert("Test_Generated_PK_Scenario_1")
+                .Insert("Test_Generated_PK_Scenario_1")
+                .Go(connection);
+
+            var scenarioRows = await connection.QueryAsync<object>("SELECT * FROM Test_Generated_PK_Scenario_1");
+            scenarioRows.Count().ShouldBe(2);
+        }
+
+        [Fact]
+        public async Task Test_Can_Insert_With_Generated_PK_Scenario_2()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await new DataDude()
+                .EnableAutomaticForeignKeys()
+                .Insert("Test_Generated_PK_Scenario_2")
+                .Insert("Test_Generated_PK_Scenario_2")
+                .Go(connection);
+
+            var scenarioRows = await connection.QueryAsync<object>("SELECT * FROM Test_Generated_PK_Scenario_2");
+            scenarioRows.Count().ShouldBe(2);
         }
 
         [Fact]
