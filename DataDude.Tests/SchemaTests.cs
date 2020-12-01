@@ -14,7 +14,7 @@ namespace DataDude.Tests
         }
 
         [Fact]
-        public async Task Test_Schema_Loading()
+        public async Task Schema_Loading()
         {
             using var connection = Fixture.CreateNewConnection();
 

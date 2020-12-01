@@ -18,11 +18,14 @@ namespace DataDude
                 new ExecuteInstructionHandler(),
                 new InsertInstructionHandler(this),
             };
+            InstructionPreProcessors = new List<IInstructionPreProcessor>();
         }
 
         public IList<IInstruction> Instructions { get; }
 
         public IList<IInstructionHandler> InstructionHandlers { get; }
+
+        public IList<IInstructionPreProcessor> InstructionPreProcessors { get; set; }
 
         public SchemaInformation? Schema { get; internal set; }
 

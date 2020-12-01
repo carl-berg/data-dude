@@ -1,34 +1,33 @@
 ﻿using System;
-using System.Data;
 using System.Linq;
-using System.Threading.Tasks;
-using Dapper;
-using DataDude.Instructions.Execute;
-using DataDude.Instructions.Insert;
+using DataDude.Instructions.Insert.AutomaticForeignKeys;
 using DataDude.Instructions.Insert.Interception;
 using DataDude.Instructions.Insert.ValueProviders;
 using DataDude.Schema;
 
-namespace DataDude
+namespace DataDude.Instructions.Insert
 {
-    public static class DataDudeExtensions
+    public static class Extensions
     {
-        public static DataDude Execute(this DataDude dude, string sql, object? parameters = null)
-        {
-            dude.Configure(x => x.Instructions.Add(new ExecuteInstruction(sql, parameters)));
-            return dude;
-        }
-
         public static DataDude Insert(this DataDude dude, string table, object? data = null)
         {
             dude.Configure(x => x.Instructions.Add(new InsertInstruction(table, data)));
             return dude;
         }
 
-        public static DataDude EnableAutomaticForeignKeys(this DataDude dude)
+        public static DataDude EnableAutomaticForeignKeys(this DataDude dude, Action<AutoFKConfiguration>? configure = null)
         {
+            var config = new AutoFKConfiguration();
+            configure?.Invoke(config);
+
             // Insert first in order to run before identity insert interceptor
             dude.ConfigureInsert(x => x.InsertInterceptors.Insert(0, new ForeignKeyInterceptor()));
+
+            if (config.AddMissingForeignKeys)
+            {
+                dude.Configure(x => x.InstructionPreProcessors.Add(new AddMissingInsertInstructionsPreProcessor()));
+            }
+
             return dude;
         }
 
