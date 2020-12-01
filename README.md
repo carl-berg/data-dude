@@ -5,7 +5,7 @@ Get started with Data dude:
 ```csharp
 await new DataDude()
     .Insert("Department")
-    .Insert("Employee", new { Name = "John Doe" })
+    .Insert("Employee", new { Name = "John Doe" }, new { Name = "Jane Doe" })
     .Go(connection);
 ```
 
@@ -19,7 +19,7 @@ Inserts are what Data dude does best. It can insert rows based on schema-knowled
 They provide default column values for the usual data types before an insert is made. If you want to add your own default values, you can configure them using shorthand like this:
 ```csharp
 await new DataDude()
-    .ConfigureCustomColumnValues(((column, value) => column.Name == "Name",  "Jane Doe"))
+    .ConfigureCustomColumnValues(((column, value) => column.Name == "Active", true))
     .Insert("Employee")
     .Go(connection);
 ```
