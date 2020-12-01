@@ -172,5 +172,18 @@ namespace DataDude.Tests
             var name = await connection.QuerySingleAsync<string>("SELECT Name FROM Buildings.Office");
             name.ShouldBe("Custom default");
         }
+
+        [Fact]
+        public async Task Test_Can_Insert_Multiple_Instructions()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await new DataDude()
+                .Insert("Office", new { Name = "test" }, new { Name = "test" })
+                .Go(connection);
+
+            var rows = await connection.QueryFirstAsync<int>("SELECT Count(1) FROM Buildings.Office");
+            rows.ShouldBe(2);
+        }
     }
 }

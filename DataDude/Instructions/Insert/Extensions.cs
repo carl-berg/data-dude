@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using DataDude.Instructions.Insert.AutomaticForeignKeys;
-using DataDude.Instructions.Insert.Interception;
 using DataDude.Instructions.Insert.ValueProviders;
 using DataDude.Schema;
 
@@ -9,9 +8,20 @@ namespace DataDude.Instructions.Insert
 {
     public static class Extensions
     {
-        public static DataDude Insert(this DataDude dude, string table, object? data = null)
+        public static DataDude Insert(this DataDude dude, string table, params object[] rowData)
         {
-            dude.Configure(x => x.Instructions.Add(new InsertInstruction(table, data)));
+            if (rowData.Any())
+            {
+                foreach (var data in rowData)
+                {
+                    dude.Configure(x => x.Instructions.Add(new InsertInstruction(table, data)));
+                }
+            }
+            else
+            {
+                dude.Configure(x => x.Instructions.Add(new InsertInstruction(table)));
+            }
+
             return dude;
         }
 
