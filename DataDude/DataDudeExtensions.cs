@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Data;
 using System.Linq;
-using System.Threading.Tasks;
-using Dapper;
 using DataDude.Instructions.Execute;
 using DataDude.Instructions.Insert;
 using DataDude.Instructions.Insert.Interception;
@@ -19,9 +16,20 @@ namespace DataDude
             return dude;
         }
 
-        public static DataDude Insert(this DataDude dude, string table, object? data = null)
+        public static DataDude Insert(this DataDude dude, string table, params object[] rowData)
         {
-            dude.Configure(x => x.Instructions.Add(new InsertInstruction(table, data)));
+            if (rowData.Any())
+            {
+                foreach (var data in rowData)
+                {
+                    dude.Configure(x => x.Instructions.Add(new InsertInstruction(table, data)));
+                }
+            }
+            else
+            {
+                dude.Configure(x => x.Instructions.Add(new InsertInstruction(table)));
+            }
+
             return dude;
         }
 
