@@ -31,5 +31,7 @@ namespace DataDude.Schema
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         public void AddForeignKey(ForeignKeyInformation fk) => _foreignKeys.Add(fk);
         public void AddTrigger(TriggerInformation trigger) => _triggers.Add(trigger);
+
+        public override string ToString() => Name;
     }
 }

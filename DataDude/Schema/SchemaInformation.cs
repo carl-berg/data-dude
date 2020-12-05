@@ -6,20 +6,21 @@ namespace DataDude.Schema
 {
     public class SchemaInformation : IEnumerable<TableInformation>
     {
-        private readonly IDictionary<string, TableInformation> _tables;
-        public SchemaInformation(IEnumerable<TableInformation> tables) => _tables = tables
+        public SchemaInformation(IEnumerable<TableInformation> tables) => Tables = tables
             .ToDictionary(x => $"{x.FullName}", x => x);
+
+        protected IDictionary<string, TableInformation> Tables { get; private set; }
 
         public TableInformation? this[string tableName]
         {
             get
             {
-                if (_tables.TryGetValue(tableName, out var schemaMatch))
+                if (Tables.TryGetValue(tableName, out var schemaMatch))
                 {
                     return schemaMatch;
                 }
 
-                var tableMatch = _tables.Values.Where(x => x.Name == tableName).ToList();
+                var tableMatch = Tables.Values.Where(x => x.Name == tableName).ToList();
                 if (tableMatch.Count == 1)
                 {
                     return tableMatch.Single();
@@ -33,7 +34,7 @@ namespace DataDude.Schema
             }
         }
 
-        public IEnumerator<TableInformation> GetEnumerator() => _tables.Values.GetEnumerator();
+        public IEnumerator<TableInformation> GetEnumerator() => Tables.Values.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using DataDude.Instructions.Execute;
 using DataDude.Instructions.Insert;
 using DataDude.Tests.Core;
 using Shouldly;
@@ -14,19 +13,6 @@ namespace DataDude.Tests
         public InstructionTests(DatabaseFixture fixture)
             : base(fixture)
         {
-        }
-
-        [Fact]
-        public async Task Can_Execute_Instruction()
-        {
-            using var connection = Fixture.CreateNewConnection();
-
-            await new DataDude()
-                .Execute("INSERT INTO Buildings.Office(Name) VALUES(@Name)", new { Name = "test" })
-                .Go(connection);
-
-            var officeName = await connection.QuerySingleAsync<string>("SELECT Name FROM Buildings.Office");
-            officeName.ShouldBe("test");
         }
 
         [Fact]

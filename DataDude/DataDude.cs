@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Data;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using DataDude.Instructions;
 using DataDude.SqlServer;
+
+[assembly: InternalsVisibleTo("DataDude.Tests")]
 
 namespace DataDude
 {
