@@ -15,6 +15,28 @@ Data dude is at its core an instruction handler, which means that it handles ins
 ### Inserts
 Inserts are what Data dude does best. It can insert rows based on schema-knowledge and configurable handling. That way you should be able to just specify the data you acually care about. Other column values should be taken care of by the dude. With its default configuration it should be able to handle most cases, but when you encounter edge cases or want to re-configure the default behavior, there are some knobs to tweak:
 
+#### Automatic Foreign Keys
+This is a concept where Data dude can utilize the schema information and fill in foreign key column values based on previos inserts. This functionality can be enabled like so:
+
+```csharp
+await new DataDude()
+    .EnableAutomaticForeignKeys()
+    .Insert("A")
+    .Insert("B")
+    .Go(connection);
+```
+In this example, if table B has a foreign key to table A, then Data dude will automatically set the corresponding foreign keys so a row can be inserted to table B without specifically specifying these keys manually.
+
+This concept can be taken taken even a bit further by instructing Data dude to dynamically add missing foreign keys, like so:
+
+```csharp
+await new DataDude()
+    .EnableAutomaticForeignKeys(x => x.AddMissingForeignKeys = true)
+    .Insert("B")
+    .Go(connection);
+```
+In this example, if table B has a foreign key to table A, then Data dude will automatically generate an insert instruction for table A before the table B -instruction. Foreign keys will then be handled in the same way as in the example above.
+
 #### InsertValueProviders
 They provide default column values for the usual data types before an insert is made. If you want to add your own default values, you can configure them using shorthand like this:
 ```csharp
