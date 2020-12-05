@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Data;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using DataDude.Instructions;
 using DataDude.SqlServer;
+
+[assembly: InternalsVisibleTo("DataDude.Tests")]
 
 namespace DataDude
 {
@@ -23,6 +26,12 @@ namespace DataDude
         public async Task Go(IDbConnection connection, IDbTransaction? transaction = null)
         {
             Context.Schema = await _schemaLoader.Load(connection, transaction);
+
+            foreach (var preProcessor in Context.InstructionPreProcessors)
+            {
+                await preProcessor.PreProcess(Context);
+            }
+
             foreach (var instruction in Context.Instructions)
             {
                 bool wasHandled = false;

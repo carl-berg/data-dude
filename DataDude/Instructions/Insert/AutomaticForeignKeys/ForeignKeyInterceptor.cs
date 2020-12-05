@@ -1,8 +1,9 @@
 ﻿using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using DataDude.Instructions.Insert.Interception;
 
-namespace DataDude.Instructions.Insert.Interception
+namespace DataDude.Instructions.Insert.AutomaticForeignKeys
 {
     /// <summary>
     /// Attempts to set fk columns based on last previous inserted row if possible.

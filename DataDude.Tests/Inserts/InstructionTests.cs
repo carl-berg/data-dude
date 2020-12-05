@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using DataDude.Instructions.Insert;
@@ -17,20 +16,7 @@ namespace DataDude.Tests
         }
 
         [Fact]
-        public async Task Test_Can_Execute_Instruction()
-        {
-            using var connection = Fixture.CreateNewConnection();
-
-            await new DataDude()
-                .Execute("INSERT INTO Buildings.Office(Name) VALUES(@Name)", new { Name = "test" })
-                .Go(connection);
-
-            var officeName = await connection.QuerySingleAsync<string>("SELECT Name FROM Buildings.Office");
-            officeName.ShouldBe("test");
-        }
-
-        [Fact]
-        public async Task Test_Can_Insert_Instruction()
+        public async Task Can_Insert_Instruction()
         {
             using var connection = Fixture.CreateNewConnection();
 
@@ -43,7 +29,7 @@ namespace DataDude.Tests
         }
 
         [Fact]
-        public async Task Test_Can_Insert_Instruction_With_Default()
+        public async Task Can_Insert_Instruction_With_Default()
         {
             using var connection = Fixture.CreateNewConnection();
 
@@ -56,7 +42,7 @@ namespace DataDude.Tests
         }
 
         [Fact]
-        public async Task Test_Can_Insert_With_Explicit_Foreign_Keys()
+        public async Task Can_Insert_With_Explicit_Foreign_Keys()
         {
             using var connection = Fixture.CreateNewConnection();
 
@@ -71,7 +57,7 @@ namespace DataDude.Tests
         }
 
         [Fact]
-        public async Task Test_Can_Insert_With_Automatic_Foreign_Keys()
+        public async Task Can_Insert_With_Automatic_Foreign_Keys()
         {
             using var connection = Fixture.CreateNewConnection();
 
@@ -87,7 +73,7 @@ namespace DataDude.Tests
         }
 
         [Fact]
-        public async Task Test_Can_Insert_With_Automatic_Foreign_Keys_PK_Is_Also_FK()
+        public async Task Can_Insert_With_Automatic_Foreign_Keys_PK_Is_Also_FK()
         {
             using var connection = Fixture.CreateNewConnection();
 
@@ -102,7 +88,21 @@ namespace DataDude.Tests
         }
 
         [Fact]
-        public async Task Test_Can_Insert_With_Generated_PK_Scenario_1()
+        public async Task Can_Insert_With_Automatic_Foreign_Keys_And_Add_Missing_Insert_Instructions()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await new DataDude()
+                .EnableAutomaticForeignKeys(x => x.AddMissingForeignKeys = true)
+                .Insert("OfficeOccupant")
+                .Go(connection);
+
+            var occupants = await connection.QueryAsync<dynamic>("SELECT * FROM Buildings.OfficeOccupant");
+            occupants.ShouldHaveSingleItem();
+        }
+
+        [Fact]
+        public async Task Can_Insert_With_Generated_PK_Scenario_1()
         {
             using var connection = Fixture.CreateNewConnection();
 
@@ -117,7 +117,7 @@ namespace DataDude.Tests
         }
 
         [Fact]
-        public async Task Test_Can_Insert_With_Generated_PK_Scenario_2()
+        public async Task Can_Insert_With_Generated_PK_Scenario_2()
         {
             using var connection = Fixture.CreateNewConnection();
 
@@ -132,7 +132,7 @@ namespace DataDude.Tests
         }
 
         [Fact]
-        public async Task Test_Can_Insert_With_Raw_SQL()
+        public async Task Can_Insert_With_Raw_SQL()
         {
             using var connection = Fixture.CreateNewConnection();
 
@@ -146,7 +146,7 @@ namespace DataDude.Tests
         }
 
         [Fact]
-        public async Task Test_Can_Specify_Custom_Defaults()
+        public async Task Can_Specify_Custom_Defaults()
         {
             using var connection = Fixture.CreateNewConnection();
 

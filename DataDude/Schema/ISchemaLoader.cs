@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using DataDude.Schema;
 
-namespace DataDude.SqlServer
+namespace DataDude
 {
     public interface ISchemaLoader
     {
