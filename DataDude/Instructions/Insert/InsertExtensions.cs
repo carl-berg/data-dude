@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Linq;
+using DataDude.Instructions.Insert;
 using DataDude.Instructions.Insert.AutomaticForeignKeys;
 using DataDude.Instructions.Insert.ValueProviders;
 using DataDude.Schema;
 
-namespace DataDude.Instructions.Insert
+namespace DataDude
 {
-    public static class Extensions
+    public static class InsertExtensions
     {
         public static DataDude Insert(this DataDude dude, string table, params object[] rowData)
         {

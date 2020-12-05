@@ -1,6 +1,8 @@
-﻿namespace DataDude.Instructions.Execute
+﻿using DataDude.Instructions.Execute;
+
+namespace DataDude
 {
-    public static class Extensions
+    public static class ExecuteExtensions
     {
         public static DataDude Execute(this DataDude dude, string sql, object? parameters = null)
         {
