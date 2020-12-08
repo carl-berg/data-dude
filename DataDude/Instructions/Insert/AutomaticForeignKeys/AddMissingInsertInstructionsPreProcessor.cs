@@ -23,10 +23,7 @@ namespace DataDude.Instructions.Insert.AutomaticForeignKeys
                         .Where(t => !toInsert.Values.Any(x => x.Contains(t)))
                         .ToList();
 
-                    if (dependencies.Any())
-                    {
-                        toInsert.Add(instruction, new InsertInformation(table, dependencies));
-                    }
+                    toInsert.Add(instruction, new InsertInformation(table, dependencies));
                 }
             }
 
