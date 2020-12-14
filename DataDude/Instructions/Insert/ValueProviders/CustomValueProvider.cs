@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using DataDude.Schema;
 
 namespace DataDude.Instructions.Insert.ValueProviders
@@ -10,31 +8,21 @@ namespace DataDude.Instructions.Insert.ValueProviders
     /// </summary>
     public class CustomValueProvider : IValueProvider
     {
-        private readonly IEnumerable<DefaultValue> _defaultValues;
+        private readonly Func<ColumnInformation, ColumnValue, bool> _match;
+        private readonly Func<object> _getValue;
 
-        public CustomValueProvider(IEnumerable<DefaultValue> defaultValues)
+        public CustomValueProvider(Func<ColumnInformation, ColumnValue, bool> match, Func<object> getValue)
         {
-            _defaultValues = defaultValues;
+            _match = match;
+            _getValue = getValue;
         }
 
         public void Process(ColumnInformation column, ColumnValue previousValue)
         {
-            foreach (var df in _defaultValues.Where(x => x.Match(column, previousValue)))
+            if (_match(column, previousValue))
             {
-                previousValue.Set(new ColumnValue(df.Value));
+                previousValue.Set(new ColumnValue(_getValue()));
             }
-        }
-
-        public class DefaultValue
-        {
-            public DefaultValue(Func<ColumnInformation, ColumnValue, bool> match, object value)
-            {
-                Match = match;
-                Value = value;
-            }
-
-            public Func<ColumnInformation, ColumnValue, bool> Match { get; }
-            public object Value { get; }
         }
     }
 }

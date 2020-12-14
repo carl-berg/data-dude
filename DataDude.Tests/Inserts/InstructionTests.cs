@@ -164,7 +164,7 @@ namespace DataDude.Tests
             using var connection = Fixture.CreateNewConnection();
 
             await new Dude()
-                .ConfigureCustomColumnValues(((column, _) => column.Name == "Name",  "Custom default"))
+                .ConfigureCustomColumnValue((column, _) => column.Name == "Name", () => "Custom default")
                 .Insert("Office")
                 .Go(connection);
 

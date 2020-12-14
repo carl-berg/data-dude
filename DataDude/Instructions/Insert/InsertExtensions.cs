@@ -42,10 +42,9 @@ namespace DataDude
             return dude;
         }
 
-        public static Dude ConfigureCustomColumnValues(this Dude dude, params (Func<ColumnInformation, ColumnValue, bool> Match, object Value)[] customValues)
+        public static Dude ConfigureCustomColumnValue(this Dude dude, Func<ColumnInformation, ColumnValue, bool> match, Func<object> getValue)
         {
-            var typedCustomValues = customValues.Select(cv => new CustomValueProvider.DefaultValue(cv.Match, cv.Value));
-            dude.ConfigureInsert(x => x.InsertValueProviders.Add(new CustomValueProvider(typedCustomValues)));
+            dude.ConfigureInsert(x => x.InsertValueProviders.Add(new CustomValueProvider(match, getValue)));
             return dude;
         }
 

@@ -41,7 +41,7 @@ In this example, if table B has a foreign key to table A, then Data dude will au
 They provide default column values for the usual data types before an insert is made. If you want to add your own default values, you can configure them using shorthand like this:
 ```csharp
 await new DataDude()
-    .ConfigureCustomColumnValues(((column, value) => column.Name == "Active", true))
+    .ConfigureCustomColumnValue((column, value) => column.Name == "Active", () => true)
     .Insert("Employee")
     .Go(connection);
 ```

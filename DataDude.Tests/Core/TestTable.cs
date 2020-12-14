@@ -2,7 +2,6 @@
 
 namespace DataDude.Tests.Core
 {
-
     public class TestTable : TableInformation
     {
         public TestTable(string name)
