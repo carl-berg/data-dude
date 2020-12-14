@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Linq;
 using DataDude.Schema;
 
 namespace DataDude.Instructions.Insert.ValueProviders
@@ -12,6 +13,7 @@ namespace DataDude.Instructions.Insert.ValueProviders
                 column.IsPrimaryKey ||
                 column.IsIdentity ||
                 column.IsComputed ||
+                column.Table.ForeignKeys.Any(fk => fk.Columns.Any(fk_col => fk_col.Column == column)) ||
                 value.Type is ColumnValueType.Ignore or ColumnValueType.Set)
             {
                 return;

@@ -94,12 +94,28 @@ namespace DataDude.Tests
                 .EnableAutomaticForeignKeys()
                 .Insert("Office")
                 .Insert("Employee", new { Id = 1 }, new { Id = 2 })
-                .Insert("Employee")
                 .Insert("OfficeOccupant", new { EmployeeId = 1 }, new { EmployeeId = 2 })
                 .Go(connection);
 
             var numberOfOccupants = await connection.QuerySingleAsync<int>("SELECT COUNT(1) FROM Buildings.OfficeOccupant");
             numberOfOccupants.ShouldBe(2);
+        }
+
+        [Fact]
+        public async Task Can_Insert_With_Automatic_Foreign_Keys_Do_Not_Use_Value_Provided_Values_For_Foreign_Keys()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await new Dude()
+                .EnableAutomaticForeignKeys()
+                .Insert("Office")
+                .Insert("Employee")
+                .Insert("OfficeOccupant")
+                .Insert("OfficeOccupancy")
+                .Go(connection);
+
+            var result = await connection.QueryAsync<dynamic>("SELECT * FROM People.OfficeOccupancy");
+            result.ShouldHaveSingleItem();
         }
 
         [Fact]
