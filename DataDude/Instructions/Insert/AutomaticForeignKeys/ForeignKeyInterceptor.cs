@@ -18,7 +18,10 @@ namespace DataDude.Instructions.Insert.AutomaticForeignKeys
                 {
                     foreach (var (insertValue, referencedColumn) in fk.Columns.Select(c => (statement.Data[c.Column], c.ReferencedColumn)))
                     {
-                        insertValue.Set(new ColumnValue(lastInsert[referencedColumn.Name]));
+                        if (insertValue.Type == ColumnValueType.NotSet)
+                        {
+                            insertValue.Set(new ColumnValue(lastInsert[referencedColumn.Name]));
+                        }
                     }
                 }
             }

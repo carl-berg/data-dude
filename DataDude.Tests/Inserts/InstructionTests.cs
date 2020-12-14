@@ -86,6 +86,23 @@ namespace DataDude.Tests
         }
 
         [Fact]
+        public async Task Can_Insert_With_Automatic_Foreign_Keys_Does_Not_Interfere_With_Specified_Keys()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await new Dude()
+                .EnableAutomaticForeignKeys()
+                .Insert("Office")
+                .Insert("Employee", new { Id = 1 }, new { Id = 2 })
+                .Insert("Employee")
+                .Insert("OfficeOccupant", new { EmployeeId = 1 }, new { EmployeeId = 2 })
+                .Go(connection);
+
+            var numberOfOccupants = await connection.QuerySingleAsync<int>("SELECT COUNT(1) FROM Buildings.OfficeOccupant");
+            numberOfOccupants.ShouldBe(2);
+        }
+
+        [Fact]
         public async Task Can_Insert_With_Automatic_Foreign_Keys_PK_Is_Also_FK()
         {
             using var connection = Fixture.CreateNewConnection();
