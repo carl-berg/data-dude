@@ -25,7 +25,7 @@ namespace DataDude.Tests.Inserts
             context.Instructions
                 .OfType<InsertInstruction>()
                 .Select(x => x.TableName)
-                .ShouldBe(new[] { "dbo.A", "dbo.B", "C" });
+                .ShouldBe(new[] { "[dbo].[A]", "[dbo].[B]", "C" });
         }
 
         [Fact]
@@ -45,7 +45,7 @@ namespace DataDude.Tests.Inserts
             context.Instructions
                 .OfType<InsertInstruction>()
                 .Select(x => x.TableName)
-                .ShouldBe(new[] { "dbo.A", "B", "dbo.C", "D" });
+                .ShouldBe(new[] { "[dbo].[A]", "B", "[dbo].[C]", "D" });
         }
 
         [Fact]
@@ -65,7 +65,7 @@ namespace DataDude.Tests.Inserts
             context.Instructions
                 .OfType<InsertInstruction>()
                 .Select(x => x.TableName)
-                .ShouldBe(new[] { "A", "dbo.B", "dbo.C", "D" });
+                .ShouldBe(new[] { "A", "[dbo].[B]", "[dbo].[C]", "D" });
         }
     }
 }

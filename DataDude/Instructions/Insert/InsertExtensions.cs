@@ -9,7 +9,7 @@ namespace DataDude
 {
     public static class InsertExtensions
     {
-        public static DataDude Insert(this DataDude dude, string table, params object[] rowData)
+        public static Dude Insert(this Dude dude, string table, params object[] rowData)
         {
             if (rowData.Any())
             {
@@ -26,7 +26,7 @@ namespace DataDude
             return dude;
         }
 
-        public static DataDude EnableAutomaticForeignKeys(this DataDude dude, Action<AutoFKConfiguration>? configure = null)
+        public static Dude EnableAutomaticForeignKeys(this Dude dude, Action<AutoFKConfiguration>? configure = null)
         {
             var config = new AutoFKConfiguration();
             configure?.Invoke(config);
@@ -42,14 +42,14 @@ namespace DataDude
             return dude;
         }
 
-        public static DataDude ConfigureCustomColumnValues(this DataDude dude, params (Func<ColumnInformation, ColumnValue, bool> Match, object Value)[] customValues)
+        public static Dude ConfigureCustomColumnValues(this Dude dude, params (Func<ColumnInformation, ColumnValue, bool> Match, object Value)[] customValues)
         {
             var typedCustomValues = customValues.Select(cv => new CustomValueProvider.DefaultValue(cv.Match, cv.Value));
             dude.ConfigureInsert(x => x.InsertValueProviders.Add(new CustomValueProvider(typedCustomValues)));
             return dude;
         }
 
-        public static DataDude ConfigureInsert(this DataDude dude, Action<InsertContext> configure)
+        public static Dude ConfigureInsert(this Dude dude, Action<InsertContext> configure)
         {
             dude.Configure(x =>
             {

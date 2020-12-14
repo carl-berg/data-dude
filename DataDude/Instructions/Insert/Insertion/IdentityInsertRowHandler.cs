@@ -22,7 +22,7 @@ namespace DataDude.Instructions.Insert.Insertion
             var primaryKey = statement.Table.Single(x => x.IsPrimaryKey && x.IsIdentity);
             var insertedRow = await connection.QuerySingleAsync<object>(
                 $@"INSERT INTO {statement.Table.FullName}({columns}) VALUES({values})
-                SELECT * FROM {statement.Table.FullName} WHERE {primaryKey.Name} = SCOPE_IDENTITY()",
+                SELECT * FROM {statement.Table.FullName} WHERE [{primaryKey.Name}] = SCOPE_IDENTITY()",
                 parameters,
                 transaction);
 

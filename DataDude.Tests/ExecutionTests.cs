@@ -18,7 +18,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new DataDude()
+            await new Dude()
                 .Execute("INSERT INTO Buildings.Office(Name) VALUES(@Name)", new { Name = "test" })
                 .Go(connection);
 

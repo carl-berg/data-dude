@@ -27,7 +27,7 @@ namespace DataDude.Instructions.Insert.Insertion
         {
             await PreProcessStatement(statement, context, connection, transaction);
             var (columns, values, parameters) = GetInsertInformation(statement);
-            var identityFilters = statement.Table.Where(x => x.IsPrimaryKey).Select(x => $"{x.Name} = {GetParameterNameOrRawSql(x, statement.Data[x])}");
+            var identityFilters = statement.Table.Where(x => x.IsPrimaryKey).Select(x => $"[{x.Name}] = {GetParameterNameOrRawSql(x, statement.Data[x])}");
             var identityFilter = string.Join(" AND ", identityFilters);
             var insertedRow = await connection.QuerySingleAsync<object>(
                 $@"INSERT INTO {statement.Table.FullName}({columns}) VALUES({values})
@@ -73,7 +73,7 @@ namespace DataDude.Instructions.Insert.Insertion
             // Attempt to use specified raw-sql values or default values
             if (GetDatabaseGenratedValuePairs(statement) is { } fetch && fetch.Count() > 0)
             {
-                var items = string.Join(", ", fetch.Select(f => $"{f.SQL} AS {f.ColumnName}"));
+                var items = string.Join(", ", fetch.Select(f => $"{f.SQL} AS [{f.ColumnName}]"));
                 var result = await connection.QuerySingleAsync<dynamic>($"SELECT {items}", transaction: transaction);
                 if (result is IReadOnlyDictionary<string, object> values)
                 {

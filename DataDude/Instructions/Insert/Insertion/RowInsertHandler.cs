@@ -16,7 +16,7 @@ namespace DataDude.Instructions.Insert.Insertion
         protected (string columns, string values, DynamicParameters parameters) GetInsertInformation(InsertStatement statement)
         {
             var columnsToInsert = statement.Data.Where(x => x.Value.Type == ColumnValueType.Set);
-            var columns = string.Join(", ", columnsToInsert.Select(x => x.Column.Name));
+            var columns = string.Join(", ", columnsToInsert.Select(x => $"[{x.Column.Name}]"));
             var values = string.Join(", ", columnsToInsert.Select(x => GetParameterNameOrRawSql(x.Column, x.Value)));
             var parameters = new DynamicParameters();
             foreach (var (column, value) in columnsToInsert)

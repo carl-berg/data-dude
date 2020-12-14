@@ -20,7 +20,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new DataDude()
+            await new Dude()
                 .Insert("Office", new { Name = "test" })
                 .Go(connection);
 
@@ -29,11 +29,24 @@ namespace DataDude.Tests
         }
 
         [Fact]
+        public async Task Can_Insert_With_Brackets()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await new Dude()
+                .Insert("[Office]")
+                .Go(connection);
+
+            var numberOfOffices = await connection.QuerySingleAsync<int>("SELECT COUNT(1) FROM Buildings.Office");
+            numberOfOffices.ShouldBe(1);
+        }
+
+        [Fact]
         public async Task Can_Insert_Instruction_With_Default()
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new DataDude()
+            await new Dude()
                 .Insert("Office")
                 .Go(connection);
 
@@ -46,7 +59,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new DataDude()
+            await new Dude()
                 .Insert("Office", new { Id = 1 })
                 .Insert("Employee", new { Id = 1 })
                 .Insert("OfficeOccupant", new { OfficeId = 1, EmployeeId = 1 })
@@ -61,7 +74,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new DataDude()
+            await new Dude()
                 .EnableAutomaticForeignKeys()
                 .Insert("Office")
                 .Insert("Employee")
@@ -77,7 +90,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new DataDude()
+            await new Dude()
                 .EnableAutomaticForeignKeys()
                 .Insert("Office")
                 .Insert("OfficeExtension")
@@ -92,7 +105,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new DataDude()
+            await new Dude()
                 .EnableAutomaticForeignKeys(x => x.AddMissingForeignKeys = true)
                 .Insert("OfficeOccupant")
                 .Go(connection);
@@ -106,7 +119,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new DataDude()
+            await new Dude()
                 .EnableAutomaticForeignKeys()
                 .Insert("Test_Generated_PK_Scenario_1")
                 .Insert("Test_Generated_PK_Scenario_1")
@@ -121,7 +134,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new DataDude()
+            await new Dude()
                 .EnableAutomaticForeignKeys()
                 .Insert("Test_Generated_PK_Scenario_2")
                 .Insert("Test_Generated_PK_Scenario_2")
@@ -136,7 +149,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new DataDude()
+            await new Dude()
                 .EnableAutomaticForeignKeys()
                 .Insert("Office", new { Name = new RawSql("CONCAT('A', 'B', 'C')") })
                 .Go(connection);
@@ -150,7 +163,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new DataDude()
+            await new Dude()
                 .ConfigureCustomColumnValues(((column, _) => column.Name == "Name",  "Custom default"))
                 .Insert("Office")
                 .Go(connection);
@@ -164,7 +177,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new DataDude()
+            await new Dude()
                 .Insert("Office", new { Name = "test" }, new { Name = "test" })
                 .Go(connection);
 

@@ -7,7 +7,7 @@ namespace DataDude.Schema
     public class SchemaInformation : IEnumerable<TableInformation>
     {
         public SchemaInformation(IEnumerable<TableInformation> tables) => Tables = tables
-            .ToDictionary(x => $"{x.FullName}", x => x);
+            .ToDictionary(x => $"{x.Schema}.{x.Name}", x => x);
 
         protected IDictionary<string, TableInformation> Tables { get; private set; }
 
@@ -20,7 +20,8 @@ namespace DataDude.Schema
                     return schemaMatch;
                 }
 
-                var tableMatch = Tables.Values.Where(x => x.Name == tableName).ToList();
+                var tableMatch = Find(tableName);
+
                 if (tableMatch.Count == 1)
                 {
                     return tableMatch.Single();
@@ -37,5 +38,17 @@ namespace DataDude.Schema
         public IEnumerator<TableInformation> GetEnumerator() => Tables.Values.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        private IList<TableInformation> Find(string tableName)
+        {
+            if (tableName.Split('.') is { Length: 2 } fullTableName)
+            {
+                var schema = fullTableName[0].Trim('[', ']');
+                var table = fullTableName[1].Trim('[', ']');
+                return Tables.Values.Where(x => x.Schema == schema && x.Name == table).ToList();
+            }
+
+            return Tables.Values.Where(x => x.Name == tableName.Trim('[', ']')).ToList();
+        }
     }
 }

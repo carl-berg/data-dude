@@ -9,11 +9,11 @@ using DataDude.SqlServer;
 
 namespace DataDude
 {
-    public class DataDude
+    public class Dude
     {
         private readonly ISchemaLoader _schemaLoader;
 
-        public DataDude(ISchemaLoader? schemaLoader = null)
+        public Dude(ISchemaLoader? schemaLoader = null)
         {
             Context = new DataDudeContext();
             _schemaLoader = schemaLoader ?? new SqlServerSchemaLoader();
