@@ -37,6 +37,23 @@ await new DataDude()
 ```
 In this example, if table B has a foreign key to table A, then Data dude will automatically generate an insert instruction for table A before the table B -instruction. Foreign keys will then be handled in the same way as in the example above.
 
+To make matters a bit more complicated, you might not always want foreign keys to automatically be inserted. You might for instance not want nullable or recursive foreign keys inserted. The strategy can be configured by setting the `DependencyTraversalStrategy` configuration like so:
+
+```csharp
+new Dude()
+    .EnableAutomaticForeignKeys(x =>
+    {
+        x.AddMissingForeignKeys = true;
+        x.DependencyTraversalStrategy = DependencyTraversalStrategy.SkipNullableForeignKeys
+    })
+```
+
+Data dude comes preconfigured with 3 dependency traversal strategy options: 
+- `FollowAllForeignKeys`: Default strategy will attempt to generate inserts for all foreign keys
+- `SkipRecursiveForeignKeys`: Will not attempt to generate inserts for foreign keys where the table has a reference to itself
+- `SkipNullableForeignKeys`: Will not attempt to generate inserts for nullable foreign keys
+If you want more control you can create your own class that implements IDependencyTraversalStrategy and plug it in like above.
+
 #### InsertValueProviders
 They provide default column values for the usual data types before an insert is made. If you want to add your own default values, you can configure them using shorthand like this:
 ```csharp
