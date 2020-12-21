@@ -18,13 +18,13 @@ namespace DataDude.Schema
             }
 
             var sortedDependencies = new List<TableInformation>();
-            var dependenciesToAdd = dependencies.Where(x => x.ForeignKeys.Count() == 0);
+            var dependenciesToAdd = dependencies.Where(x => x.ForeignKeys.Where(_strategy.Process).Count() == 0);
             while (dependenciesToAdd.Count() > 0)
             {
                 sortedDependencies.AddRange(dependenciesToAdd);
                 dependenciesToAdd = dependencies
                     .Except(sortedDependencies)
-                    .Where(x => x.ForeignKeys.All(fk => sortedDependencies.Contains(fk.ReferencedTable)));
+                    .Where(x => x.ForeignKeys.Where(_strategy.Process).All(fk => sortedDependencies.Contains(fk.ReferencedTable)));
             }
 
             if (sortedDependencies.Count() != dependencies.Count())
