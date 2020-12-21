@@ -29,7 +29,7 @@ namespace DataDude.Schema
         public ColumnInformation? this[string name] => _columns.TryGetValue(name, out var column) ? column : null;
         public IEnumerator<ColumnInformation> GetEnumerator() => _columns.Values.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-        public void AddForeignKey(ForeignKeyInformation fk) => _foreignKeys.Add(fk);
+        public void AddForeignKey(Func<TableInformation, ForeignKeyInformation> getFk) => _foreignKeys.Add(getFk(this));
         public void AddTrigger(TriggerInformation trigger) => _triggers.Add(trigger);
 
         public override string ToString() => Name;

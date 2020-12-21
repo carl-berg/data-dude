@@ -11,15 +11,17 @@ namespace DataDude.Instructions.Insert.AutomaticForeignKeys
     /// </summary>
     public class AddMissingInsertInstructionsPreProcessor : IInstructionPreProcessor
     {
+        private readonly DependencyService _dependencyService;
+        public AddMissingInsertInstructionsPreProcessor(DependencyService dependencyService) => _dependencyService = dependencyService;
+
         public Task PreProcess(DataDudeContext context)
         {
-            var service = new DependencyService();
             var toInsert = new Dictionary<InsertInstruction, InsertInformation>();
             foreach (var instruction in context.Instructions.OfType<InsertInstruction>())
             {
                 if (context.Schema?[instruction.TableName] is { } table)
                 {
-                    var dependencies = service.GetOrderedDependenciesFor(table)
+                    var dependencies = _dependencyService.GetOrderedDependenciesFor(table)
                         .Where(t => !toInsert.Values.Any(x => x.Contains(t)))
                         .ToList();
 

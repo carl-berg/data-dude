@@ -6,10 +6,13 @@ namespace DataDude.Schema
 {
     public class DependencyService
     {
+        private readonly IDependencyTraversalStrategy _strategy;
+        public DependencyService(IDependencyTraversalStrategy strategy) => _strategy = strategy;
+
         public IEnumerable<TableInformation> GetOrderedDependenciesFor(TableInformation table)
         {
             var dependencies = new HashSet<TableInformation>();
-            foreach (var dep in table.ForeignKeys.Select(x => x.ReferencedTable))
+            foreach (var dep in table.ForeignKeys.Where(_strategy.Process).Select(x => x.ReferencedTable))
             {
                 ProcessDependencies(dep, ref dependencies);
             }
@@ -26,7 +29,7 @@ namespace DataDude.Schema
 
             if (sortedDependencies.Count() != dependencies.Count())
             {
-                throw new Exception($"Failed building a dependency chain for table {table.FullName}");
+                throw new DependencyTraversalFailedException($"Failed building a dependency chain for table {table.FullName}");
             }
 
             return sortedDependencies;
@@ -35,7 +38,7 @@ namespace DataDude.Schema
         private void ProcessDependencies(TableInformation table, ref HashSet<TableInformation> dependencies)
         {
             dependencies.Add(table);
-            foreach (var dep in table.ForeignKeys.Select(x => x.ReferencedTable))
+            foreach (var dep in table.ForeignKeys.Where(_strategy.Process).Select(x => x.ReferencedTable))
             {
                 if (!dependencies.Contains(dep))
                 {

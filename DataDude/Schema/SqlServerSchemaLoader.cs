@@ -45,7 +45,7 @@ namespace DataDude.SqlServer
                 }
 
                 var fkColumns = GetForeignKeyColumns(constraintName, table, referenceTable, group);
-                table.AddForeignKey(new ForeignKeyInformation(group.Key.ConstraintName, referenceTable, fkColumns));
+                table.AddForeignKey(table => new ForeignKeyInformation(group.Key.ConstraintName, table, referenceTable, fkColumns));
             }
 
             foreach (var group in triggers.GroupBy(x => (x.SchemaName, x.TableName)))

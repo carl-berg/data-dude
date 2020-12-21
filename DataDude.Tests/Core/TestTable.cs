@@ -1,14 +1,17 @@
-﻿using DataDude.Schema;
+﻿using System.Linq;
+using DataDude.Schema;
 
 namespace DataDude.Tests.Core
 {
     public class TestTable : TableInformation
     {
         public TestTable(string name)
-            : base("dbo", name, table => new[]
+            : this(name, "Id")
         {
-                new ColumnInformation(table, "Id", "int", true, true, false, false, null, 4, 0, 0),
-        })
+        }
+
+        public TestTable(string name, params string[] columns)
+            : base("dbo", name, table => columns.Select(c => new ColumnInformation(table, c, "int", true, true, false, false, null, 4, 0, 0)))
         {
         }
 
@@ -18,9 +21,10 @@ namespace DataDude.Tests.Core
             {
                 var fk = new ForeignKeyInformation(
                     $"FK_{Name}_{referenceTable.Name}",
+                    this,
                     referenceTable,
                     new[] { (this["Id"], referenceTable["Id"]) });
-                AddForeignKey(fk);
+                AddForeignKey(t => fk);
             }
 
             return this;

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using DataDude.Instructions.Insert;
 using DataDude.Instructions.Insert.AutomaticForeignKeys;
+using DataDude.Schema;
 using DataDude.Tests.Core;
 using Shouldly;
 using Xunit;
@@ -21,7 +22,8 @@ namespace DataDude.Tests.Inserts
             var context = new DataDudeContext() { Schema = schema };
 
             context.Instructions.Add(new InsertInstruction("C"));
-            await new AddMissingInsertInstructionsPreProcessor().PreProcess(context);
+            var dependencyService = new DependencyService(DependencyTraversalStrategy.FollowAllForeignKeys);
+            await new AddMissingInsertInstructionsPreProcessor(dependencyService).PreProcess(context);
             context.Instructions
                 .OfType<InsertInstruction>()
                 .Select(x => x.TableName)
@@ -41,7 +43,8 @@ namespace DataDude.Tests.Inserts
 
             context.Instructions.Add(new InsertInstruction("B"));
             context.Instructions.Add(new InsertInstruction("D"));
-            await new AddMissingInsertInstructionsPreProcessor().PreProcess(context);
+            var dependencyService = new DependencyService(DependencyTraversalStrategy.FollowAllForeignKeys);
+            await new AddMissingInsertInstructionsPreProcessor(dependencyService).PreProcess(context);
             context.Instructions
                 .OfType<InsertInstruction>()
                 .Select(x => x.TableName)
@@ -61,7 +64,8 @@ namespace DataDude.Tests.Inserts
 
             context.Instructions.Add(new InsertInstruction("A"));
             context.Instructions.Add(new InsertInstruction("D"));
-            await new AddMissingInsertInstructionsPreProcessor().PreProcess(context);
+            var dependencyService = new DependencyService(DependencyTraversalStrategy.FollowAllForeignKeys);
+            await new AddMissingInsertInstructionsPreProcessor(dependencyService).PreProcess(context);
             context.Instructions
                 .OfType<InsertInstruction>()
                 .Select(x => x.TableName)
