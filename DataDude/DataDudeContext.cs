@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Data;
+using System.Threading.Tasks;
 using DataDude.Instructions;
 using DataDude.Instructions.Execute;
 using DataDude.Instructions.Insert;
@@ -9,9 +11,10 @@ namespace DataDude
     public class DataDudeContext
     {
         private Dictionary<string, object> _store;
-        public DataDudeContext()
+        public DataDudeContext(ISchemaLoader schemaLoader)
         {
             _store = new Dictionary<string, object>();
+            SchemaLoader = new CachableSchemaLoader(schemaLoader);
             Instructions = new List<IInstruction>();
             InstructionHandlers = new List<IInstructionHandler>
             {
@@ -21,13 +24,15 @@ namespace DataDude
             InstructionPreProcessors = new List<IInstructionPreProcessor>();
         }
 
+        public ISchemaLoader SchemaLoader { get; }
+
         public IList<IInstruction> Instructions { get; }
 
         public IList<IInstructionHandler> InstructionHandlers { get; }
 
-        public IList<IInstructionPreProcessor> InstructionPreProcessors { get; set; }
+        public IList<IInstructionPreProcessor> InstructionPreProcessors { get; }
 
-        public SchemaInformation? Schema { get; internal set; }
+        public SchemaInformation? Schema { get; private set; }
 
         public T? Get<T>(string key)
         {
@@ -49,6 +54,11 @@ namespace DataDude
             {
                 _store.Remove(key);
             }
+        }
+
+        public async Task LoadSchema(IDbConnection connection, IDbTransaction? transaction = null)
+        {
+            Schema = await SchemaLoader.Load(connection, transaction);
         }
     }
 }

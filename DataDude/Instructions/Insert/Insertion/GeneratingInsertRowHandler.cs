@@ -21,7 +21,8 @@ namespace DataDude.Instructions.Insert.Insertion
 
         public override bool CanHandleInsert(InsertStatement statement, InsertContext context) => statement.Data
             .Where(x => x.Column.IsPrimaryKey)
-            .All(x => CanHandleInsertOfPKColumn(x.Column, x.Value, context));
+            .All(x => CanHandleInsertOfPKColumn(x.Column, x.Value, context)) &&
+            statement.Data.Any(x => x.Column.IsPrimaryKey);
 
         public override async Task<InsertedRow> Insert(InsertStatement statement, InsertContext context, IDbConnection connection, IDbTransaction? transaction = null)
         {

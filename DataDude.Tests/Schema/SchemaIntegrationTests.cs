@@ -4,20 +4,26 @@ using DataDude.Tests.Core;
 using Shouldly;
 using Xunit;
 
-namespace DataDude.Tests
+namespace DataDude.Tests.Schema
 {
-    public class SchemaTests : DatabaseTest
+    public class SchemaIntegrationTests : DatabaseTest
     {
-        public SchemaTests(DatabaseFixture fixture)
+        public SchemaIntegrationTests(DatabaseFixture fixture)
             : base(fixture)
         {
+        }
+
+        [Fact]
+        public void SqlServerSchemaLoader_Has_Caching_Enabled_By_Default()
+        {
+            var loader = new SqlServerSchemaLoader();
+            loader.CacheSchema.ShouldBeTrue();
         }
 
         [Fact]
         public async Task Schema_Loading()
         {
             using var connection = Fixture.CreateNewConnection();
-
             var schema = await new SqlServerSchemaLoader().Load(connection);
 
             schema["Office"].ShouldNotBeNull();

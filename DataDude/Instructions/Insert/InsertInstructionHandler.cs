@@ -47,12 +47,10 @@ namespace DataDude.Instructions.Insert
                         }
                         else
                         {
-                            throw new InsertHandlerException(
-                                $"Could not resolve a row handler for insertion of a row in {insert.TableName}",
-                                statement: statement);
+                            throw new InsertRowHandlerMissing(statement);
                         }
                     }
-                    catch (Exception ex)
+                    catch (Exception ex) when (ex is not InsertRowHandlerMissing)
                     {
                         throw new InsertHandlerException($"Insertion into table {insert.TableName} failed", ex, statement);
                     }

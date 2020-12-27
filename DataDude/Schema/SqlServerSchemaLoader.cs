@@ -9,6 +9,8 @@ namespace DataDude.SqlServer
 {
     public class SqlServerSchemaLoader : ISchemaLoader
     {
+        public bool CacheSchema { get; set; } = true;
+
         public async Task<SchemaInformation> Load(IDbConnection connection, IDbTransaction? transaction = null)
         {
             var (columns, foreignKeys, triggers) = await LoadSchema(connection, transaction);
