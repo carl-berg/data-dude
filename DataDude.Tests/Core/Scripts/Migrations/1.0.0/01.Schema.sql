@@ -58,6 +58,12 @@ CREATE TABLE Test_Generated_PK_Scenario_2(
 )
 GO
 
+CREATE TABLE Test_PK_Less_Scenario(
+	Id1 INT NOT NULL,
+	Id2 INT NOT NULL,
+)
+GO
+
 CREATE TRIGGER People.EmployeeUpdatedAt ON People.Employee AFTER UPDATE AS BEGIN
 	UPDATE People.Employee 
 		SET People.Employee.UpdatedAt = GETDATE()

@@ -3,7 +3,7 @@ using System.Data;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using DataDude.Instructions;
-using DataDude.SqlServer;
+using DataDude.Schema;
 
 [assembly: InternalsVisibleTo("DataDude.Tests")]
 
@@ -11,12 +11,9 @@ namespace DataDude
 {
     public class Dude
     {
-        private readonly ISchemaLoader _schemaLoader;
-
         public Dude(ISchemaLoader? schemaLoader = null)
         {
-            Context = new DataDudeContext();
-            _schemaLoader = schemaLoader ?? new SqlServerSchemaLoader();
+            Context = new DataDudeContext(schemaLoader ?? new SqlServer.SqlServerSchemaLoader());
         }
 
         protected DataDudeContext Context { get; }
@@ -25,7 +22,7 @@ namespace DataDude
 
         public async Task Go(IDbConnection connection, IDbTransaction? transaction = null)
         {
-            Context.Schema = await _schemaLoader.Load(connection, transaction);
+            await Context.LoadSchema(connection, transaction);
 
             foreach (var preProcessor in Context.InstructionPreProcessors)
             {

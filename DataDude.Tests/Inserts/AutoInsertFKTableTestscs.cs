@@ -19,8 +19,8 @@ namespace DataDude.Tests.Inserts
             var b = schema.AddTable("B").AddFk(a);
             var c = schema.AddTable("C").AddFk(b);
 
-            var context = new DataDudeContext() { Schema = schema };
-
+            var context = new DataDudeContext(schema);
+            await context.LoadSchema(null, null);
             context.Instructions.Add(new InsertInstruction("C"));
             var dependencyService = new DependencyService(DependencyTraversalStrategy.FollowAllForeignKeys);
             await new AddMissingInsertInstructionsPreProcessor(dependencyService).PreProcess(context);
@@ -39,8 +39,8 @@ namespace DataDude.Tests.Inserts
             var c = schema.AddTable("C").AddFk(b);
             var d = schema.AddTable("D").AddFk(c);
 
-            var context = new DataDudeContext() { Schema = schema };
-
+            var context = new DataDudeContext(schema);
+            await context.LoadSchema(null, null);
             context.Instructions.Add(new InsertInstruction("B"));
             context.Instructions.Add(new InsertInstruction("D"));
             var dependencyService = new DependencyService(DependencyTraversalStrategy.FollowAllForeignKeys);
@@ -60,8 +60,8 @@ namespace DataDude.Tests.Inserts
             var c = schema.AddTable("C").AddFk(b);
             var d = schema.AddTable("D").AddFk(c);
 
-            var context = new DataDudeContext() { Schema = schema };
-
+            var context = new DataDudeContext(schema);
+            await context.LoadSchema(null, null);
             context.Instructions.Add(new InsertInstruction("A"));
             context.Instructions.Add(new InsertInstruction("D"));
             var dependencyService = new DependencyService(DependencyTraversalStrategy.FollowAllForeignKeys);
@@ -80,8 +80,8 @@ namespace DataDude.Tests.Inserts
             a.AddForeignKey(t => new ForeignKeyInformation("FK_A_A", t, t, new[] { (t["Id"], t["Id"]) }));
             var b = schema.AddTable("B").AddFk(a);
 
-            var context = new DataDudeContext() { Schema = schema };
-
+            var context = new DataDudeContext(schema);
+            await context.LoadSchema(null, null);
             context.Instructions.Add(new InsertInstruction("B"));
             var dependencyService = new DependencyService(DependencyTraversalStrategy.SkipRecursiveForeignKeys);
             await new AddMissingInsertInstructionsPreProcessor(dependencyService).PreProcess(context);
@@ -102,8 +102,8 @@ namespace DataDude.Tests.Inserts
             });
             b.AddForeignKey(t => new ForeignKeyInformation("FK_B_A", t, a, new[] { (t["a_Id"], a["Id"]) }));
 
-            var context = new DataDudeContext() { Schema = schema };
-
+            var context = new DataDudeContext(schema);
+            await context.LoadSchema(null, null);
             context.Instructions.Add(new InsertInstruction("B"));
             var dependencyService = new DependencyService(DependencyTraversalStrategy.SkipNullableForeignKeys);
             await new AddMissingInsertInstructionsPreProcessor(dependencyService).PreProcess(context);

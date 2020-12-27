@@ -4,11 +4,11 @@ using DataDude.Tests.Core;
 using Shouldly;
 using Xunit;
 
-namespace DataDude.Tests
+namespace DataDude.Tests.Schema
 {
-    public class SchemaTests : DatabaseTest
+    public class SchemaIntegrationTests : DatabaseTest
     {
-        public SchemaTests(DatabaseFixture fixture)
+        public SchemaIntegrationTests(DatabaseFixture fixture)
             : base(fixture)
         {
         }
@@ -17,9 +17,10 @@ namespace DataDude.Tests
         public async Task Schema_Loading()
         {
             using var connection = Fixture.CreateNewConnection();
+            var loader = new SqlServerSchemaLoader();
+            var schema = await loader.Load(connection);
 
-            var schema = await new SqlServerSchemaLoader().Load(connection);
-
+            loader.CacheSchema.ShouldBeTrue();
             schema["Office"].ShouldNotBeNull();
             schema["Buildings.Office"].ShouldNotBeNull();
             schema["Employee"].ShouldSatisfyAllConditions(

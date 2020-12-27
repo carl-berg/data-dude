@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Dapper;
 using DataDude.Instructions.Insert;
+using DataDude.Instructions.Insert.Insertion;
 using DataDude.Tests.Core;
 using Shouldly;
 using Xunit;
@@ -206,7 +207,7 @@ namespace DataDude.Tests
         }
 
         [Fact]
-        public async Task Test_Can_Insert_Multiple_Instructions()
+        public async Task Can_Insert_Multiple_Instructions()
         {
             using var connection = Fixture.CreateNewConnection();
 
@@ -216,6 +217,30 @@ namespace DataDude.Tests
 
             var rows = await connection.QueryFirstAsync<int>("SELECT Count(1) FROM Buildings.Office");
             rows.ShouldBe(2);
+        }
+
+        [Fact]
+        public async Task Cannot_Insert_Into_Table_Without_PK()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            var exception = await Should.ThrowAsync<InsertRowHandlerMissing>(new Dude()
+                .Insert("Test_PK_Less_Scenario")
+                .Go(connection));
+        }
+
+        [Fact]
+        public async Task Can_Insert_Into_Table_Without_PK_With_OutputInsertRowHandler_Configured()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await new Dude()
+                .ConfigureInsert(x => x.InsertRowHandlers.Add(new OutputInsertRowHandler()))
+                .Insert("Test_PK_Less_Scenario")
+                .Go(connection);
+
+            var rows = await connection.QueryFirstAsync<int>("SELECT Count(1) FROM Test_PK_Less_Scenario");
+            rows.ShouldBe(1);
         }
     }
 }
