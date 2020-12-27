@@ -14,13 +14,18 @@ namespace DataDude.Tests.Schema
         }
 
         [Fact]
+        public void SqlServerSchemaLoader_Has_Caching_Enabled_By_Default()
+        {
+            var loader = new SqlServerSchemaLoader();
+            loader.CacheSchema.ShouldBeTrue();
+        }
+
+        [Fact]
         public async Task Schema_Loading()
         {
             using var connection = Fixture.CreateNewConnection();
-            var loader = new SqlServerSchemaLoader();
-            var schema = await loader.Load(connection);
+            var schema = await new SqlServerSchemaLoader().Load(connection);
 
-            loader.CacheSchema.ShouldBeTrue();
             schema["Office"].ShouldNotBeNull();
             schema["Buildings.Office"].ShouldNotBeNull();
             schema["Employee"].ShouldSatisfyAllConditions(
