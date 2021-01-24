@@ -2,12 +2,14 @@
 {
     public class TriggerInformation
     {
-        public TriggerInformation(string name, bool isDisabled)
+        public TriggerInformation(TableInformation table, string name, bool isDisabled)
         {
+            Table = table;
             Name = name;
             IsDisabled = isDisabled;
         }
 
+        public TableInformation Table { get; }
         public string Name { get; }
         public bool IsDisabled { get; }
     }
