@@ -13,7 +13,7 @@ namespace DataDude.SqlServer
 
         public async Task<SchemaInformation> Load(IDbConnection connection, IDbTransaction? transaction = null)
         {
-            var (columns, foreignKeys, triggers) = await LoadSchema(connection, transaction);
+            var (columns, indexes, foreignKeys, triggers) = await LoadSchema(connection, transaction);
 
             var tables = columns
                 .GroupBy(x => (x.TableSchema, x.TableName))
@@ -24,7 +24,6 @@ namespace DataDude.SqlServer
                         t,
                         x.ColumnName,
                         x.DataType,
-                        x.IsPrimaryKey,
                         x.IsIdentity,
                         x.IsNullable,
                         x.IsComputed,
@@ -34,6 +33,31 @@ namespace DataDude.SqlServer
                         x.Scale))));
 
             var schema = new SchemaInformation(tables);
+
+            foreach (var group in indexes.GroupBy(x => (x.Name, x.TableSchema, x.TableName, x.IsPrimaryKey, x.IsUnique, x.IsUniqueConstraint, x.IsDisabled)))
+            {
+                var indexName = group.Key.Name;
+                var table = schema[$"{group.Key.TableSchema}.{group.Key.TableName}"];
+
+                if (table is null)
+                {
+                    throw new SchemaInformationException($"Could not resolve table for index {indexName}");
+                }
+
+                var indexColumns = group.Select(x => table[x.ColumnName]);
+                if (indexColumns?.Any(x => x == null) ?? true)
+                {
+                    throw new SchemaInformationException($"Could not resolve all columns for index {indexName}");
+                }
+
+                table.AddIndex(new IndexInformation(
+                    indexName,
+                    indexColumns!,
+                    group.Key.IsPrimaryKey,
+                    group.Key.IsUnique,
+                    group.Key.IsUniqueConstraint,
+                    group.Key.IsDisabled));
+            }
 
             foreach (var group in foreignKeys.GroupBy(x => (x.ConstraintName, x.SchemaName, x.TableName, x.ReferencedSchemaName, x.ReferencedTableName)))
             {
@@ -82,7 +106,7 @@ namespace DataDude.SqlServer
             }
         }
 
-        private async Task<(IEnumerable<SysColumns>, IEnumerable<ForeignKey>, IEnumerable<Trigger> triggers)> LoadSchema(IDbConnection connection, IDbTransaction? transaction = null)
+        private async Task<(IEnumerable<SysColumns>, IEnumerable<Indexes>, IEnumerable<ForeignKey>, IEnumerable<Trigger> triggers)> LoadSchema(IDbConnection connection, IDbTransaction? transaction = null)
         {
             using var reader = await connection.QueryMultipleAsync(
                 @"SELECT 
@@ -90,7 +114,6 @@ namespace DataDude.SqlServer
                     t.name as TableName,
                     c.name as ColumnName,
                     y.name as DataType,
-	                ISNULL(i.is_primary_key, 0) AS IsPrimaryKey,
 	                c.is_nullable As IsNullable,
 	                c.is_identity as IsIdentity,
                     c.is_computed as IsComputed,
@@ -102,8 +125,21 @@ namespace DataDude.SqlServer
                 INNER JOIN sys.columns c on c.object_id = t.object_id
                 INNER JOIN sys.types y ON c.user_type_id = y.user_type_id
                 INNER JOIN sys.schemas s ON s.schema_id = t.schema_id
-                LEFT JOIN sys.index_columns ic ON c.column_id = ic.column_id AND ic.object_id = c.object_id
-                LEFT JOIN sys.indexes i ON i.object_id = ic.object_id AND i.index_id = ic.index_id AND i.is_primary_key = 1
+                ORDER BY s.name, t.name
+
+                SELECT 
+	                i.name as Name, 
+	                s.name as TableSchema,
+	                OBJECT_NAME(i.object_id) AS TableName, 
+	                COL_NAME(i.object_id, ic.column_id) AS ColumnName,
+	                i.is_primary_key AS IsPrimaryKey,
+	                i.is_unique AS IsUnique,
+	                i.is_unique_constraint AS IsUniqueConstraint,
+                    i.is_disabled AS IsDisabled
+                FROM sys.index_columns ic
+                INNER JOIN sys.indexes i ON i.object_id = ic.object_id AND i.index_id = ic.index_id
+                INNER JOIN sys.tables t on i.object_id = t.object_id
+                INNER JOIN sys.schemas s ON s.schema_id = t.schema_id
                 ORDER BY s.name, t.name
 
                 SELECT 
@@ -128,9 +164,10 @@ namespace DataDude.SqlServer
                 transaction: transaction);
 
             var allColumns = await reader.ReadAsync<SysColumns>();
+            var allIndexes = await reader.ReadAsync<Indexes>();
             var allForeignKeys = await reader.ReadAsync<ForeignKey>();
             var triggers = await reader.ReadAsync<Trigger>();
-            return (allColumns, allForeignKeys, triggers);
+            return (allColumns, allIndexes, allForeignKeys, triggers);
         }
 
         private class SysColumns
@@ -139,7 +176,6 @@ namespace DataDude.SqlServer
             public string TableName { get; set; } = default!;
             public string ColumnName { get; set; } = default!;
             public string DataType { get; set; } = default!;
-            public bool IsPrimaryKey { get; set; }
             public bool IsIdentity { get; set; }
             public bool IsNullable { get; set; }
             public bool IsComputed { get; set; }
@@ -147,6 +183,18 @@ namespace DataDude.SqlServer
             public int MaxLength { get; set; }
             public int Precision { get; set; }
             public int Scale { get; set; }
+        }
+
+        private class Indexes
+        {
+            public string Name { get; set; } = default!;
+            public string TableSchema { get; set; } = default!;
+            public string TableName { get; set; } = default!;
+            public string ColumnName { get; set; } = default!;
+            public bool IsPrimaryKey { get; set; }
+            public bool IsUnique { get; set; }
+            public bool IsUniqueConstraint { get; set; }
+            public bool IsDisabled { get; set; }
         }
 
         private class ForeignKey

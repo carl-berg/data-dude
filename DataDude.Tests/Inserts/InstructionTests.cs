@@ -242,5 +242,18 @@ namespace DataDude.Tests
             var rows = await connection.QueryFirstAsync<int>("SELECT Count(1) FROM Test_PK_Less_Scenario");
             rows.ShouldBe(1);
         }
+
+        [Fact]
+        public async Task Can_Insert_Sequential_Default_Using_Generated_Value_Instead_Of_Default()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await new Dude()
+                .Insert("Test_PK_Sequential_Uuid")
+                .Go(connection);
+
+            var rows = await connection.QueryFirstAsync<int>("SELECT Count(1) FROM Test_PK_Sequential_Uuid");
+            rows.ShouldBe(1);
+        }
     }
 }

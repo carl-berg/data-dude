@@ -20,15 +20,15 @@ namespace DataDude.Instructions.Insert.Insertion
         public UniqueValueGenerator PrimaryKeyValueGenerator { get; set; }
 
         public override bool CanHandleInsert(InsertStatement statement, InsertContext context) => statement.Data
-            .Where(x => x.Column.IsPrimaryKey)
+            .Where(x => x.Column.IsPrimaryKey())
             .All(x => CanHandleInsertOfPKColumn(x.Column, x.Value, context)) &&
-            statement.Data.Any(x => x.Column.IsPrimaryKey);
+            statement.Data.Any(x => x.Column.IsPrimaryKey());
 
         public override async Task<InsertedRow> Insert(InsertStatement statement, InsertContext context, IDbConnection connection, IDbTransaction? transaction = null)
         {
             await PreProcessStatement(statement, context, connection, transaction);
             var (columns, values, parameters) = GetInsertInformation(statement);
-            var identityFilters = statement.Table.Where(x => x.IsPrimaryKey).Select(x => $"[{x.Name}] = {GetParameterNameOrRawSql(x, statement.Data[x])}");
+            var identityFilters = statement.Table.Where(x => x.IsPrimaryKey()).Select(x => $"[{x.Name}] = {GetParameterNameOrRawSql(x, statement.Data[x])}");
             var identityFilter = string.Join(" AND ", identityFilters);
             var insertedRow = await connection.QuerySingleAsync<object>(
                 $@"INSERT INTO {statement.Table.FullName}({columns}) VALUES({values})
@@ -41,7 +41,7 @@ namespace DataDude.Instructions.Insert.Insertion
 
         protected virtual IEnumerable<(string SQL, string ColumnName)> GetDatabaseGenratedValuePairs(InsertStatement statement)
         {
-            foreach (var (column, value) in statement.Data.Where(x => x.Column.IsPrimaryKey))
+            foreach (var (column, value) in statement.Data.Where(x => x.Column.IsPrimaryKey()))
             {
                 if (value.Value is RawSql rawSql)
                 {
@@ -49,7 +49,10 @@ namespace DataDude.Instructions.Insert.Insertion
                 }
                 else if (value.Type == ColumnValueType.NotSet && column.DefaultValue is { } defaultSql)
                 {
-                    yield return (defaultSql, column.Name);
+                    if (!defaultSql.Contains("newsequentialid") /* Cannot be used in a select statement */)
+                    {
+                        yield return (defaultSql, column.Name);
+                    }
                 }
             }
         }
@@ -89,7 +92,7 @@ namespace DataDude.Instructions.Insert.Insertion
             }
 
             // Attempt to generate new id's using unique value generator
-            foreach (var (column, value) in statement.Data.Where(x => x.Column.IsPrimaryKey && x.Value.Type == ColumnValueType.NotSet))
+            foreach (var (column, value) in statement.Data.Where(x => x.Column.IsPrimaryKey() && x.Value.Type == ColumnValueType.NotSet))
             {
                 var generatedValue = PrimaryKeyValueGenerator.GenerateValue(context, column);
                 statement.Data[column].Set(new ColumnValue(generatedValue));

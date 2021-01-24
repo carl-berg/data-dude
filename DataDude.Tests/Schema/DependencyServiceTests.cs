@@ -93,7 +93,7 @@ namespace DataDude.Tests.Schema
             var a = new TestTable("A");
             var b = new TableInformation("dbo", "B", table => new[]
             {
-                new ColumnInformation(table, "a_Id", "int", false, false, isNullable: true, false, null, 0, 0, 0),
+                new ColumnInformation(table, "a_Id", "int", false, isNullable: true, false, null, 0, 0, 0),
             });
             b.AddForeignKey(table => new ForeignKeyInformation("FK", table, a, new[] { (table["a_Id"], a["Id"]) }));
 
@@ -109,7 +109,7 @@ namespace DataDude.Tests.Schema
             var a = new TestTable("A");
             var b = new TableInformation("dbo", "B", table => new[]
             {
-                new ColumnInformation(table, "a_Id", "int", false, false, isNullable: true, false, null, 0, 0, 0),
+                new ColumnInformation(table, "a_Id", "int", false, isNullable: true, false, null, 0, 0, 0),
             });
             b.AddForeignKey(table => new ForeignKeyInformation("FK", table, a, new[] { (table["a_Id"], a["Id"]) }));
 
