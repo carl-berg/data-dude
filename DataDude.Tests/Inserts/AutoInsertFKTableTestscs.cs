@@ -77,7 +77,7 @@ namespace DataDude.Tests.Inserts
         {
             var schema = new TestSchema();
             var a = schema.AddTable("A");
-            a.AddForeignKey(t => new ForeignKeyInformation("FK_A_A", t, t, new[] { (t["Id"], t["Id"]) }));
+            a.AddForeignKey(new ForeignKeyInformation("FK_A_A", a, a, new[] { (a["Id"], a["Id"]) }));
             var b = schema.AddTable("B").AddFk(a);
 
             var context = new DataDudeContext(schema);
@@ -100,7 +100,8 @@ namespace DataDude.Tests.Inserts
             {
                 new ColumnInformation(table, "a_Id", "int", false, isNullable: true, false, null, 0, 0, 0),
             });
-            b.AddForeignKey(t => new ForeignKeyInformation("FK_B_A", t, a, new[] { (t["a_Id"], a["Id"]) }));
+
+            b.AddForeignKey(new ForeignKeyInformation("FK_B_A", b, a, new[] { (b["a_Id"], b["Id"]) }));
 
             var context = new DataDudeContext(schema);
             await context.LoadSchema(null, null);

@@ -69,7 +69,7 @@ namespace DataDude.Tests.Schema
         {
             var service = new DependencyService(DependencyTraversalStrategy.FollowAllForeignKeys);
             var a = new TestTable("A");
-            a.AddForeignKey(t => new ForeignKeyInformation("FK", t, t, new[] { (t["Id"], t["Id"]) }));
+            a.AddForeignKey(new ForeignKeyInformation("FK", a, a, new[] { (a["Id"], a["Id"]) }));
 
             Should.Throw<DependencyTraversalFailedException>(() => service.GetOrderedDependenciesFor(a));
         }
@@ -79,7 +79,7 @@ namespace DataDude.Tests.Schema
         {
             var service = new DependencyService(DependencyTraversalStrategy.SkipRecursiveForeignKeys);
             var a = new TestTable("A");
-            a.AddForeignKey(t => new ForeignKeyInformation("FK", t, t, new[] { (t["Id"], t["Id"]) }));
+            a.AddForeignKey(new ForeignKeyInformation("FK", a, a, new[] { (a["Id"], a["Id"]) }));
 
             var dependencies = Should.NotThrow(() => service.GetOrderedDependenciesFor(a));
             dependencies.ShouldBeEmpty();
@@ -95,7 +95,7 @@ namespace DataDude.Tests.Schema
             {
                 new ColumnInformation(table, "a_Id", "int", false, isNullable: true, false, null, 0, 0, 0),
             });
-            b.AddForeignKey(table => new ForeignKeyInformation("FK", table, a, new[] { (table["a_Id"], a["Id"]) }));
+            b.AddForeignKey(new ForeignKeyInformation("FK", b, a, new[] { (b["a_Id"], a["Id"]) }));
 
             var dependencies = Should.NotThrow(() => service.GetOrderedDependenciesFor(b));
             dependencies.ShouldContain(a);
@@ -111,7 +111,7 @@ namespace DataDude.Tests.Schema
             {
                 new ColumnInformation(table, "a_Id", "int", false, isNullable: true, false, null, 0, 0, 0),
             });
-            b.AddForeignKey(table => new ForeignKeyInformation("FK", table, a, new[] { (table["a_Id"], a["Id"]) }));
+            b.AddForeignKey(new ForeignKeyInformation("FK", b, a, new[] { (b["a_Id"], a["Id"]) }));
 
             var dependencies = Should.NotThrow(() => service.GetOrderedDependenciesFor(b));
             dependencies.ShouldBeEmpty();

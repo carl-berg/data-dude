@@ -8,7 +8,7 @@ namespace DataDude.Tests.Core
         public TestTable(string name)
             : this(name, "Id")
         {
-            AddIndex(new IndexInformation($"PK_{name}", new[] { this["Id"] ! }, true, false, false, false));
+            AddIndex(new IndexInformation(this, $"PK_{name}", new[] { this["Id"] ! }, true, false, false, false));
         }
 
         public TestTable(string name, params string[] columns)
@@ -25,7 +25,7 @@ namespace DataDude.Tests.Core
                     this,
                     referenceTable,
                     new[] { (this["Id"], referenceTable["Id"]) });
-                AddForeignKey(t => fk);
+                AddForeignKey(fk);
             }
 
             return this;

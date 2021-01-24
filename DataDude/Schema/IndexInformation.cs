@@ -6,8 +6,9 @@ namespace DataDude.Schema
     [DebuggerDisplay("{Name}")]
     public class IndexInformation
     {
-        public IndexInformation(string name, IEnumerable<ColumnInformation> columns, bool isPrimaryKey, bool isUnique, bool isUniqueConstraint, bool isDisabled)
+        public IndexInformation(TableInformation table, string name, IEnumerable<ColumnInformation> columns, bool isPrimaryKey, bool isUnique, bool isUniqueConstraint, bool isDisabled)
         {
+            Table = table;
             Name = name;
             Columns = columns;
             IsPrimaryKey = isPrimaryKey;
@@ -16,6 +17,7 @@ namespace DataDude.Schema
             IsDisabled = isDisabled;
         }
 
+        public TableInformation Table { get; }
         public string Name { get; }
         public IEnumerable<ColumnInformation> Columns { get; }
         public bool IsPrimaryKey { get; }

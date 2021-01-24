@@ -51,6 +51,7 @@ namespace DataDude.SqlServer
                 }
 
                 table.AddIndex(new IndexInformation(
+                    table,
                     indexName,
                     indexColumns!,
                     group.Key.IsPrimaryKey,
@@ -71,7 +72,7 @@ namespace DataDude.SqlServer
                 }
 
                 var fkColumns = GetForeignKeyColumns(constraintName, table, referenceTable, group);
-                table.AddForeignKey(table => new ForeignKeyInformation(group.Key.ConstraintName, table, referenceTable, fkColumns));
+                table.AddForeignKey(new ForeignKeyInformation(group.Key.ConstraintName, table, referenceTable, fkColumns));
             }
 
             foreach (var group in triggers.GroupBy(x => (x.SchemaName, x.TableName)))
@@ -84,7 +85,7 @@ namespace DataDude.SqlServer
 
                 foreach (var trigger in group)
                 {
-                    table.AddTrigger(new TriggerInformation(trigger.Name, trigger.IsDisabled));
+                    table.AddTrigger(new TriggerInformation(table, trigger.Name, trigger.IsDisabled));
                 }
             }
 
