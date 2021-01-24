@@ -10,7 +10,7 @@ namespace DataDude.Instructions.Insert.ValueProviders
         public void Process(ColumnInformation column, ColumnValue value)
         {
             if (column.DefaultValue is { Length: > 0 } ||
-                column.IsPrimaryKey ||
+                column.IsPrimaryKey() ||
                 column.IsIdentity ||
                 column.IsComputed ||
                 column.Table.ForeignKeys.Any(fk => fk.Columns.Any(fk_col => fk_col.Column == column)) ||
@@ -37,8 +37,7 @@ namespace DataDude.Instructions.Insert.ValueProviders
             "datetime" => DbType.DateTime,
             "datetime2" => DbType.DateTime2,
             "datetimeoffset" => DbType.DateTimeOffset,
-            "decimal" => DbType.Decimal,
-            "numeric" => DbType.VarNumeric,
+            "decimal" or "numeric" => DbType.Decimal,
             "float" => DbType.Double,
             "uniqueidentifier" => DbType.Guid,
             "smallint" => DbType.Int16,

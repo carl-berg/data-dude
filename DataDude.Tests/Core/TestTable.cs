@@ -8,10 +8,11 @@ namespace DataDude.Tests.Core
         public TestTable(string name)
             : this(name, "Id")
         {
+            AddIndex(new IndexInformation($"PK_{name}", new[] { this["Id"] ! }, true, false, false, false));
         }
 
         public TestTable(string name, params string[] columns)
-            : base("dbo", name, table => columns.Select(c => new ColumnInformation(table, c, "int", true, true, false, false, null, 4, 0, 0)))
+            : base("dbo", name, table => columns.Select(c => new ColumnInformation(table, c, "int", true, false, false, null, 4, 0, 0)))
         {
         }
 

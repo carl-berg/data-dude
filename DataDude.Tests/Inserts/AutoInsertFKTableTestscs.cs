@@ -98,7 +98,7 @@ namespace DataDude.Tests.Inserts
             var a = schema.AddTable("A");
             var b = new TableInformation("dbo", "B", table => new[]
             {
-                new ColumnInformation(table, "a_Id", "int", false, false, isNullable: true, false, null, 0, 0, 0),
+                new ColumnInformation(table, "a_Id", "int", false, isNullable: true, false, null, 0, 0, 0),
             });
             b.AddForeignKey(t => new ForeignKeyInformation("FK_B_A", t, a, new[] { (t["a_Id"], a["Id"]) }));
 

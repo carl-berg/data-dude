@@ -1,4 +1,7 @@
-﻿namespace DataDude.Schema
+﻿using System;
+using System.Linq;
+
+namespace DataDude.Schema
 {
     public class ColumnInformation
     {
@@ -6,7 +9,6 @@
             TableInformation table,
             string name,
             string dataType,
-            bool isPrimaryKey,
             bool isIdentity,
             bool isNullable,
             bool isComputed,
@@ -18,7 +20,6 @@
             Table = table;
             Name = name;
             DataType = dataType;
-            IsPrimaryKey = isPrimaryKey;
             IsIdentity = isIdentity;
             IsNullable = isNullable;
             IsComputed = isComputed;
@@ -31,7 +32,6 @@
         public TableInformation Table { get; }
         public string Name { get; }
         public string DataType { get; } = default!;
-        public bool IsPrimaryKey { get; }
         public bool IsIdentity { get; }
         public bool IsNullable { get; }
         public bool IsComputed { get; }
@@ -39,5 +39,8 @@
         public int MaxLength { get; }
         public int Precision { get; }
         public int Scale { get; }
+        public bool IsPrimaryKey() => Table.Indexes
+            .Where(x => x.IsPrimaryKey)
+            .Any(index => index.Columns.Contains(this));
     }
 }

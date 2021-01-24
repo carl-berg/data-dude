@@ -54,6 +54,10 @@ namespace DataDude.Tests.Schema
                 referencedTable: "OfficeOccupant",
                 ("OfficeId", "OfficeId"),
                 ("EmployeeId", "EmployeeId"));
+
+            schema["Test_Generated_PK_Scenario_1"].Indexes.ShouldHaveSingleItem().ShouldSatisfyAllConditions(
+                index => index.Name.ShouldBe("PK_Test_PK_Scenarios_1"),
+                index => index.IsPrimaryKey.ShouldBeTrue());
         }
     }
 }

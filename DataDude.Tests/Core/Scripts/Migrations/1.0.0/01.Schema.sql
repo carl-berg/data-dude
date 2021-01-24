@@ -64,6 +64,11 @@ CREATE TABLE Test_PK_Less_Scenario(
 )
 GO
 
+CREATE TABLE Test_PK_Sequential_Uuid(
+	Id UNIQUEIDENTIFIER PRIMARY KEY NOT NULL DEFAULT(newsequentialid()),
+)
+GO
+
 CREATE TRIGGER People.EmployeeUpdatedAt ON People.Employee AFTER UPDATE AS BEGIN
 	UPDATE People.Employee 
 		SET People.Employee.UpdatedAt = GETDATE()

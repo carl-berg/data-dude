@@ -12,14 +12,14 @@ namespace DataDude.Instructions.Insert.Insertion
     {
         public override bool CanHandleInsert(InsertStatement statement, InsertContext context)
         {
-            var primaryKeys = statement.Table.Where(x => x.IsPrimaryKey);
+            var primaryKeys = statement.Table.Where(x => x.IsPrimaryKey());
             return primaryKeys.Count() == 1 && primaryKeys.All(x => x.IsIdentity);
         }
 
         public override async Task<InsertedRow> Insert(InsertStatement statement, InsertContext context, IDbConnection connection, IDbTransaction? transaction = null)
         {
             var (columns, values, parameters) = GetInsertInformation(statement);
-            var primaryKey = statement.Table.Single(x => x.IsPrimaryKey && x.IsIdentity);
+            var primaryKey = statement.Table.Single(x => x.IsPrimaryKey() && x.IsIdentity);
             var insertedRow = await connection.QuerySingleAsync<object>(
                 $@"INSERT INTO {statement.Table.FullName}({columns}) VALUES({values})
                 SELECT * FROM {statement.Table.FullName} WHERE [{primaryKey.Name}] = SCOPE_IDENTITY()",
