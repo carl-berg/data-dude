@@ -20,7 +20,7 @@ namespace DataDude.Instructions.Insert.ValueProviders
             }
             else if (column.IsNullable)
             {
-                value.Set(ColumnValue.Null(GetNullDbType(column.DataType)));
+                value.Set(ColumnValue.Null(DataDudeContext.GetDbType(column)));
             }
             else if (GetDefaultValue(column, value) is { } newValue)
             {
@@ -29,24 +29,5 @@ namespace DataDude.Instructions.Insert.ValueProviders
         }
 
         protected abstract ColumnValue? GetDefaultValue(ColumnInformation column, ColumnValue value);
-
-        private DbType GetNullDbType(string dataType) => dataType switch
-        {
-            "bit" => DbType.Boolean,
-            "date" => DbType.Date,
-            "datetime" => DbType.DateTime,
-            "datetime2" => DbType.DateTime2,
-            "datetimeoffset" => DbType.DateTimeOffset,
-            "decimal" or "numeric" => DbType.Decimal,
-            "float" => DbType.Double,
-            "uniqueidentifier" => DbType.Guid,
-            "smallint" => DbType.Int16,
-            "int" => DbType.Int32,
-            "bigint" => DbType.Int64,
-            "variant" => DbType.Object,
-            "varbinary" => DbType.Binary,
-            "varchar" or "nvarchar" or "geography" => DbType.String,
-            _ => throw new NotImplementedException($"Db type for {dataType} is not known"),
-        };
     }
 }

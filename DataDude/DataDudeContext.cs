@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using DataDude.Instructions;
@@ -24,6 +25,27 @@ namespace DataDude
             InstructionPreProcessors = new List<IInstructionPreProcessor>();
         }
 
+        public static IDictionary<string, DbType> TypeMappings { get; } = new Dictionary<string, DbType>
+        {
+            ["bit"] = DbType.Boolean,
+            ["date"] = DbType.Date,
+            ["datetime"] = DbType.DateTime,
+            ["datetime2"] = DbType.DateTime2,
+            ["datetimeoffset"] = DbType.DateTimeOffset,
+            ["decimal"] = DbType.Decimal,
+            ["numeric"] = DbType.Decimal,
+            ["float"] = DbType.Double,
+            ["uniqueidentifier"] = DbType.Guid,
+            ["smallint"] = DbType.Int16,
+            ["int"] = DbType.Int32,
+            ["bigint"] = DbType.Int64,
+            ["variant"] = DbType.Object,
+            ["varbinary"] = DbType.Binary,
+            ["varchar"] = DbType.String,
+            ["nvarchar"] = DbType.String,
+            ["geography"] = DbType.String,
+        };
+
         public ISchemaLoader SchemaLoader { get; }
 
         public IList<IInstruction> Instructions { get; }
@@ -33,6 +55,16 @@ namespace DataDude
         public IList<IInstructionPreProcessor> InstructionPreProcessors { get; }
 
         public SchemaInformation? Schema { get; private set; }
+
+        public static DbType GetDbType(ColumnInformation column)
+        {
+            if (TypeMappings.ContainsKey(column.DataType))
+            {
+                return TypeMappings[column.DataType];
+            }
+
+            throw new NotImplementedException($"Db type for {column.DataType} of column {column.Table.FullName}.{column.Name} is not known");
+        }
 
         public T? Get<T>(string key)
         {
