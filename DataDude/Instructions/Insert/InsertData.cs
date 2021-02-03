@@ -14,9 +14,16 @@ namespace DataDude.Instructions.Insert
 
             foreach (var column in table)
             {
-                if (instruction.ColumnValues.TryGetValue(column.Name, out var value) && value is { })
+                if (instruction.ColumnValues.ContainsKey(column.Name))
                 {
-                    _data.Add(column, new ColumnValue(value));
+                    if (instruction.ColumnValues[column.Name] is { } value)
+                    {
+                        _data.Add(column, new ColumnValue(value));
+                    }
+                    else
+                    {
+                        _data.Add(column, ColumnValue.Null(DataDudeContext.GetDbType(column)));
+                    }
                 }
                 else
                 {

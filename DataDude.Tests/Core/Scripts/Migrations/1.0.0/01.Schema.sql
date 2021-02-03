@@ -69,6 +69,13 @@ CREATE TABLE Test_PK_Sequential_Uuid(
 )
 GO
 
+CREATE TABLE Test_Nullable_FK(
+	Id INT PRIMARY KEY,
+	OfficeId INT NULL,
+	CONSTRAINT FK_Test_Nullable_FK_Office FOREIGN KEY (OfficeId) references Buildings.Office(Id),
+)
+GO
+
 CREATE TRIGGER People.EmployeeUpdatedAt ON People.Employee AFTER UPDATE AS BEGIN
 	UPDATE People.Employee 
 		SET People.Employee.UpdatedAt = GETDATE()

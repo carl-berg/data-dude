@@ -255,5 +255,23 @@ namespace DataDude.Tests
             var rows = await connection.QueryFirstAsync<int>("SELECT Count(1) FROM Test_PK_Sequential_Uuid");
             rows.ShouldBe(1);
         }
+
+        [Fact]
+        public async Task Can_Honor_Specified_Null_Values_When_Inserting_Nullable_FK()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await new Dude()
+                .EnableAutomaticForeignKeys()
+                .Insert("Office", new { Id = 1 })
+                .Insert("Test_Nullable_FK", new { Id = 1 })
+                .Insert("Test_Nullable_FK", new { Id = 2, OfficeId = (int?)null })
+                .Go(connection);
+
+            var firstOfficeId = await connection.QuerySingleAsync<int?>("SELECT OfficeId FROM Test_Nullable_FK WHERE Id = 1");
+            var secondOfficeId = await connection.QuerySingleAsync<int?>("SELECT OfficeId FROM Test_Nullable_FK WHERE Id = 2");
+            firstOfficeId.ShouldBe(1);
+            secondOfficeId.ShouldBeNull();
+        }
     }
 }
