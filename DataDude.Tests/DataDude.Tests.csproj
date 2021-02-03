@@ -10,9 +10,9 @@
     <PackageReference Include="ADatabaseFixture.GalacticWasteManagement" Version="0.2.1" />
     <PackageReference Include="ADatabaseFixture.SqlServer" Version="0.1.0" />
     <PackageReference Include="FakeItEasy" Version="6.2.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
-    <PackageReference Include="Respawn" Version="3.3.0" />
-    <PackageReference Include="Shouldly" Version="4.0.0-beta0004" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
+    <PackageReference Include="Respawn" Version="4.0.0" />
+    <PackageReference Include="Shouldly" Version="4.0.3" />
     <PackageReference Include="Spinit.StyleCop.Analyzers" Version="1.0.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">

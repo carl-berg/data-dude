@@ -43,9 +43,9 @@ namespace DataDude
             return dude;
         }
 
-        public static Dude ConfigureCustomColumnValue(this Dude dude, Func<ColumnInformation, ColumnValue, bool> match, Func<object> getValue)
+        public static Dude ConfigureCustomColumnValue(this Dude dude, Action<ColumnInformation, ColumnValue> getValue)
         {
-            dude.ConfigureInsert(x => x.InsertValueProviders.Insert(0, new CustomValueProvider(match, getValue)));
+            dude.ConfigureInsert(x => x.InsertValueProviders.Insert(0, new CustomValueProvider(getValue)));
             return dude;
         }
 

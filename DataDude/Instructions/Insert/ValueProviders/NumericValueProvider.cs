@@ -6,7 +6,7 @@ namespace DataDude.Instructions.Insert.ValueProviders
     {
         protected override ColumnValue? GetDefaultValue(ColumnInformation column, ColumnValue value)
         {
-            if (column.DataType is "int" or "smallint" or "bigint" or "decimal" or "numeric")
+            if (column.DataType is "int" or "smallint" or "bigint" or "decimal" or "numeric" or "real" or "float")
             {
                 return new ColumnValue(0);
             }

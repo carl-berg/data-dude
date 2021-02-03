@@ -19,10 +19,17 @@ namespace DataDude.Instructions.Insert.Insertion
 
         public UniqueValueGenerator PrimaryKeyValueGenerator { get; set; }
 
-        public override bool CanHandleInsert(InsertStatement statement, InsertContext context) => statement.Data
-            .Where(x => x.Column.IsPrimaryKey())
-            .All(x => CanHandleInsertOfPKColumn(x.Column, x.Value, context)) &&
-            statement.Data.Any(x => x.Column.IsPrimaryKey());
+        public override bool CanHandleInsert(InsertStatement statement, InsertContext context)
+        {
+            if (statement.Table.Any(column => column.IsPrimaryKey()))
+            {
+                return statement.Data
+                    .Where(x => x.Column.IsPrimaryKey())
+                    .All(x => CanHandleInsertOfPKColumn(x.Column, x.Value, context));
+            }
+
+            return false;
+        }
 
         public override async Task<InsertedRow> Insert(InsertStatement statement, InsertContext context, IDbConnection connection, IDbTransaction? transaction = null)
         {

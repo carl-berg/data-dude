@@ -35,6 +35,7 @@ namespace DataDude
             ["decimal"] = DbType.Decimal,
             ["numeric"] = DbType.Decimal,
             ["float"] = DbType.Double,
+            ["real"] = DbType.Double,
             ["uniqueidentifier"] = DbType.Guid,
             ["smallint"] = DbType.Int16,
             ["int"] = DbType.Int32,
@@ -44,6 +45,7 @@ namespace DataDude
             ["varchar"] = DbType.String,
             ["nvarchar"] = DbType.String,
             ["geography"] = DbType.String,
+            ["timestamp"] = DbType.Binary,
         };
 
         public ISchemaLoader SchemaLoader { get; }

@@ -20,9 +20,13 @@ namespace DataDude.Instructions.Insert
                     {
                         _data.Add(column, new ColumnValue(value));
                     }
-                    else
+                    else if (column.IsNullable)
                     {
                         _data.Add(column, ColumnValue.Null(DataDudeContext.GetDbType(column)));
+                    }
+                    else
+                    {
+                        _data.Add(column, ColumnValue.NotSet);
                     }
                 }
                 else

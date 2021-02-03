@@ -8,21 +8,16 @@ namespace DataDude.Instructions.Insert.ValueProviders
     /// </summary>
     public class CustomValueProvider : IValueProvider
     {
-        private readonly Func<ColumnInformation, ColumnValue, bool> _match;
-        private readonly Func<object> _getValue;
+        private readonly Action<ColumnInformation, ColumnValue> _action;
 
-        public CustomValueProvider(Func<ColumnInformation, ColumnValue, bool> match, Func<object> getValue)
+        public CustomValueProvider(Action<ColumnInformation, ColumnValue> action)
         {
-            _match = match;
-            _getValue = getValue;
+            _action = action;
         }
 
         public void Process(ColumnInformation column, ColumnValue previousValue)
         {
-            if (_match(column, previousValue))
-            {
-                previousValue.Set(new ColumnValue(_getValue()));
-            }
+            _action(column, previousValue);
         }
     }
 }

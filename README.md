@@ -58,7 +58,13 @@ If you want more control you can create your own class that implements IDependen
 They provide default column values for the usual data types before an insert is made. If you want to add your own default values, you can configure them using shorthand like this:
 ```csharp
 await new DataDude()
-    .ConfigureCustomColumnValue((column, value) => column.Name == "Active", () => true)
+    .ConfigureCustomColumnValue((column, value) => 
+    {
+        if (column.Name == "Active")
+        {
+            value.Set(new ColumnValue(true));
+        }
+    })
     .Insert("Employee")
     .Go(connection);
 ```
