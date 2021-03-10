@@ -76,6 +76,12 @@ CREATE TABLE Test_Nullable_FK(
 )
 GO
 
+CREATE TABLE Test_Nullable_Text_Data_Type(
+	Id INT PRIMARY KEY,
+	Text TEXT NULL,
+)
+GO
+
 CREATE TRIGGER People.EmployeeUpdatedAt ON People.Employee AFTER UPDATE AS BEGIN
 	UPDATE People.Employee 
 		SET People.Employee.UpdatedAt = GETDATE()

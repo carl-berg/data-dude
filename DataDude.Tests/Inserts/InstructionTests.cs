@@ -279,5 +279,38 @@ namespace DataDude.Tests
             firstOfficeId.ShouldBe(1);
             secondOfficeId.ShouldBeNull();
         }
+
+        [Fact]
+        public async Task Can_Handle_Nullable_Text_Data_Type()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await new Dude()
+                .Insert("Test_Nullable_Text_Data_Type")
+                .Go(connection);
+
+            var insertedItems = await connection.QueryAsync<(int, string)>("SELECT Id, Text FROM Test_Nullable_Text_Data_Type");
+            insertedItems.ShouldNotBeEmpty();
+        }
+
+        [Fact]
+        public async Task Instructions_Are_Cleared_After_Go()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            var dude = new Dude();
+            await dude
+                .Insert("Office", new { Name = "test" })
+                .Go(connection);
+
+            await dude
+                .Insert("Employee", new { Name = "test" })
+                .Go(connection);
+
+            var insertedOffices = await connection.QuerySingleAsync<int>("SELECT COUNT(1) FROM Buildings.Office");
+            var insertedEmployees = await connection.QuerySingleAsync<int>("SELECT COUNT(1) FROM People.Employee");
+            insertedOffices.ShouldBe(1);
+            insertedEmployees.ShouldBe(1);
+        }
     }
 }

@@ -44,6 +44,7 @@ namespace DataDude
             ["varbinary"] = DbType.Binary,
             ["varchar"] = DbType.String,
             ["nvarchar"] = DbType.String,
+            ["text"] = DbType.String,
             ["geography"] = DbType.String,
             ["timestamp"] = DbType.Binary,
         };

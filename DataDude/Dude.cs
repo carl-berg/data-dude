@@ -53,6 +53,8 @@ namespace DataDude
                     throw new HandlerException($"Instruction of type '{instruction.GetType()}' lacks handler and cannot be processed");
                 }
             }
+
+            Context.Instructions.Clear();
         }
     }
 }
