@@ -21,8 +21,10 @@ namespace DataDude.Instructions.Insert.AutomaticForeignKeys
             {
                 if (context.Schema?[instruction.TableName] is { } table)
                 {
+                    IEnumerable<InsertedRow> insertedRows = InsertContext.Get(context)?.InsertedRows ?? Array.Empty<InsertedRow>();
                     var dependencies = _dependencyService.GetOrderedDependenciesFor(table)
                         .Where(t => !toInsert.Values.Any(x => x.Contains(t)))
+                        .Where(t => !insertedRows.Any(x => x.Table == t))
                         .ToList();
 
                     toInsert.Add(instruction, new InsertInformation(table, dependencies));

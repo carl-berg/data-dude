@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DataDude.Instructions.Insert;
 using DataDude.Instructions.Insert.AutomaticForeignKeys;
@@ -112,6 +113,65 @@ namespace DataDude.Tests.Inserts
                 .OfType<InsertInstruction>()
                 .Select(x => x.TableName)
                 .ShouldBe(new[] { "B" });
+        }
+
+        [Fact]
+        public async Task Handles_Previously_Inserted_Rows()
+        {
+            var schema = new TestSchema();
+            var a = schema.AddTable("A");
+            var b = schema.AddTable("B").AddFk(a);
+            var c = schema.AddTable("C").AddFk(b);
+
+            var context = new DataDudeContext(schema);
+            await context.LoadSchema(null, null);
+
+            // Simulate that dude.Go(..) from a previous execution has been executed and a row has already been inserted into table A
+            InsertContext.Get(context).InsertedRows.Add(new InsertedRow(a, new Dictionary<string, object>(), null));
+
+            context.Instructions.Add(new InsertInstruction("C"));
+            var dependencyService = new DependencyService(DependencyTraversalStrategy.FollowAllForeignKeys);
+            await new AddMissingInsertInstructionsPreProcessor(dependencyService).PreProcess(context);
+            context.Instructions
+                .OfType<InsertInstruction>()
+                .Select(x => x.TableName)
+                .ShouldBe(new[] { "[dbo].[B]", "C" });
+        }
+
+        [Fact]
+        public void Can_Enable_AutoFks_Multiple_Times()
+        {
+            var dude = new Dude()
+                .EnableAutomaticForeignKeys(x => x.AddMissingForeignKeys = false)
+                .EnableAutomaticForeignKeys(x => x.AddMissingForeignKeys = true);
+
+            dude.Configure(context =>
+            {
+                context.InstructionPreProcessors.OfType<AddMissingInsertInstructionsPreProcessor>().ShouldHaveSingleItem();
+            });
+
+            dude.ConfigureInsert(insertContext =>
+            {
+                insertContext.InsertInterceptors.OfType<ForeignKeyInterceptor>().ShouldHaveSingleItem();
+            });
+        }
+
+        [Fact]
+        public void Can_Disable_AutoFks()
+        {
+            var dude = new Dude()
+                .EnableAutomaticForeignKeys(x => x.AddMissingForeignKeys = true)
+                .DisableAutomaticForeignKeys();
+
+            dude.Configure(context =>
+            {
+                context.InstructionPreProcessors.OfType<AddMissingInsertInstructionsPreProcessor>().ShouldBeEmpty();
+            });
+
+            dude.ConfigureInsert(insertContext =>
+            {
+                insertContext.InsertInterceptors.OfType<ForeignKeyInterceptor>().ShouldBeEmpty();
+            });
         }
     }
 }
