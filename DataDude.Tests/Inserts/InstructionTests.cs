@@ -144,6 +144,12 @@ namespace DataDude.Tests
                 .Insert("OfficeOccupant")
                 .Go(connection);
 
+            var offices = await connection.QueryAsync<dynamic>("SELECT * FROM Buildings.Office");
+            offices.ShouldHaveSingleItem();
+
+            var employees = await connection.QueryAsync<dynamic>("SELECT * FROM People.Employee");
+            offices.ShouldHaveSingleItem();
+
             var occupants = await connection.QueryAsync<dynamic>("SELECT * FROM Buildings.OfficeOccupant");
             occupants.ShouldHaveSingleItem();
         }
@@ -311,6 +317,33 @@ namespace DataDude.Tests
             var insertedEmployees = await connection.QuerySingleAsync<int>("SELECT COUNT(1) FROM People.Employee");
             insertedOffices.ShouldBe(1);
             insertedEmployees.ShouldBe(1);
+        }
+
+        [Fact]
+        public async Task Split_Inserts_Keeps_Track_Of_Previously_Inserted_Data()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            var dude = new Dude()
+                .EnableAutomaticForeignKeys(x => x.AddMissingForeignKeys = true);
+
+            // Inserts Office, Employee, OfficeOccupant and OfficeOccupancy
+            await dude.Insert("OfficeOccupancy").Go(connection);
+
+            // Should insert OfficeOccupancy only
+            await dude.Insert("OfficeOccupancy").Go(connection);
+
+            var offices = await connection.QueryAsync<dynamic>("SELECT * FROM Buildings.Office");
+            offices.ShouldHaveSingleItem();
+
+            var employees = await connection.QueryAsync<dynamic>("SELECT * FROM People.Employee");
+            offices.ShouldHaveSingleItem();
+
+            var occupants = await connection.QueryAsync<dynamic>("SELECT * FROM Buildings.OfficeOccupant");
+            occupants.ShouldHaveSingleItem();
+
+            var officeOccupancies = await connection.QueryAsync<dynamic>("SELECT * FROM People.OfficeOccupancy");
+            officeOccupancies.ShouldContain(x => true, 2, "Should contain two occupancies");
         }
     }
 }
