@@ -31,14 +31,44 @@ namespace DataDude
             var config = new AutoFKConfiguration();
             configure?.Invoke(config);
 
+            DisableAutomaticForeignKeys(dude);
+
             // Insert first in order to run before identity insert interceptor
-            dude.ConfigureInsert(x => x.InsertInterceptors.Insert(0, new ForeignKeyInterceptor()));
+            dude.ConfigureInsert(insertContext =>
+            {
+                 insertContext.InsertInterceptors.Insert(0, new ForeignKeyInterceptor());
+            });
 
             if (config.AddMissingForeignKeys)
             {
                 var dependencyService = new DependencyService(config.DependencyTraversalStrategy);
                 dude.Configure(x => x.InstructionPreProcessors.Add(new AddMissingInsertInstructionsPreProcessor(dependencyService)));
             }
+
+            return dude;
+        }
+
+        public static Dude DisableAutomaticForeignKeys(this Dude dude)
+        {
+            // Clean out existing ForeignKeyInterceptor
+            dude.ConfigureInsert(insertContext =>
+            {
+                var existingInterceptors = insertContext.InsertInterceptors.OfType<ForeignKeyInterceptor>().ToList();
+                foreach (var existingFKInterceptors in existingInterceptors)
+                {
+                    insertContext.InsertInterceptors.Remove(existingFKInterceptors);
+                }
+            });
+
+            // Clean out existing AddMissingInsertInstructionsPreProcessors
+            dude.Configure(x =>
+            {
+                var existingPreProcessors = x.InstructionPreProcessors.OfType<AddMissingInsertInstructionsPreProcessor>().ToList();
+                foreach (var existingPreProcessor in existingPreProcessors)
+                {
+                    x.InstructionPreProcessors.Remove(existingPreProcessor);
+                }
+            });
 
             return dude;
         }
