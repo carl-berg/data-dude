@@ -13,10 +13,11 @@ namespace DataDude.Tests.Core
 
         public bool CacheSchema { get; set; }
 
-        public TestTable AddTable(string name)
+        public TestTable AddTable(string name) => AddTable(new TestTable(name));
+
+        public TestTable AddTable(TestTable table)
         {
-            var table = new TestTable(name);
-            Tables.Add(name, table);
+            Tables.Add(table.Name, table);
             return table;
         }
 

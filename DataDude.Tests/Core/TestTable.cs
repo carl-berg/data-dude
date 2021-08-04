@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using DataDude.Schema;
 
 namespace DataDude.Tests.Core
@@ -6,13 +8,18 @@ namespace DataDude.Tests.Core
     public class TestTable : TableInformation
     {
         public TestTable(string name)
-            : this(name, "Id")
+            : this(name, c => c.AddIntegerColumn("Id", true))
         {
             AddIndex(new IndexInformation(this, $"PK_{name}", new[] { this["Id"] ! }, true, false, false, false));
         }
 
-        public TestTable(string name, params string[] columns)
-            : base("dbo", name, table => columns.Select(c => new ColumnInformation(table, c, "int", true, false, false, null, 4, 0, 0)))
+        public TestTable(string name, Action<TestTableColumnBuilder> configureColumns)
+            : base("dbo", name, table =>
+            {
+                var builder = new TestTableColumnBuilder(table);
+                configureColumns(builder);
+                return builder;
+            })
         {
         }
 
@@ -29,6 +36,28 @@ namespace DataDude.Tests.Core
             }
 
             return this;
+        }
+
+        public class TestTableColumnBuilder : IEnumerable<ColumnInformation>
+        {
+            private readonly TableInformation _table;
+            private readonly List<ColumnInformation> _columns = new List<ColumnInformation>();
+            public TestTableColumnBuilder(TableInformation table) => _table = table;
+            public TestTableColumnBuilder AddIntegerColumn(string name, bool identity = false)
+            {
+                _columns.Add(new ColumnInformation(_table, name, "int", identity, false, false, null, 4, 0, 0));
+                return this;
+            }
+
+            public TestTableColumnBuilder AddStringColumn(string name, int length = 250)
+            {
+                _columns.Add(new ColumnInformation(_table, name, $"nvarchar", false, false, false, null, length, 0, 0));
+                return this;
+            }
+
+            public IEnumerator<ColumnInformation> GetEnumerator() => _columns.GetEnumerator();
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
     }
 }

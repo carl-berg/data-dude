@@ -7,10 +7,18 @@ namespace DataDude.Instructions.Insert
         public InsertInstruction(string tableName, object? columnData = null)
         {
             TableName = tableName;
-            ColumnValues = new Dictionary<string, object>();
-            foreach (var prop in columnData?.GetType().GetProperties() ?? new System.Reflection.PropertyInfo[0])
+
+            if (columnData is IDictionary<string, object> columnValues)
             {
-                ColumnValues[prop.Name] = prop.GetValue(columnData);
+                ColumnValues = columnValues;
+            }
+            else
+            {
+                ColumnValues = new Dictionary<string, object>();
+                foreach (var prop in columnData?.GetType().GetProperties() ?? new System.Reflection.PropertyInfo[0])
+                {
+                    ColumnValues[prop.Name] = prop.GetValue(columnData);
+                }
             }
         }
 
