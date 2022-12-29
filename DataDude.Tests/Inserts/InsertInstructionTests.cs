@@ -48,12 +48,14 @@ namespace DataDude.Tests.Inserts
             {
                 ["A"] = "A string",
                 ["B"] = 5,
+                ["A_@_B"] = 5,
             };
 
             var instruction = new InsertInstruction("A", data);
 
             instruction.ColumnValues.ShouldContainKey("A");
             instruction.ColumnValues.ShouldContainKey("B");
+            instruction.ColumnValues.ShouldContainKey("A_@_B");
         }
 
         public class ClassBasedInstruction
