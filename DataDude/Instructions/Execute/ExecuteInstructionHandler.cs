@@ -1,6 +1,6 @@
 ﻿using System.Data;
+using System.Data.Common;
 using System.Threading.Tasks;
-using Dapper;
 
 namespace DataDude.Instructions.Execute
 {
@@ -10,7 +10,26 @@ namespace DataDude.Instructions.Execute
         {
             if (instruction is ExecuteInstruction executeInstruction)
             {
-                await connection.ExecuteAsync(executeInstruction.Sql, executeInstruction.Parameters, transaction);
+                var command = connection.CreateCommand();
+
+                command.CommandText = executeInstruction.Sql;
+                foreach (var instructionParameter in executeInstruction.Parameters)
+                {
+                    var parameter = command.CreateParameter();
+                    parameter.ParameterName = instructionParameter.Key;
+                    parameter.Value = instructionParameter.Value;
+                    command.Parameters.Add(parameter);
+                }
+
+                if (command is DbCommand dbCommand)
+                {
+                    await dbCommand.ExecuteNonQueryAsync();
+                }
+                else
+                {
+                    command.ExecuteNonQuery();
+                }
+
                 return new HandleInstructionResult(true);
             }
 
