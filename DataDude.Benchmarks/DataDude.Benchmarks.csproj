@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <OutputType>Exe</OutputType>
+    <LangVersion>11.0</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ADatabaseFixture.GalacticWasteManagement" Version="0.2.1" />
+    <PackageReference Include="ADatabaseFixture.SqlServer" Version="0.1.0" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.13.3" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.0.1" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DataDude\DataDude.csproj" />
+  </ItemGroup>
+
+</Project>
