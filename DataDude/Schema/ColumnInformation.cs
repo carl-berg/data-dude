@@ -1,10 +1,11 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 
 namespace DataDude.Schema
 {
     public class ColumnInformation
     {
+        private bool? _isPrimaryKey;
+
         public ColumnInformation(
             TableInformation table,
             string name,
@@ -39,8 +40,11 @@ namespace DataDude.Schema
         public int MaxLength { get; }
         public int Precision { get; }
         public int Scale { get; }
-        public bool IsPrimaryKey() => Table.Indexes
-            .Where(x => x.IsPrimaryKey)
-            .Any(index => index.Columns.Contains(this));
+        public bool IsPrimaryKey()
+        {
+            return _isPrimaryKey ??= Table.Indexes
+                .Where(x => x.IsPrimaryKey)
+                .Any(index => index.Columns.Contains(this));
+        }
     }
 }

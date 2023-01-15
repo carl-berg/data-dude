@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
 using DataDude.Schema;
 
 namespace DataDude.SqlServer
@@ -109,8 +110,15 @@ namespace DataDude.SqlServer
 
         private async Task<(IEnumerable<SysColumns>, IEnumerable<Indexes>, IEnumerable<ForeignKey>, IEnumerable<Trigger> triggers)> LoadSchema(IDbConnection connection, IDbTransaction? transaction = null)
         {
-            using var reader = await connection.QueryMultipleAsync(
-                @"SELECT 
+            var command = connection.CreateCommand() as DbCommand;
+
+            if (command is null)
+            {
+                throw new Exception();
+            }
+
+            command.Transaction = transaction as DbTransaction;
+            command.CommandText = @"SELECT 
                     s.name as TableSchema,
                     t.name as TableName,
                     c.name as ColumnName,
@@ -161,14 +169,100 @@ namespace DataDude.SqlServer
 	                tr.name AS Name,
 	                is_disabled AS IsDisabled
                 FROM sys.triggers tr
-                INNER JOIN sys.tables t ON tr.parent_id= t.object_id",
-                transaction: transaction);
+                INNER JOIN sys.tables t ON tr.parent_id= t.object_id";
 
-            var allColumns = await reader.ReadAsync<SysColumns>();
-            var allIndexes = await reader.ReadAsync<Indexes>();
-            var allForeignKeys = await reader.ReadAsync<ForeignKey>();
-            var triggers = await reader.ReadAsync<Trigger>();
+            using var reader = command.ExecuteReader(CommandBehavior.Default);
+            var allColumns = await ReadColumns(reader);
+            await reader.NextResultAsync();
+            var allIndexes = await ReadIndexes(reader);
+            await reader.NextResultAsync();
+            var allForeignKeys = await ReadForeignKeys(reader);
+            await reader.NextResultAsync();
+            var triggers = await ReadTriggers(reader);
+            reader.Close();
             return (allColumns, allIndexes, allForeignKeys, triggers);
+        }
+
+        private async Task<IReadOnlyList<SysColumns>> ReadColumns(DbDataReader reader)
+        {
+            var items = new List<SysColumns>();
+            while(await reader.ReadAsync())
+            {
+                items.Add(new SysColumns
+                {
+                    TableSchema = reader.GetString(0),
+                    TableName = reader.GetString(1),
+                    ColumnName = reader.GetString(2),
+                    DataType = reader.GetString(3),
+                    IsNullable = reader.GetBoolean(4),
+                    IsIdentity = reader.GetBoolean(5),
+                    IsComputed = reader.GetBoolean(6),
+                    DefaultValue = reader.IsDBNull(7) ? null : reader.GetString(7),
+                    MaxLength = Convert.ToInt32(reader.GetValue(8)),
+                    Precision = Convert.ToInt32(reader.GetValue(9)),
+                    Scale = Convert.ToInt32(reader.GetValue(10)),
+                });
+            }
+
+            return items;
+        }
+
+        private async Task<IReadOnlyList<Indexes>> ReadIndexes(DbDataReader reader)
+        {
+            var items = new List<Indexes>();
+            while (await reader.ReadAsync())
+            {
+                items.Add(new Indexes
+                {
+                    Name = reader.GetString(0),
+                    TableSchema = reader.GetString(1),
+                    TableName = reader.GetString(2),
+                    ColumnName = reader.GetString(3),
+                    IsPrimaryKey = reader.GetBoolean(4),
+                    IsUnique = reader.GetBoolean(5),
+                    IsUniqueConstraint = reader.GetBoolean(6),
+                    IsDisabled = reader.GetBoolean(7),
+                });
+            }
+
+            return items;
+        }
+
+        private async Task<IReadOnlyList<ForeignKey>> ReadForeignKeys(DbDataReader reader)
+        {
+            var items = new List<ForeignKey>();
+            while (await reader.ReadAsync())
+            {
+                items.Add(new ForeignKey
+                {
+                    ConstraintName = reader.GetString(0),
+                    SchemaName = reader.GetString(1),
+                    TableName = reader.GetString(2),
+                    ColumnName = reader.GetString(3),
+                    ReferencedSchemaName = reader.GetString(4),
+                    ReferencedTableName = reader.GetString(5),
+                    ReferencedColumnName = reader.GetString(6),
+                });
+            }
+
+            return items;
+        }
+
+        private async Task<IReadOnlyList<Trigger>> ReadTriggers(DbDataReader reader)
+        {
+            var items = new List<Trigger>();
+            while (await reader.ReadAsync())
+            {
+                items.Add(new Trigger
+                { 
+                    SchemaName = reader.GetString(0),
+                    TableName = reader.GetString(1),
+                    Name = reader.GetString(2),
+                    IsDisabled = reader.GetBoolean(3),
+                });
+            }
+
+            return items;
         }
 
         private class SysColumns

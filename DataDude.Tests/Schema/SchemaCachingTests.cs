@@ -13,7 +13,7 @@ namespace DataDude.Tests.Schema
         public async Task Schema_Can_Be_Loaded()
         {
             var loader = A.Fake<ISchemaLoader>();
-            var expectedSchema = new SchemaInformation(new TableInformation[0]);
+            var expectedSchema = new SchemaInformation(System.Array.Empty<TableInformation>());
             A.CallTo(() => loader.Load(A<IDbConnection>.Ignored, A<IDbTransaction>.Ignored)).Returns(expectedSchema);
             var dude = new Dude(loader);
 
@@ -25,7 +25,7 @@ namespace DataDude.Tests.Schema
         [Fact]
         public async Task Schema_Can_Be_Cached()
         {
-            var schemaLoader = A.Fake<ISchemaLoader>(o => o.ConfigureFake(loader => loader.CacheSchema = true));
+            var schemaLoader = A.Fake<ISchemaLoader>();
 
             var dude = new Dude(schemaLoader);
             await dude.Go(null, null);
@@ -37,12 +37,12 @@ namespace DataDude.Tests.Schema
         [Fact]
         public async Task Schema_Cache_Can_Be_Turned_Off()
         {
-            var schemaLoader = A.Fake<ISchemaLoader>(o => o.ConfigureFake(loader => loader.CacheSchema = true));
+            var schemaLoader = A.Fake<ISchemaLoader>();
             var dude = new Dude(schemaLoader);
 
             await dude.Go(null, null);
             await dude.Go(null, null);
-            dude.Configure(x => x.SchemaLoader.CacheSchema = false);
+            dude.Configure(x => x.Set<SchemaInformation>("Schema", null));
             await dude.Go(null, null);
 
             A.CallTo(() => schemaLoader.Load(A<IDbConnection>.Ignored, A<IDbTransaction>.Ignored)).MustHaveHappenedTwiceExactly();

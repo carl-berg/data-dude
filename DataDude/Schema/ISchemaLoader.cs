@@ -6,7 +6,6 @@ namespace DataDude
 {
     public interface ISchemaLoader
     {
-        bool CacheSchema { get; set; }
         Task<SchemaInformation> Load(IDbConnection connection, IDbTransaction? transaction = null);
     }
 }

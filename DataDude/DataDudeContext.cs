@@ -15,7 +15,7 @@ namespace DataDude
         public DataDudeContext(ISchemaLoader schemaLoader)
         {
             _store = new Dictionary<string, object>();
-            SchemaLoader = new CachableSchemaLoader(schemaLoader);
+            SchemaLoader = schemaLoader;
             Instructions = new List<IInstruction>();
             InstructionHandlers = new List<IInstructionHandler>
             {
@@ -57,7 +57,7 @@ namespace DataDude
 
         public IList<IInstructionPreProcessor> InstructionPreProcessors { get; }
 
-        public SchemaInformation? Schema { get; private set; }
+        public SchemaInformation? Schema => Get<SchemaInformation>("Schema");
 
         public static DbType GetDbType(ColumnInformation column)
         {
@@ -93,7 +93,11 @@ namespace DataDude
 
         public async Task LoadSchema(IDbConnection connection, IDbTransaction? transaction = null)
         {
-            Schema = await SchemaLoader.Load(connection, transaction);
+            if (_store.ContainsKey("Schema") is false)
+            {
+                var schema = await SchemaLoader.Load(connection, transaction);
+                Set("Schema", schema);
+            }
         }
     }
 }
