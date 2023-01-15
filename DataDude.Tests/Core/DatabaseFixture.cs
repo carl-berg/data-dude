@@ -6,10 +6,11 @@ using GalacticWasteManagement;
 using GalacticWasteManagement.Scripts;
 using GalacticWasteManagement.Scripts.EmbeddedScripts;
 using GalacticWasteManagement.Scripts.ScriptProviders;
+using Xunit;
 
 namespace DataDude.Tests.Core
 {
-    public class DatabaseFixture : DatabaseFixtureBase
+    public class DatabaseFixture : DatabaseFixtureBase, IAsyncLifetime
     {
         public DatabaseFixture()
             : base(
