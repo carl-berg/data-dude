@@ -123,6 +123,3 @@ There is one other insert handler available, `OutputInsertRowHandler` which uses
 ```csharp
 dude.ConfigureInsert(x => x.InsertRowHandlers.Add(new OutputInsertRowHandler()));
 ```
-
-## Dependencies
-- [Dapper](https://github.com/StackExchange/Dapper) is used for internal data access
