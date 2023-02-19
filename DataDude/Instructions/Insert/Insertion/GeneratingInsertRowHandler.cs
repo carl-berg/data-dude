@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
+using DataDude.Core;
 using DataDude.Schema;
 
 namespace DataDude.Instructions.Insert.Insertion
@@ -31,13 +31,13 @@ namespace DataDude.Instructions.Insert.Insertion
             return false;
         }
 
-        public override async Task<InsertedRow> Insert(InsertStatement statement, InsertContext context, IDbConnection connection, IDbTransaction? transaction = null)
+        public override async Task<InsertedRow> Insert(InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null)
         {
             await PreProcessStatement(statement, context, connection, transaction);
             var (columns, values, parameters) = GetInsertInformation(statement);
             var identityFilters = statement.Table.Where(x => x.IsPrimaryKey()).Select(x => $"[{x.Name}] = {GetParameterNameOrRawSql(x, statement.Data[x])}");
             var identityFilter = string.Join(" AND ", identityFilters);
-            var insertedRow = await connection.QuerySingleAsync<object>(
+            var insertedRow = await connection.QuerySingleAsync(
                 $@"INSERT INTO {statement.Table.FullName}({columns}) VALUES({values})
                 SELECT * FROM {statement.Table.FullName} WHERE {identityFilter}",
                 parameters,
@@ -79,21 +79,19 @@ namespace DataDude.Instructions.Insert.Insertion
             return column.DefaultValue is { } || PrimaryKeyValueGenerator.CanHandle(column);
         }
 
-        protected virtual async Task PreProcessStatement(InsertStatement statement, InsertContext context, IDbConnection connection, IDbTransaction? transaction = null)
+        protected virtual async Task PreProcessStatement(InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null)
         {
             // Attempt to use specified raw-sql values or default values
             if (GetDatabaseGenratedValuePairs(statement) is { } fetch && fetch.Count() > 0)
             {
                 var items = string.Join(", ", fetch.Select(f => $"{f.SQL} AS [{f.ColumnName}]"));
-                var result = await connection.QuerySingleAsync<dynamic>($"SELECT {items}", transaction: transaction);
-                if (result is IReadOnlyDictionary<string, object> values)
+                var result = await connection.QuerySingleAsync($"SELECT {items}", transaction: transaction);
+
+                foreach (var item in result)
                 {
-                    foreach (var item in values)
+                    if (statement.Table[item.Key] is { } column)
                     {
-                        if (statement.Table[item.Key] is { } column)
-                        {
-                            statement.Data[column].Set(new ColumnValue(item.Value));
-                        }
+                        statement.Data[column].Set(new ColumnValue(item.Value));
                     }
                 }
             }

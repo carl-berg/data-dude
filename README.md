@@ -92,7 +92,7 @@ These are executed before and after inserts (but after value providers have been
 ```csharp
 public class AlwaysTrue : IInsertInterceptor
 {
-    public Task OnInsert(InsertStatement statement, InsertContext context, IDbConnection connection, IDbTransaction? transaction = null)
+    public Task OnInsert(InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null)
     {
         foreach (var (column, value) in statement.Data)
         {
@@ -105,7 +105,7 @@ public class AlwaysTrue : IInsertInterceptor
         return Task.CompletedTask;
     }
 
-    public Task OnInserted(InsertedRow insertedRow, InsertStatement statement, InsertContext context, IDbConnection connection, IDbTransaction? transaction = null)
+    public Task OnInserted(InsertedRow insertedRow, InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null)
         => Task.CompletedTask;
 }
 

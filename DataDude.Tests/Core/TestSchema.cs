@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Data.Common;
 using System.Threading.Tasks;
 using DataDude.Schema;
 
@@ -21,7 +22,7 @@ namespace DataDude.Tests.Core
             return table;
         }
 
-        public Task<SchemaInformation> Load(IDbConnection connection, IDbTransaction transaction = null)
+        public Task<SchemaInformation> Load(DbConnection connection, DbTransaction transaction = null)
         {
             return Task.FromResult(this as SchemaInformation);
         }

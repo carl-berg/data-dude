@@ -1,4 +1,4 @@
-﻿using System.Data;
+﻿using System.Data.Common;
 using System.Threading.Tasks;
 using DataDude.Schema;
 using FakeItEasy;
@@ -14,7 +14,7 @@ namespace DataDude.Tests.Schema
         {
             var loader = A.Fake<ISchemaLoader>();
             var expectedSchema = new SchemaInformation(System.Array.Empty<TableInformation>());
-            A.CallTo(() => loader.Load(A<IDbConnection>.Ignored, A<IDbTransaction>.Ignored)).Returns(expectedSchema);
+            A.CallTo(() => loader.Load(A<DbConnection>.Ignored, A<DbTransaction>.Ignored)).Returns(expectedSchema);
             var dude = new Dude(loader);
 
             await dude.Go(null, null);
@@ -31,7 +31,7 @@ namespace DataDude.Tests.Schema
             await dude.Go(null, null);
             await dude.Go(null, null);
 
-            A.CallTo(() => schemaLoader.Load(A<IDbConnection>.Ignored, A<IDbTransaction>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => schemaLoader.Load(A<DbConnection>.Ignored, A<DbTransaction>.Ignored)).MustHaveHappenedOnceExactly();
         }
 
         [Fact]
@@ -45,7 +45,7 @@ namespace DataDude.Tests.Schema
             dude.Configure(x => x.Set<SchemaInformation>("Schema", null));
             await dude.Go(null, null);
 
-            A.CallTo(() => schemaLoader.Load(A<IDbConnection>.Ignored, A<IDbTransaction>.Ignored)).MustHaveHappenedTwiceExactly();
+            A.CallTo(() => schemaLoader.Load(A<DbConnection>.Ignored, A<DbTransaction>.Ignored)).MustHaveHappenedTwiceExactly();
         }
     }
 }
