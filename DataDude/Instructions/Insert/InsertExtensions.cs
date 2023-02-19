@@ -41,8 +41,11 @@ namespace DataDude
 
             if (config.AddMissingForeignKeys)
             {
-                var dependencyService = new DependencyService(config.DependencyTraversalStrategy);
-                dude.Configure(x => x.InstructionPreProcessors.Add(new AddMissingInsertInstructionsPreProcessor(dependencyService)));
+                dude.Configure(ctx => 
+                {
+                    var dependencyService = new DependencyService(config.DependencyTraversalStrategy, ctx);
+                    ctx.InstructionPreProcessors.Add(new AddMissingInsertInstructionsPreProcessor(dependencyService));
+                });
             }
 
             return dude;

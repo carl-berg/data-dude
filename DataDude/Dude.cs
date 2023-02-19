@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Data;
+using System.Data.Common;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using DataDude.Instructions;
-using DataDude.Schema;
 
 [assembly: InternalsVisibleTo("DataDude.Tests")]
 
@@ -20,7 +19,7 @@ namespace DataDude
 
         public void Configure(Action<DataDudeContext> configure) => configure?.Invoke(Context);
 
-        public async Task Go(IDbConnection connection, IDbTransaction? transaction = null)
+        public async Task Go(DbConnection connection, DbTransaction? transaction = null)
         {
             await Context.LoadSchema(connection, transaction);
 

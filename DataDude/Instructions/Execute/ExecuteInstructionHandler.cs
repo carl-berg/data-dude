@@ -6,7 +6,7 @@ namespace DataDude.Instructions.Execute
 {
     public class ExecuteInstructionHandler : IInstructionHandler
     {
-        public async Task<HandleInstructionResult> Handle(IInstruction instruction, DataDudeContext context, IDbConnection connection, IDbTransaction? transaction = null)
+        public async Task<HandleInstructionResult> Handle(IInstruction instruction, DataDudeContext context, DbConnection connection, DbTransaction? transaction = null)
         {
             if (instruction is ExecuteInstruction executeInstruction)
             {

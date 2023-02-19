@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
+using DataDude.Core;
 using DataDude.Schema;
 
 namespace DataDude.Instructions.Insert.Insertion
@@ -11,19 +11,19 @@ namespace DataDude.Instructions.Insert.Insertion
     {
         public abstract bool CanHandleInsert(InsertStatement statement, InsertContext context);
 
-        public abstract Task<InsertedRow> Insert(InsertStatement statement, InsertContext context, IDbConnection connection, IDbTransaction? transaction = null);
+        public abstract Task<InsertedRow> Insert(InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null);
 
-        protected (string columns, string values, DynamicParameters parameters) GetInsertInformation(InsertStatement statement)
+        protected internal (string columns, string values, IReadOnlyList<DataDudeDbParameter> parameters) GetInsertInformation(InsertStatement statement)
         {
             var columnsToInsert = statement.Data.Where(x => x.Value.Type == ColumnValueType.Set);
             var columns = string.Join(", ", columnsToInsert.Select(x => $"[{x.Column.Name}]"));
             var values = string.Join(", ", columnsToInsert.Select(x => GetParameterNameOrRawSql(x.Column, x.Value)));
-            var parameters = new DynamicParameters();
+            var parameters = new List<DataDudeDbParameter>();
             foreach (var (column, value) in columnsToInsert)
             {
                 if (!(value.Value is RawSql))
                 {
-                    parameters.Add(column.Name, value.Value, value.DbType);
+                    parameters.Add(new (column.Name, value.Value, value.DbType));
                 }
             }
 

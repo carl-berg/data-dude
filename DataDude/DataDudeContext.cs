@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Threading.Tasks;
 using DataDude.Instructions;
 using DataDude.Instructions.Execute;
@@ -91,7 +92,7 @@ namespace DataDude
             }
         }
 
-        public async Task LoadSchema(IDbConnection connection, IDbTransaction? transaction = null)
+        public async Task LoadSchema(DbConnection connection, DbTransaction? transaction = null)
         {
             if (_store.ContainsKey("Schema") is false)
             {

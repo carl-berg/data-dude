@@ -6,10 +6,21 @@ namespace DataDude.Schema
     public class DependencyService
     {
         private readonly IDependencyTraversalStrategy _strategy;
-        public DependencyService(IDependencyTraversalStrategy strategy) => _strategy = strategy;
+        private readonly IDictionary<TableInformation, IReadOnlyList<TableInformation>> _cachedDependencies;
+
+        public DependencyService(IDependencyTraversalStrategy strategy, DataDudeContext? context = null)
+        {
+            _strategy = strategy;
+            _cachedDependencies = GetCache(context);
+        }
 
         public IEnumerable<TableInformation> GetOrderedDependenciesFor(TableInformation table)
         {
+            if (_cachedDependencies.TryGetValue(table, out var cachedDependencies))
+            {
+                return cachedDependencies;
+            }
+
             var dependencies = new HashSet<TableInformation>();
             foreach (var dep in table.ForeignKeys.Where(_strategy.Process).Select(x => x.ReferencedTable))
             {
@@ -31,6 +42,7 @@ namespace DataDude.Schema
                 throw new DependencyTraversalFailedException($"Failed building a dependency chain for table {table.FullName}");
             }
 
+            _cachedDependencies[table] = sortedDependencies;
             return sortedDependencies;
         }
 
@@ -44,6 +56,18 @@ namespace DataDude.Schema
                     ProcessDependencies(dep, ref dependencies);
                 }
             }
+        }
+
+        private IDictionary<TableInformation, IReadOnlyList<TableInformation>> GetCache(DataDudeContext? context)
+        {
+            if (context?.Get<IDictionary<TableInformation, IReadOnlyList<TableInformation>>>("DependencyService_Cache") is IDictionary<TableInformation, IReadOnlyList<TableInformation>> cache)
+            {
+                return cache;
+            }
+
+            var newCache = new Dictionary<TableInformation, IReadOnlyList<TableInformation>>();
+            context?.Set("DependencyService_Cache", newCache);
+            return newCache;
         }
     }
 }

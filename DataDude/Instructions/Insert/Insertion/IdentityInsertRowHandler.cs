@@ -1,7 +1,7 @@
-﻿using System.Data;
+﻿using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
+using DataDude.Core;
 
 namespace DataDude.Instructions.Insert.Insertion
 {
@@ -16,11 +16,11 @@ namespace DataDude.Instructions.Insert.Insertion
             return primaryKeys.Count() == 1 && primaryKeys.All(x => x.IsIdentity);
         }
 
-        public override async Task<InsertedRow> Insert(InsertStatement statement, InsertContext context, IDbConnection connection, IDbTransaction? transaction = null)
+        public override async Task<InsertedRow> Insert(InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null)
         {
             var (columns, values, parameters) = GetInsertInformation(statement);
             var primaryKey = statement.Table.Single(x => x.IsPrimaryKey() && x.IsIdentity);
-            var insertedRow = await connection.QuerySingleAsync<object>(
+            var insertedRow = await connection.QuerySingleAsync(
                 $@"INSERT INTO {statement.Table.FullName}({columns}) VALUES({values})
                 SELECT * FROM {statement.Table.FullName} WHERE [{primaryKey.Name}] = SCOPE_IDENTITY()",
                 parameters,

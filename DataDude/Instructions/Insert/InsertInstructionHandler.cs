@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using DataDude.Instructions.Insert.Insertion;
@@ -15,7 +16,7 @@ namespace DataDude.Instructions.Insert
 
         private InsertContext Context { get; }
 
-        public virtual async Task<HandleInstructionResult> Handle(IInstruction instruction, DataDudeContext context, IDbConnection connection, IDbTransaction? transaction = null)
+        public virtual async Task<HandleInstructionResult> Handle(IInstruction instruction, DataDudeContext context, DbConnection connection, DbTransaction? transaction = null)
         {
             if (instruction is InsertInstruction insert)
             {

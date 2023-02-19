@@ -12,7 +12,7 @@ namespace DataDude.SqlServer
     {
         public bool CacheSchema { get; set; } = true;
 
-        public async Task<SchemaInformation> Load(IDbConnection connection, IDbTransaction? transaction = null)
+        public async Task<SchemaInformation> Load(DbConnection connection, DbTransaction? transaction = null)
         {
             var (columns, indexes, foreignKeys, triggers) = await LoadSchema(connection, transaction);
 
@@ -108,16 +108,16 @@ namespace DataDude.SqlServer
             }
         }
 
-        private async Task<(IEnumerable<SysColumns>, IEnumerable<Indexes>, IEnumerable<ForeignKey>, IEnumerable<Trigger> triggers)> LoadSchema(IDbConnection connection, IDbTransaction? transaction = null)
+        private async Task<(IEnumerable<SysColumns>, IEnumerable<Indexes>, IEnumerable<ForeignKey>, IEnumerable<Trigger> triggers)> LoadSchema(DbConnection connection, DbTransaction? transaction = null)
         {
-            var command = connection.CreateCommand() as DbCommand;
+            var command = connection.CreateCommand();
 
             if (command is null)
             {
                 throw new Exception();
             }
 
-            command.Transaction = transaction as DbTransaction;
+            command.Transaction = transaction;
             command.CommandText = @"SELECT 
                     s.name as TableSchema,
                     t.name as TableName,

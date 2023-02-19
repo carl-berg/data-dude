@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using DataDude.Instructions.Insert.Interception;
@@ -10,7 +11,7 @@ namespace DataDude.Instructions.Insert.AutomaticForeignKeys
     /// </summary>
     public class ForeignKeyInterceptor : IInsertInterceptor
     {
-        public Task OnInsert(InsertStatement statement, InsertContext context, IDbConnection connection, IDbTransaction? transaction = null)
+        public Task OnInsert(InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null)
         {
             foreach (var fk in statement.Table.ForeignKeys)
             {
@@ -33,7 +34,7 @@ namespace DataDude.Instructions.Insert.AutomaticForeignKeys
             InsertedRow insertedRow,
             InsertStatement statement,
             InsertContext context,
-            IDbConnection connection,
-            IDbTransaction? transaction = null) => Task.CompletedTask;
+            DbConnection connection,
+            DbTransaction? transaction = null) => Task.CompletedTask;
     }
 }

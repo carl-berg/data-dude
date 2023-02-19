@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
+using DataDude.Core;
 using DataDude.Schema;
 
 namespace DataDude.Instructions
 {
-    public static class Extensions
+    internal static class Extensions
     {
-        public static async Task DisableTriggers(this TableInformation table, IDbConnection connection, IDbTransaction? transaction = null)
+        internal static async Task DisableTriggers(this TableInformation table, DbConnection connection, DbTransaction? transaction = null)
         {
             var disableTriggerStatements = table.Triggers
                 .Where(x => !x.IsDisabled)
@@ -21,7 +21,7 @@ namespace DataDude.Instructions
             }
         }
 
-        public static async Task EnableTriggers(this TableInformation table, IDbConnection connection, IDbTransaction? transaction = null)
+        internal static async Task EnableTriggers(this TableInformation table, DbConnection connection, DbTransaction? transaction = null)
         {
             var enableTriggerStatements = table.Triggers
                 .Where(x => !x.IsDisabled)

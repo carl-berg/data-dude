@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Data;
+using System.Data.Common;
 using System.Threading.Tasks;
-using Dapper;
+using DataDude.Core;
 
 namespace DataDude.Instructions.Insert.Insertion
 {
@@ -14,11 +14,11 @@ namespace DataDude.Instructions.Insert.Insertion
     {
         public override bool CanHandleInsert(InsertStatement statement, InsertContext context) => true;
 
-        public override async Task<InsertedRow> Insert(InsertStatement statement, InsertContext context, IDbConnection connection, IDbTransaction? transaction = null)
+        public override async Task<InsertedRow> Insert(InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null)
         {
             var (columns, values, parameters) = GetInsertInformation(statement);
             await statement.Table.DisableTriggers(connection, transaction);
-            var insertedRow = await connection.QuerySingleAsync<dynamic>(
+            var insertedRow = await connection.QuerySingleAsync(
                 $@"INSERT INTO {statement.Table.FullName}({columns}) OUTPUT inserted.* VALUES({values})",
                 parameters,
                 transaction);
