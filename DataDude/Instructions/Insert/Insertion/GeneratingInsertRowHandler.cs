@@ -31,7 +31,7 @@ namespace DataDude.Instructions.Insert.Insertion
             return false;
         }
 
-        public override async Task<InsertedRow> Insert(InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null)
+        public override async ValueTask<InsertedRow> Insert(InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null)
         {
             await PreProcessStatement(statement, context, connection, transaction);
             var (columns, values, parameters) = GetInsertInformation(statement);
@@ -79,7 +79,7 @@ namespace DataDude.Instructions.Insert.Insertion
             return column.DefaultValue is { } || PrimaryKeyValueGenerator.CanHandle(column);
         }
 
-        protected virtual async Task PreProcessStatement(InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null)
+        protected virtual async ValueTask PreProcessStatement(InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null)
         {
             // Attempt to use specified raw-sql values or default values
             if (GetDatabaseGenratedValuePairs(statement) is { } fetch && fetch.Count() > 0)

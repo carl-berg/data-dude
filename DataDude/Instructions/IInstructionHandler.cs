@@ -6,6 +6,6 @@ namespace DataDude.Instructions
 {
     public interface IInstructionHandler
     {
-        Task<HandleInstructionResult> Handle(IInstruction instruction, DataDudeContext context, DbConnection connection, DbTransaction? transaction = null);
+        ValueTask<HandleInstructionResult> Handle(IInstruction instruction, DataDudeContext context, DbConnection connection, DbTransaction? transaction = null);
     }
 }

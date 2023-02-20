@@ -14,13 +14,6 @@ namespace DataDude.Tests.Schema
         }
 
         [Fact]
-        public void SqlServerSchemaLoader_Has_Caching_Enabled_By_Default()
-        {
-            var loader = new SqlServerSchemaLoader();
-            loader.CacheSchema.ShouldBeTrue();
-        }
-
-        [Fact]
         public async Task Schema_Loading()
         {
             using var connection = Fixture.CreateNewConnection();

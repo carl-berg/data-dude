@@ -23,7 +23,7 @@ namespace DataDude
                 new ExecuteInstructionHandler(),
                 new InsertInstructionHandler(this),
             };
-            InstructionPreProcessors = new List<IInstructionPreProcessor>();
+            InstructionDecorators = new List<IInstructionDecorator>();
         }
 
         public static IDictionary<string, DbType> TypeMappings { get; } = new Dictionary<string, DbType>
@@ -56,7 +56,7 @@ namespace DataDude
 
         public IList<IInstructionHandler> InstructionHandlers { get; }
 
-        public IList<IInstructionPreProcessor> InstructionPreProcessors { get; }
+        public IList<IInstructionDecorator> InstructionDecorators { get; }
 
         public SchemaInformation? Schema => Get<SchemaInformation>("Schema");
 
@@ -92,7 +92,7 @@ namespace DataDude
             }
         }
 
-        public async Task LoadSchema(DbConnection connection, DbTransaction? transaction = null)
+        public async ValueTask LoadSchema(DbConnection connection, DbTransaction? transaction = null)
         {
             if (_store.ContainsKey("Schema") is false)
             {

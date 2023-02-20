@@ -9,12 +9,12 @@ namespace DataDude.Instructions.Insert.AutomaticForeignKeys
     /// <summary>
     /// Adds "missing" dependent inserts based on foreign keys.
     /// </summary>
-    public class AddMissingInsertInstructionsPreProcessor : IInstructionPreProcessor
+    public class AddMissingInsertInstructionsPreProcessor : IInstructionDecorator
     {
         private readonly DependencyService _dependencyService;
         public AddMissingInsertInstructionsPreProcessor(DependencyService dependencyService) => _dependencyService = dependencyService;
 
-        public Task PreProcess(DataDudeContext context)
+        public ValueTask PreProcess(DataDudeContext context)
         {
             var toInsert = new Dictionary<InsertInstruction, InsertInformation>();
             foreach (var instruction in context.Instructions.OfType<InsertInstruction>())
@@ -40,8 +40,10 @@ namespace DataDude.Instructions.Insert.AutomaticForeignKeys
                 }
             }
 
-            return Task.CompletedTask;
+            return default;
         }
+
+        public ValueTask PostProcess(DataDudeContext context) => default;
 
         private class InsertInformation
         {

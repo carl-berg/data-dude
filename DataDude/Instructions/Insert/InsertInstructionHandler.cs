@@ -16,7 +16,7 @@ namespace DataDude.Instructions.Insert
 
         private InsertContext Context { get; }
 
-        public virtual async Task<HandleInstructionResult> Handle(IInstruction instruction, DataDudeContext context, DbConnection connection, DbTransaction? transaction = null)
+        public virtual async ValueTask<HandleInstructionResult> Handle(IInstruction instruction, DataDudeContext context, DbConnection connection, DbTransaction? transaction = null)
         {
             if (instruction is InsertInstruction insert)
             {

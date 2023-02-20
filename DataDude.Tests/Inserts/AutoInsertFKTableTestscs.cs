@@ -147,7 +147,7 @@ namespace DataDude.Tests.Inserts
 
             dude.Configure(context =>
             {
-                context.InstructionPreProcessors.OfType<AddMissingInsertInstructionsPreProcessor>().ShouldHaveSingleItem();
+                context.InstructionDecorators.OfType<AddMissingInsertInstructionsPreProcessor>().ShouldHaveSingleItem();
             });
 
             dude.ConfigureInsert(insertContext =>
@@ -165,7 +165,7 @@ namespace DataDude.Tests.Inserts
 
             dude.Configure(context =>
             {
-                context.InstructionPreProcessors.OfType<AddMissingInsertInstructionsPreProcessor>().ShouldBeEmpty();
+                context.InstructionDecorators.OfType<AddMissingInsertInstructionsPreProcessor>().ShouldBeEmpty();
             });
 
             dude.ConfigureInsert(insertContext =>

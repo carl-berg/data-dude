@@ -44,7 +44,7 @@ namespace DataDude
                 dude.Configure(ctx => 
                 {
                     var dependencyService = new DependencyService(config.DependencyTraversalStrategy, ctx);
-                    ctx.InstructionPreProcessors.Add(new AddMissingInsertInstructionsPreProcessor(dependencyService));
+                    ctx.InstructionDecorators.Add(new AddMissingInsertInstructionsPreProcessor(dependencyService));
                 });
             }
 
@@ -66,10 +66,10 @@ namespace DataDude
             // Clean out existing AddMissingInsertInstructionsPreProcessors
             dude.Configure(x =>
             {
-                var existingPreProcessors = x.InstructionPreProcessors.OfType<AddMissingInsertInstructionsPreProcessor>().ToList();
+                var existingPreProcessors = x.InstructionDecorators.OfType<AddMissingInsertInstructionsPreProcessor>().ToList();
                 foreach (var existingPreProcessor in existingPreProcessors)
                 {
-                    x.InstructionPreProcessors.Remove(existingPreProcessor);
+                    x.InstructionDecorators.Remove(existingPreProcessor);
                 }
             });
 
