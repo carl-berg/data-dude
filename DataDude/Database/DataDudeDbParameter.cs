@@ -29,14 +29,9 @@ namespace DataDude.Core
             {
                 param.DbType = dbType;
             }
-
-            if (Column is { DataType: "geography" })
+            else if (Column is { DataType: "geography" } && param.GetType().GetProperty("UdtTypeName") is PropertyInfo udtProperty)
             {
-                if (param.GetType().GetProperty("UdtTypeName") is PropertyInfo udtProperty)
-                {
-                    udtProperty.SetValue(param, "geography");
-                }
-
+                udtProperty.SetValue(param, "geography");
             }
 
             cmd.Parameters.Add(param);
