@@ -4,6 +4,7 @@ using Dapper;
 using DataDude.Instructions.Insert;
 using DataDude.Instructions.Insert.Insertion;
 using DataDude.Tests.Core;
+using Microsoft.SqlServer.Types;
 using Shouldly;
 using Xunit;
 
@@ -344,6 +345,31 @@ namespace DataDude.Tests
 
             var officeOccupancies = await connection.QueryAsync<dynamic>("SELECT * FROM People.OfficeOccupancy");
             officeOccupancies.ShouldContain(x => true, 2, "Should contain two occupancies");
+        }
+
+        [Fact]
+        public async Task Can_Insert_Geography_Data()
+        {
+            using var connection = Fixture.CreateNewConnection();
+            var position = SqlGeography.Point(50, 11, 4326);
+
+            var dude = new Dude();
+            await dude
+                .Insert("Test_Geography_Data", 
+                    new { Position = position },
+                    new { Position = (SqlGeography)null })
+                .Go(connection);
+
+            var geography_data = (await connection.QueryAsync<(decimal? Lat, decimal? Long)>("SELECT Position.Lat, Position.Long FROM Test_Geography_Data ORDER BY Id")).ToList();
+            geography_data.ShouldSatisfyAllConditions(
+                positions => positions[0].ShouldSatisfyAllConditions(
+                    position => position.Lat.ShouldBe(50),
+                    position => position.Long.ShouldBe(11)),
+                positions => positions[1].ShouldSatisfyAllConditions(
+                    position => position.Lat.ShouldBeNull(),
+                    position => position.Long.ShouldBeNull()));
+
+
         }
     }
 }

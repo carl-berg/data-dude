@@ -1,31 +1,37 @@
 ﻿using System;
 using System.Data;
 using System.Data.Common;
+using System.Reflection;
+using DataDude.Instructions.Insert;
+using DataDude.Schema;
 
 namespace DataDude.Core
 {
     public struct DataDudeDbParameter
     {
-        public DataDudeDbParameter(string name, object? value, DbType? dbType)
+        public DataDudeDbParameter(ColumnInformation column, ColumnValue? value)
         {
-            Name = name;
-            Value = value;
-            DbType = dbType;
+            Column = column;
+            ColumnValue = value;
         }
 
-        public string Name { get; }
-        public object? Value { get; }
-        public DbType? DbType { get; }
+        public ColumnInformation Column { get; }
+        public ColumnValue? ColumnValue { get; }
 
         public void AddParameterTo(DbCommand cmd)
         {
             var param = cmd.CreateParameter();
-            param.ParameterName = $"@{Name}";
-            param.Value = Value ?? DBNull.Value;
+            param.ParameterName = $"@{Column.Name}";
+            param.Value = ColumnValue?.Value ?? DBNull.Value;
             param.Direction = ParameterDirection.Input;
-            if (DbType is { })
+            
+            if (ColumnValue?.DbType is { } dbType)
             {
-                param.DbType = DbType.Value;
+                param.DbType = dbType;
+            }
+            else if (Column is { DataType: "geography" } && param.GetType().GetProperty("UdtTypeName") is PropertyInfo udtProperty)
+            {
+                udtProperty.SetValue(param, "geography");
             }
 
             cmd.Parameters.Add(param);
