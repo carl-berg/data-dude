@@ -1,0 +1,53 @@
+name: Release DataDude
+
+on:
+  push:
+    tags: 
+    - '*'
+
+env:
+  DOTNET_VERSION: '7.x' # The .NET SDK version to use
+
+jobs:
+
+  build-and-test:
+    name: Build and test
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Install dependencies
+      run: dotnet restore
+
+    - name: Start localdb
+      shell: pwsh
+      run: sqllocaldb start mssqllocaldb
+    
+    - name: Test
+      run: dotnet test --configuration Release --no-restore --verbosity normal
+
+  deploy:
+    name: Deploy
+    runs-on: windows-latest
+    environment: NugetDeploy
+    needs: [build-and-test]
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Package artifact
+      run: dotnet pack DataDude/DataDude.csproj --configuration Release -o ${{ github.workspace }}/artifact
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: ADatabaseFixture
+        path: ${{ github.workspace }}/artifact/**/*
+
+    - name: Publish the package to nuget.org
+      run: dotnet nuget push ${{ github.workspace }}\artifact\*.nupkg -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGET_TOKEN }}
