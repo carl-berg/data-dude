@@ -3,7 +3,7 @@
 namespace DataDude.Instructions
 {
     /// <summary>
-    /// 
+    /// Intercept context before and after instructions have been executed
     /// </summary>
     public interface IInstructionDecorator
     {

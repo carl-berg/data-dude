@@ -23,7 +23,7 @@ namespace DataDude.Instructions.Insert.Insertion
             {
                 if (!(value.Value is RawSql))
                 {
-                    parameters.Add(new (column.Name, value.Value, value.DbType));
+                    parameters.Add(new (column, value));
                 }
             }
 
