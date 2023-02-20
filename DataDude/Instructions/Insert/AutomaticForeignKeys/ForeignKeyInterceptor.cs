@@ -11,7 +11,7 @@ namespace DataDude.Instructions.Insert.AutomaticForeignKeys
     /// </summary>
     public class ForeignKeyInterceptor : IInsertInterceptor
     {
-        public Task OnInsert(InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null)
+        public ValueTask OnInsert(InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null)
         {
             foreach (var fk in statement.Table.ForeignKeys)
             {
@@ -27,14 +27,14 @@ namespace DataDude.Instructions.Insert.AutomaticForeignKeys
                 }
             }
 
-            return Task.CompletedTask;
+            return default;
         }
 
-        public Task OnInserted(
+        public ValueTask OnInserted(
             InsertedRow insertedRow,
             InsertStatement statement,
             InsertContext context,
             DbConnection connection,
-            DbTransaction? transaction = null) => Task.CompletedTask;
+            DbTransaction? transaction = null) => default;
     }
 }

@@ -11,7 +11,7 @@ namespace DataDude.Instructions.Insert.Insertion
     {
         public abstract bool CanHandleInsert(InsertStatement statement, InsertContext context);
 
-        public abstract Task<InsertedRow> Insert(InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null);
+        public abstract ValueTask<InsertedRow> Insert(InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null);
 
         protected internal (string columns, string values, IReadOnlyList<DataDudeDbParameter> parameters) GetInsertInformation(InsertStatement statement)
         {

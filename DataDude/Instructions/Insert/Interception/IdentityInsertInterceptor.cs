@@ -8,7 +8,7 @@ namespace DataDude.Instructions.Insert.Interception
 {
     public class IdentityInsertInterceptor : IInsertInterceptor
     {
-        public async Task OnInsert(InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null)
+        public async ValueTask OnInsert(InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null)
         {
             if (statement.Data.Any(x => x.Value.Type == ColumnValueType.Set && x.Column.IsIdentity))
             {
@@ -16,7 +16,7 @@ namespace DataDude.Instructions.Insert.Interception
             }
         }
 
-        public async Task OnInserted(InsertedRow insertedRow, InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null)
+        public async ValueTask OnInserted(InsertedRow insertedRow, InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null)
         {
             if (statement.Data.Any(x => x.Value.Type == ColumnValueType.Set && x.Column.IsIdentity))
             {

@@ -6,7 +6,7 @@ namespace DataDude.Instructions.Execute
 {
     public class ExecuteInstructionHandler : IInstructionHandler
     {
-        public async Task<HandleInstructionResult> Handle(IInstruction instruction, DataDudeContext context, DbConnection connection, DbTransaction? transaction = null)
+        public async ValueTask<HandleInstructionResult> Handle(IInstruction instruction, DataDudeContext context, DbConnection connection, DbTransaction? transaction = null)
         {
             if (instruction is ExecuteInstruction executeInstruction)
             {
@@ -21,14 +21,7 @@ namespace DataDude.Instructions.Execute
                     command.Parameters.Add(parameter);
                 }
 
-                if (command is DbCommand dbCommand)
-                {
-                    await dbCommand.ExecuteNonQueryAsync();
-                }
-                else
-                {
-                    command.ExecuteNonQuery();
-                }
+                await command.ExecuteNonQueryAsync().ConfigureAwait(false);
 
                 return new HandleInstructionResult(true);
             }

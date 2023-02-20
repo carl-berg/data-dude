@@ -16,7 +16,7 @@ namespace DataDude.Instructions.Insert.Insertion
             return primaryKeys.Count() == 1 && primaryKeys.All(x => x.IsIdentity);
         }
 
-        public override async Task<InsertedRow> Insert(InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null)
+        public override async ValueTask<InsertedRow> Insert(InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null)
         {
             var (columns, values, parameters) = GetInsertInformation(statement);
             var primaryKey = statement.Table.Single(x => x.IsPrimaryKey() && x.IsIdentity);

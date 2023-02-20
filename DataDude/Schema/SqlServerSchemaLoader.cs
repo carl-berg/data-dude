@@ -10,9 +10,7 @@ namespace DataDude.SqlServer
 {
     public class SqlServerSchemaLoader : ISchemaLoader
     {
-        public bool CacheSchema { get; set; } = true;
-
-        public async Task<SchemaInformation> Load(DbConnection connection, DbTransaction? transaction = null)
+        public async ValueTask<SchemaInformation> Load(DbConnection connection, DbTransaction? transaction = null)
         {
             var (columns, indexes, foreignKeys, triggers) = await LoadSchema(connection, transaction);
 
@@ -108,7 +106,7 @@ namespace DataDude.SqlServer
             }
         }
 
-        private async Task<(IEnumerable<SysColumns>, IEnumerable<Indexes>, IEnumerable<ForeignKey>, IEnumerable<Trigger> triggers)> LoadSchema(DbConnection connection, DbTransaction? transaction = null)
+        private async ValueTask<(IEnumerable<SysColumns>, IEnumerable<Indexes>, IEnumerable<ForeignKey>, IEnumerable<Trigger> triggers)> LoadSchema(DbConnection connection, DbTransaction? transaction = null)
         {
             var command = connection.CreateCommand();
 
@@ -171,22 +169,22 @@ namespace DataDude.SqlServer
                 FROM sys.triggers tr
                 INNER JOIN sys.tables t ON tr.parent_id= t.object_id";
 
-            using var reader = command.ExecuteReader(CommandBehavior.Default);
+            using var reader = await command.ExecuteReaderAsync(CommandBehavior.Default).ConfigureAwait(false);
             var allColumns = await ReadColumns(reader);
-            await reader.NextResultAsync();
+            await reader.NextResultAsync().ConfigureAwait(false);
             var allIndexes = await ReadIndexes(reader);
-            await reader.NextResultAsync();
+            await reader.NextResultAsync().ConfigureAwait(false);
             var allForeignKeys = await ReadForeignKeys(reader);
-            await reader.NextResultAsync();
+            await reader.NextResultAsync().ConfigureAwait(false);
             var triggers = await ReadTriggers(reader);
-            reader.Close();
+            await reader.CloseAsync().ConfigureAwait(false);
             return (allColumns, allIndexes, allForeignKeys, triggers);
         }
 
-        private async Task<IReadOnlyList<SysColumns>> ReadColumns(DbDataReader reader)
+        private async ValueTask<IReadOnlyList<SysColumns>> ReadColumns(DbDataReader reader)
         {
             var items = new List<SysColumns>();
-            while(await reader.ReadAsync())
+            while(await reader.ReadAsync().ConfigureAwait(false))
             {
                 items.Add(new SysColumns
                 {
@@ -207,10 +205,10 @@ namespace DataDude.SqlServer
             return items;
         }
 
-        private async Task<IReadOnlyList<Indexes>> ReadIndexes(DbDataReader reader)
+        private async ValueTask<IReadOnlyList<Indexes>> ReadIndexes(DbDataReader reader)
         {
             var items = new List<Indexes>();
-            while (await reader.ReadAsync())
+            while (await reader.ReadAsync().ConfigureAwait(false))
             {
                 items.Add(new Indexes
                 {
@@ -228,10 +226,10 @@ namespace DataDude.SqlServer
             return items;
         }
 
-        private async Task<IReadOnlyList<ForeignKey>> ReadForeignKeys(DbDataReader reader)
+        private async ValueTask<IReadOnlyList<ForeignKey>> ReadForeignKeys(DbDataReader reader)
         {
             var items = new List<ForeignKey>();
-            while (await reader.ReadAsync())
+            while (await reader.ReadAsync().ConfigureAwait(false))
             {
                 items.Add(new ForeignKey
                 {
@@ -248,10 +246,10 @@ namespace DataDude.SqlServer
             return items;
         }
 
-        private async Task<IReadOnlyList<Trigger>> ReadTriggers(DbDataReader reader)
+        private async ValueTask<IReadOnlyList<Trigger>> ReadTriggers(DbDataReader reader)
         {
             var items = new List<Trigger>();
-            while (await reader.ReadAsync())
+            while (await reader.ReadAsync().ConfigureAwait(false))
             {
                 items.Add(new Trigger
                 { 

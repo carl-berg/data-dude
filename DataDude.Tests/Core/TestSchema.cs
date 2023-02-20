@@ -8,7 +8,7 @@ namespace DataDude.Tests.Core
     public class TestSchema : SchemaInformation, ISchemaLoader
     {
         public TestSchema()
-            : base(new TableInformation[0])
+            : base(System.Array.Empty<TableInformation>())
         {
         }
 
@@ -22,9 +22,9 @@ namespace DataDude.Tests.Core
             return table;
         }
 
-        public Task<SchemaInformation> Load(DbConnection connection, DbTransaction transaction = null)
+        public ValueTask<SchemaInformation> Load(DbConnection connection, DbTransaction transaction = null)
         {
-            return Task.FromResult(this as SchemaInformation);
+            return new ValueTask<SchemaInformation>(this);
         }
     }
 }

@@ -8,15 +8,15 @@ namespace DataDude.Core
 {
     internal static class Extensions
     {
-        internal static Task<int> ExecuteAsync(this DbConnection connection, string statement, DbTransaction? transaction)
+        internal static async ValueTask<int> ExecuteAsync(this DbConnection connection, string statement, DbTransaction? transaction)
         {
             var cmd = connection.CreateCommand();
             cmd.Transaction = transaction;
             cmd.CommandText = statement;
-            return cmd.ExecuteNonQueryAsync();
+            return await cmd.ExecuteNonQueryAsync().ConfigureAwait(false);
         }
 
-        internal static async Task<IReadOnlyDictionary<string, object>> QuerySingleAsync(this DbConnection connection, string statement, IReadOnlyList<DataDudeDbParameter>? parameters = null, DbTransaction ? transaction = null)
+        internal static async ValueTask<IReadOnlyDictionary<string, object>> QuerySingleAsync(this DbConnection connection, string statement, IReadOnlyList<DataDudeDbParameter>? parameters = null, DbTransaction ? transaction = null)
         {
             var cmd = connection.CreateCommand();
             cmd.Transaction = transaction;
@@ -27,7 +27,7 @@ namespace DataDude.Core
                 parameter.AddParameterTo(cmd);
             }
 
-            using var reader = cmd.ExecuteReader(CommandBehavior.SingleRow);
+            using var reader = await cmd.ExecuteReaderAsync(CommandBehavior.SingleRow).ConfigureAwait(false);
             if (reader.CanGetColumnSchema())
             {
                 var columns = reader.GetColumnSchema();
@@ -47,7 +47,5 @@ namespace DataDude.Core
 
             throw new Exception($"Cannot extract reader schema from query{Environment.NewLine}{statement}");
         }
-
-        
     }
 }

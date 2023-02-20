@@ -236,7 +236,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            var exception = await Should.ThrowAsync<InsertRowHandlerMissing>(new Dude()
+            var exception = await Should.ThrowAsync<InsertRowHandlerMissing>(async () => await new Dude()
                 .Insert("Test_PK_Less_Scenario")
                 .Go(connection));
         }

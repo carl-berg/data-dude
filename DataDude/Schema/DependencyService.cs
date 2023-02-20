@@ -7,11 +7,12 @@ namespace DataDude.Schema
     {
         private readonly IDependencyTraversalStrategy _strategy;
         private readonly IDictionary<TableInformation, IReadOnlyList<TableInformation>> _cachedDependencies;
+        internal const string CachePrefix = "DependencyService_Cache";
 
         public DependencyService(IDependencyTraversalStrategy strategy, DataDudeContext? context = null)
         {
             _strategy = strategy;
-            _cachedDependencies = GetCache(context);
+            _cachedDependencies = GetCache(strategy, context);
         }
 
         public IEnumerable<TableInformation> GetOrderedDependenciesFor(TableInformation table)
@@ -58,15 +59,17 @@ namespace DataDude.Schema
             }
         }
 
-        private IDictionary<TableInformation, IReadOnlyList<TableInformation>> GetCache(DataDudeContext? context)
+        internal IDictionary<TableInformation, IReadOnlyList<TableInformation>> GetCache(IDependencyTraversalStrategy strategy, DataDudeContext? context)
         {
-            if (context?.Get<IDictionary<TableInformation, IReadOnlyList<TableInformation>>>("DependencyService_Cache") is IDictionary<TableInformation, IReadOnlyList<TableInformation>> cache)
+            var cacheKey = $"{CachePrefix}_{strategy.GetType().FullName}";
+
+            if (context?.Get<IDictionary<TableInformation, IReadOnlyList<TableInformation>>>(cacheKey) is IDictionary<TableInformation, IReadOnlyList<TableInformation>> cache)
             {
                 return cache;
             }
 
             var newCache = new Dictionary<TableInformation, IReadOnlyList<TableInformation>>();
-            context?.Set("DependencyService_Cache", newCache);
+            context?.Set(cacheKey, newCache);
             return newCache;
         }
     }

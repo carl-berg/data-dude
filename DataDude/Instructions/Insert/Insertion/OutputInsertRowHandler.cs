@@ -14,7 +14,7 @@ namespace DataDude.Instructions.Insert.Insertion
     {
         public override bool CanHandleInsert(InsertStatement statement, InsertContext context) => true;
 
-        public override async Task<InsertedRow> Insert(InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null)
+        public override async ValueTask<InsertedRow> Insert(InsertStatement statement, InsertContext context, DbConnection connection, DbTransaction? transaction = null)
         {
             var (columns, values, parameters) = GetInsertInformation(statement);
             await statement.Table.DisableTriggers(connection, transaction);

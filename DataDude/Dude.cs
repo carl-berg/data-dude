@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.Common;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using DataDude.Instructions;
@@ -19,11 +20,11 @@ namespace DataDude
 
         public void Configure(Action<DataDudeContext> configure) => configure?.Invoke(Context);
 
-        public async Task Go(DbConnection connection, DbTransaction? transaction = null)
+        public async ValueTask Go(DbConnection connection, DbTransaction? transaction = null)
         {
             await Context.LoadSchema(connection, transaction);
 
-            foreach (var preProcessor in Context.InstructionPreProcessors)
+            foreach (var preProcessor in Context.InstructionDecorators)
             {
                 await preProcessor.PreProcess(Context);
             }
@@ -51,6 +52,11 @@ namespace DataDude
                 {
                     throw new HandlerException($"Instruction of type '{instruction.GetType()}' lacks handler and cannot be processed");
                 }
+            }
+
+            foreach (var preProcessor in Context.InstructionDecorators.Reverse())
+            {
+                await preProcessor.PostProcess(Context);
             }
 
             Context.Instructions.Clear();
