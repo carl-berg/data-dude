@@ -58,6 +58,8 @@ namespace DataDude
 
         public IList<IInstructionDecorator> InstructionDecorators { get; }
 
+        public IEnumerable<string> ContextKeys => _store.Keys;
+
         public SchemaInformation? Schema => Get<SchemaInformation>("Schema");
 
         public static DbType GetDbType(ColumnInformation column)
