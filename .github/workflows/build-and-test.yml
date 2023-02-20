@@ -1,0 +1,38 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  DOTNET_VERSION: '7.x' # The .NET SDK version to use
+
+jobs:
+  build-and-test:
+    name: Test ${{ matrix.dotnet }} on ${{matrix.os}}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        dotnet: [ '3.1', '6.x', '7.x' ]
+        os: [windows-latest]
+
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+
+    - name: Install dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --configuration Debug --no-restore
+
+    - name: Start localdb
+      shell: pwsh
+      run: sqllocaldb start mssqllocaldb
+    
+    - name: Test
+      run: dotnet test --configuration Debug --no-restore --verbosity normal
