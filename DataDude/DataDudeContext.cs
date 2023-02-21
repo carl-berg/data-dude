@@ -12,7 +12,9 @@ namespace DataDude
 {
     public class DataDudeContext
     {
+        internal const string SchemaKey = "Schema";
         private Dictionary<string, object> _store;
+        
         public DataDudeContext(ISchemaLoader schemaLoader)
         {
             _store = new Dictionary<string, object>();
@@ -60,7 +62,7 @@ namespace DataDude
 
         public IEnumerable<string> ContextKeys => _store.Keys;
 
-        public SchemaInformation? Schema => Get<SchemaInformation>("Schema");
+        public SchemaInformation? Schema => Get<SchemaInformation>(SchemaKey);
 
         public static DbType GetDbType(ColumnInformation column)
         {
@@ -96,10 +98,10 @@ namespace DataDude
 
         public async ValueTask LoadSchema(DbConnection connection, DbTransaction? transaction = null)
         {
-            if (_store.ContainsKey("Schema") is false)
+            if (_store.ContainsKey(SchemaKey) is false)
             {
                 var schema = await SchemaLoader.Load(connection, transaction);
-                Set("Schema", schema);
+                Set(SchemaKey, schema);
             }
         }
     }
