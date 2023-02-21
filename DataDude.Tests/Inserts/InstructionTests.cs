@@ -353,8 +353,7 @@ namespace DataDude.Tests
             using var connection = Fixture.CreateNewConnection();
             var position = SqlGeography.Point(50, 11, 4326);
 
-            var dude = new Dude();
-            await dude
+            await new Dude()
                 .Insert("Test_Geography_Data", 
                     new { Position = position },
                     new { Position = (SqlGeography)null })
@@ -368,8 +367,17 @@ namespace DataDude.Tests
                 positions => positions[1].ShouldSatisfyAllConditions(
                     position => position.Lat.ShouldBeNull(),
                     position => position.Long.ShouldBeNull()));
+        }
 
+        [Fact]
+        public async Task Can_Insert_Default_Date_Times()
+        {
+            using var connection = Fixture.CreateNewConnection();
 
+            await new Dude().Insert("Test_DateTime_Data").Go(connection);
+
+            var rows = await connection.QueryAsync<dynamic>("SELECT SomeDate, SomeTime, SomeDateTime FROM Test_DateTime_Data");
+            rows.ShouldHaveSingleItem();
         }
     }
 }
