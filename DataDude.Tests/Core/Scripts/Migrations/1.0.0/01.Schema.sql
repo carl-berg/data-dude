@@ -88,6 +88,14 @@ CREATE TABLE Test_Geography_Data(
 )
 GO
 
+CREATE TABLE Test_DateTime_Data(
+	Id INT IDENTITY PRIMARY KEY,
+	SomeDate DATE NOT NULL,
+	SomeTime TIME NOT NULL,
+	SomeDateTime DATETIME NOT NULL,
+)
+GO
+
 CREATE TRIGGER People.EmployeeUpdatedAt ON People.Employee AFTER UPDATE AS BEGIN
 	UPDATE People.Employee 
 		SET People.Employee.UpdatedAt = GETDATE()
