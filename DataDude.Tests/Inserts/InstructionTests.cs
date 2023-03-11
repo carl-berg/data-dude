@@ -379,5 +379,54 @@ namespace DataDude.Tests
             var rows = await connection.QueryAsync<dynamic>("SELECT SomeDate, SomeTime, SomeDateTime FROM Test_DateTime_Data");
             rows.ShouldHaveSingleItem();
         }
+
+        [Theory]
+        [InlineData("bigint")]
+        [InlineData("bit")]
+        [InlineData("decimal")]
+        [InlineData("int")]
+        [InlineData("money")]
+        [InlineData("numeric")]
+        [InlineData("smallint")]
+        [InlineData("smallmoney")]
+        [InlineData("tinyint")]
+        [InlineData("float")]
+        [InlineData("real")]
+        [InlineData("date")]
+        [InlineData("datetime2")]
+        [InlineData("datetime")]
+        [InlineData("datetimeoffset")]
+        [InlineData("smalldatetime")]
+        [InlineData("time")]
+        [InlineData("char")]
+        [InlineData("text")]
+        [InlineData("varchar")]
+        [InlineData("nchar")]
+        [InlineData("ntext")]
+        [InlineData("nvarchar")]
+        [InlineData("binary")]
+        [InlineData("varbinary")]
+        [InlineData("image")]
+        [InlineData("uniqueidentifier")]
+        public async Task Can_Insert_Default_Values(string dataType)
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            var tableName = $"Test_{dataType}";
+            await connection.ExecuteAsync($"" +
+                $"""
+                CREATE TABLE [{tableName}]
+                (
+                    Id INT PRIMARY KEY IDENTITY, 
+                    Value {dataType} NOT NULL, 
+                    NullableValue {dataType} NULL
+                )
+                """);
+
+            await new Dude().Insert(tableName).Go(connection);
+
+            var rows = await connection.QueryAsync<dynamic>($"SELECT * FROM [{tableName}]");
+            rows.ShouldHaveSingleItem();
+        }
     }
 }

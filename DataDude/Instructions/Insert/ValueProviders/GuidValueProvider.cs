@@ -1,14 +1,15 @@
-﻿using DataDude.Schema;
+﻿using System;
+using DataDude.Schema;
 
 namespace DataDude.Instructions.Insert.ValueProviders
 {
-    public class BinaryValueProvider : ValueProvider
+    public class GuidValueProvider : ValueProvider
     {
         protected override ColumnValue? GetDefaultValue(ColumnInformation column, ColumnValue value)
         {
-            if (column.DataType is "binary" or "image" or "varbinary")
+            if (column.DataType is "uniqueidentifier")
             {
-                return new ColumnValue(new byte[0]);
+                return new ColumnValue(Guid.NewGuid());
             }
 
             return null;
