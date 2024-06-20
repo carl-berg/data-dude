@@ -10,7 +10,7 @@ using Xunit;
 
 namespace DataDude.Tests.Inserts
 {
-    public class AutoInsertFKTableTestscs
+    public class AutoInsertFKTableTests
     {
         [Fact]
         public async Task Chain()

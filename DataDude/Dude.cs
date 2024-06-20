@@ -1,8 +1,5 @@
-﻿using System;
-using System.Data.Common;
-using System.Linq;
+﻿using System.Data.Common;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using DataDude.Instructions;
 
 [assembly: InternalsVisibleTo("DataDude.Tests")]
@@ -11,14 +8,19 @@ namespace DataDude
 {
     public class Dude
     {
-        public Dude(ISchemaLoader? schemaLoader = null)
+        public Dude(ISchemaLoader? schemaLoader = null, Action<DataDudeContext>? configure = null)
         {
             Context = new DataDudeContext(schemaLoader ?? new SqlServer.SqlServerSchemaLoader());
+            configure?.Invoke(Context);
         }
 
         protected DataDudeContext Context { get; }
 
-        public void Configure(Action<DataDudeContext> configure) => configure?.Invoke(Context);
+        public Dude Configure(Action<DataDudeContext> configure)
+        {
+            configure.Invoke(Context);
+            return this;
+        }
 
         public async ValueTask Go(DbConnection connection, DbTransaction? transaction = null)
         {

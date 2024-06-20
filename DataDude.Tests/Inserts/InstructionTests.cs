@@ -10,19 +10,16 @@ using Xunit;
 
 namespace DataDude.Tests
 {
-    public class InstructionTests : DatabaseTest
+    public class InstructionTests(DatabaseFixture fixture) : DatabaseTest(fixture)
     {
-        public InstructionTests(DatabaseFixture fixture)
-            : base(fixture)
-        {
-        }
+        private Dude Dude { get; } = new Dude(configure: context => context.InstructionDecorators.Clear());
 
         [Fact]
         public async Task Can_Insert_Instruction()
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new Dude()
+            await Dude
                 .Insert("Office", new { Name = "test" })
                 .Go(connection);
 
@@ -35,7 +32,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new Dude()
+            await Dude
                 .Insert("[Office]")
                 .Go(connection);
 
@@ -48,7 +45,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new Dude()
+            await Dude
                 .Insert("Office")
                 .Go(connection);
 
@@ -61,7 +58,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new Dude()
+            await Dude
                 .Insert("Office", new { Id = 1 })
                 .Insert("Employee", new { Id = 1 })
                 .Insert("OfficeOccupant", new { OfficeId = 1, EmployeeId = 1 })
@@ -76,7 +73,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new Dude()
+            await Dude
                 .EnableAutomaticForeignKeys()
                 .Insert("Office")
                 .Insert("Employee")
@@ -92,7 +89,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new Dude()
+            await Dude
                 .EnableAutomaticForeignKeys()
                 .Insert("Office")
                 .Insert("Employee", new { Id = 1 }, new { Id = 2 })
@@ -108,7 +105,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new Dude()
+            await Dude
                 .EnableAutomaticForeignKeys()
                 .Insert("Office")
                 .Insert("Employee")
@@ -125,7 +122,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new Dude()
+            await Dude
                 .EnableAutomaticForeignKeys()
                 .Insert("Office")
                 .Insert("OfficeExtension")
@@ -140,7 +137,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new Dude()
+            await Dude
                 .EnableAutomaticForeignKeys(x => x.AddMissingForeignKeys = true)
                 .Insert("OfficeOccupant")
                 .Go(connection);
@@ -160,7 +157,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new Dude()
+            await Dude
                 .EnableAutomaticForeignKeys()
                 .Insert("Test_Generated_PK_Scenario_1")
                 .Insert("Test_Generated_PK_Scenario_1")
@@ -175,7 +172,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new Dude()
+            await Dude
                 .EnableAutomaticForeignKeys()
                 .Insert("Test_Generated_PK_Scenario_2")
                 .Insert("Test_Generated_PK_Scenario_2")
@@ -190,7 +187,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new Dude()
+            await Dude
                 .EnableAutomaticForeignKeys()
                 .Insert("Office", new { Name = new RawSql("CONCAT('A', 'B', 'C')") })
                 .Go(connection);
@@ -204,7 +201,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new Dude()
+            await Dude
                 .ConfigureCustomColumnValue((column, value) =>
                 {
                     if (column.Name == "Name")
@@ -220,11 +217,31 @@ namespace DataDude.Tests
         }
 
         [Fact]
+        public async Task Can_Specify_Custom_Defaults_Simpler()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await Dude
+                .ConfigureCustomColumnValue((column, value) =>
+                {
+                    if (column.Name == "Name")
+                    {
+                        value.Set("Custom default");
+                    }
+                })
+                .Insert("Office")
+                .Go(connection);
+
+            var name = await connection.QuerySingleAsync<string>("SELECT Name FROM Buildings.Office");
+            name.ShouldBe("Custom default");
+        }
+
+        [Fact]
         public async Task Can_Insert_Multiple_Instructions()
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new Dude()
+            await Dude
                 .Insert("Office", new { Name = "test" }, new { Name = "test" })
                 .Go(connection);
 
@@ -237,7 +254,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            var exception = await Should.ThrowAsync<InsertRowHandlerMissing>(async () => await new Dude()
+            var exception = await Should.ThrowAsync<InsertRowHandlerMissing>(async () => await Dude
                 .Insert("Test_PK_Less_Scenario")
                 .Go(connection));
         }
@@ -247,7 +264,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new Dude()
+            await Dude
                 .ConfigureInsert(x => x.InsertRowHandlers.Add(new OutputInsertRowHandler()))
                 .Insert("Test_PK_Less_Scenario")
                 .Go(connection);
@@ -261,7 +278,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new Dude()
+            await Dude
                 .Insert("Test_PK_Sequential_Uuid")
                 .Go(connection);
 
@@ -274,7 +291,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new Dude()
+            await Dude
                 .EnableAutomaticForeignKeys()
                 .Insert("Office", new { Id = 1 })
                 .Insert("Test_Nullable_FK", new { Id = 1 })
@@ -292,7 +309,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new Dude()
+            await Dude
                 .Insert("Test_Nullable_Text_Data_Type")
                 .Go(connection);
 
@@ -305,7 +322,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            var dude = new Dude();
+            var dude = Dude;
             await dude
                 .Insert("Office", new { Name = "test" })
                 .Go(connection);
@@ -325,7 +342,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            var dude = new Dude()
+            var dude = Dude
                 .EnableAutomaticForeignKeys(x => x.AddMissingForeignKeys = true);
 
             // Inserts Office, Employee, OfficeOccupant and OfficeOccupancy
@@ -353,7 +370,7 @@ namespace DataDude.Tests
             using var connection = Fixture.CreateNewConnection();
             var position = SqlGeography.Point(50, 11, 4326);
 
-            await new Dude()
+            await Dude
                 .Insert("Test_Geography_Data", 
                     new { Position = position },
                     new { Position = (SqlGeography)null })
@@ -374,7 +391,7 @@ namespace DataDude.Tests
         {
             using var connection = Fixture.CreateNewConnection();
 
-            await new Dude().Insert("Test_DateTime_Data").Go(connection);
+            await Dude.Insert("Test_DateTime_Data").Go(connection);
 
             var rows = await connection.QueryAsync<dynamic>("SELECT SomeDate, SomeTime, SomeDateTime FROM Test_DateTime_Data");
             rows.ShouldHaveSingleItem();
@@ -423,7 +440,7 @@ namespace DataDude.Tests
                 )
                 """);
 
-            await new Dude().Insert(tableName).Go(connection);
+            await Dude.Insert(tableName).Go(connection);
 
             var rows = await connection.QueryAsync<dynamic>($"SELECT * FROM [{tableName}]");
             rows.ShouldHaveSingleItem();
