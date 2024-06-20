@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using DataDude.Schema;
-using System.Threading.Tasks;
+﻿using DataDude.Schema;
 
 namespace DataDude.Instructions
 {
@@ -9,9 +6,9 @@ namespace DataDude.Instructions
     /// Attempting to speed up DataDude by statically caching and pre-loading sql schema and calculated dependencies in between runs
     /// Warning: This is an experimental feature
     /// </summary>
-    public class StaticCache : IInstructionDecorator
+    internal class StaticCache : IInstructionDecorator
     {
-        public StaticCache(DataDudeContext context)
+        internal StaticCache(DataDudeContext context)
         {
             if (Schema is { })
             {
@@ -27,7 +24,7 @@ namespace DataDude.Instructions
         }
 
         protected static SchemaInformation? Schema { get; set; }
-        protected static Dictionary<string, IDictionary<TableInformation, IReadOnlyList<TableInformation>>> Dependencies { get; set; } = new();
+        protected static Dictionary<string, IDictionary<TableInformation, IReadOnlyList<TableInformation>>> Dependencies { get; set; } = [];
 
         public ValueTask PreProcess(DataDudeContext context) => default;
 
