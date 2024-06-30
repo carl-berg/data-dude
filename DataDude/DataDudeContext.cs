@@ -105,13 +105,8 @@ namespace DataDude
         {
             if (_store.ContainsKey(SchemaKey) is false)
             {
-                Console.WriteLine("Loading schema");
                 var schema = await SchemaLoader.Load(connection, transaction);
                 Set(SchemaKey, schema);
-            }
-            else
-            {
-                Console.WriteLine("Schema already loaded");
             }
         }
     }
