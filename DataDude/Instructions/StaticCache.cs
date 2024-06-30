@@ -4,7 +4,6 @@ namespace DataDude.Instructions
 {
     /// <summary>
     /// Attempting to speed up DataDude by statically caching and pre-loading sql schema and calculated dependencies in between runs
-    /// Warning: This is an experimental feature
     /// </summary>
     internal class StaticCache : IInstructionDecorator
     {

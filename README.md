@@ -16,7 +16,7 @@ Data dude is at its core an instruction handler, which means that it handles ins
 Inserts are what Data dude does best. It can insert rows based on schema-knowledge and configurable handling. That way you should be able to just specify the data you acually care about. Other column values should be taken care of by the dude. With its default configuration it should be able to handle most cases, but when you encounter edge cases or want to re-configure the default behavior, there are some knobs to tweak:
 
 #### Automatic Foreign Keys
-This is a concept where Data dude can utilize the schema information and fill in foreign key column values based on previos inserts. This functionality can be enabled like so:
+This is a concept where Data dude can utilize the schema information and fill in foreign key column values based on previous inserts. This functionality can be enabled like so:
 
 ```csharp
 await new DataDude()
@@ -31,7 +31,7 @@ This concept can be taken taken even a bit further by instructing Data dude to d
 
 ```csharp
 await new DataDude()
-    .EnableAutomaticForeignKeys(x => x.AddMissingForeignKeys = true)
+    .EnableAutomaticInsertOfForeignKeys()
     .Insert("B")
     .Go(connection);
 ```
@@ -41,17 +41,13 @@ To make matters a bit more complicated, you might not always want foreign keys t
 
 ```csharp
 new Dude()
-    .EnableAutomaticForeignKeys(x =>
-    {
-        x.AddMissingForeignKeys = true;
-        x.DependencyTraversalStrategy = DependencyTraversalStrategy.SkipNullableForeignKeys
-    })
+    .EnableAutomaticInsertOfForeignKeys(DependencyTraversalStrategy.SkipRecursiveForeignKeys)
 ```
 
 Data dude comes preconfigured with 3 dependency traversal strategy options: 
-- `FollowAllForeignKeys`: Default strategy will attempt to generate inserts for all foreign keys
+- `FollowAllForeignKeys`: Will attempt to generate inserts for all foreign keys
 - `SkipRecursiveForeignKeys`: Will not attempt to generate inserts for foreign keys where the table has a reference to itself
-- `SkipNullableForeignKeys`: Will not attempt to generate inserts for nullable foreign keys
+- `SkipNullableForeignKeys`: Will not attempt to generate inserts for nullable foreign keys (this is the default)
 If you want more control you can create your own class that implements IDependencyTraversalStrategy and plug it in like above.
 
 #### InsertValueProviders
@@ -62,7 +58,7 @@ await new DataDude()
     {
         if (column.Name == "Active")
         {
-            value.Set(new ColumnValue(true));
+            value.Set(true);
         }
     })
     .Insert("Employee")
@@ -79,7 +75,7 @@ public class ActiveUserValueProvider : IValueProvider
             column.Table.Name == "User" &&
             column.Name == "Active")
         {
-            previousValue.Set(new ColumnValue(true));
+            previousValue.Set(true);
         }
     }
 }
@@ -98,7 +94,7 @@ public class AlwaysTrue : IInsertInterceptor
         {
             if (column.DataType == "bit")
             {
-                value.Set(new ColumnValue(true));
+                value.Set(true);
             }
         }
 

@@ -1,6 +1,6 @@
-﻿using System.Data.Common;
+﻿using DataDude.Instructions;
+using System.Data.Common;
 using System.Runtime.CompilerServices;
-using DataDude.Instructions;
 
 [assembly: InternalsVisibleTo("DataDude.Tests")]
 
