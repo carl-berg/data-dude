@@ -16,7 +16,7 @@ namespace DataDude
         {
             SchemaLoader = schemaLoader;
             InstructionHandlers = [new ExecuteInstructionHandler(), new InsertInstructionHandler(this)];
-            InstructionDecorators = [new StaticCache(this)];
+            InstructionDecorators = [new StaticCache()];
         }
 
         public static IDictionary<string, DbType> TypeMappings { get; } = new Dictionary<string, DbType>
@@ -105,8 +105,13 @@ namespace DataDude
         {
             if (_store.ContainsKey(SchemaKey) is false)
             {
+                Console.WriteLine("Loading schema");
                 var schema = await SchemaLoader.Load(connection, transaction);
                 Set(SchemaKey, schema);
+            }
+            else
+            {
+                Console.WriteLine("Schema already loaded");
             }
         }
     }

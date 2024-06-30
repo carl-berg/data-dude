@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using DataDude.Schema;
+﻿using DataDude.Schema;
 
 namespace DataDude.Instructions.Insert.AutomaticForeignKeys
 {
     /// <summary>
     /// Adds "missing" dependent inserts based on foreign keys.
     /// </summary>
-    public class AddMissingInsertInstructionsPreProcessor : IInstructionDecorator
+    public class AddMissingInsertInstructionsPreProcessor(DependencyService dependencyService) : IInstructionDecorator
     {
-        private readonly DependencyService _dependencyService;
-        public AddMissingInsertInstructionsPreProcessor(DependencyService dependencyService) => _dependencyService = dependencyService;
-
         public ValueTask PreProcess(DataDudeContext context)
         {
             var toInsert = new Dictionary<InsertInstruction, InsertInformation>();
@@ -22,7 +15,7 @@ namespace DataDude.Instructions.Insert.AutomaticForeignKeys
                 if (context.Schema?[instruction.TableName] is { } table)
                 {
                     IEnumerable<InsertedRow> insertedRows = InsertContext.Get(context)?.InsertedRows ?? Array.Empty<InsertedRow>();
-                    var dependencies = _dependencyService.GetOrderedDependenciesFor(table)
+                    var dependencies = dependencyService.GetOrderedDependenciesFor(table)
                         .Where(t => !toInsert.Values.Any(x => x.Contains(t)))
                         .Where(t => !insertedRows.Any(x => x.Table == t))
                         .ToList();
@@ -43,18 +36,10 @@ namespace DataDude.Instructions.Insert.AutomaticForeignKeys
             return default;
         }
 
-        public ValueTask PostProcess(DataDudeContext context) => default;
-
-        private class InsertInformation
+        private class InsertInformation(TableInformation table, IEnumerable<TableInformation> dependencies)
         {
-            public InsertInformation(TableInformation table, IEnumerable<TableInformation> dependencies)
-            {
-                Table = table;
-                Dependencies = dependencies;
-            }
-
-            public TableInformation Table { get; }
-            public IEnumerable<TableInformation> Dependencies { get; }
+            public TableInformation Table { get; } = table;
+            public IEnumerable<TableInformation> Dependencies { get; } = dependencies;
             public bool Contains(TableInformation table)
             {
                 return table == Table || Dependencies.Contains(table);

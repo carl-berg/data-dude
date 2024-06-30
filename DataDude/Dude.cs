@@ -24,6 +24,11 @@ namespace DataDude
 
         public async ValueTask Go(DbConnection connection, DbTransaction? transaction = null)
         {
+            foreach (var preProcessor in Context.InstructionDecorators)
+            {
+                await preProcessor.Initialize(Context);
+            }
+
             await Context.LoadSchema(connection, transaction);
 
             foreach (var preProcessor in Context.InstructionDecorators)

@@ -8,7 +8,10 @@ namespace DataDude.Instructions
     /// </summary>
     internal class StaticCache : IInstructionDecorator
     {
-        internal StaticCache(DataDudeContext context)
+        protected static SchemaInformation? Schema { get; set; }
+        protected static Dictionary<string, IDictionary<TableInformation, IReadOnlyList<TableInformation>>> Dependencies { get; set; } = [];
+
+        public ValueTask Initialize(DataDudeContext context)
         {
             if (Schema is { })
             {
@@ -21,12 +24,8 @@ namespace DataDude.Instructions
                 // Pre-load calculated dependencies
                 context.Set(cacheKey, dependencyCache);
             }
+            return default;
         }
-
-        protected static SchemaInformation? Schema { get; set; }
-        protected static Dictionary<string, IDictionary<TableInformation, IReadOnlyList<TableInformation>>> Dependencies { get; set; } = [];
-
-        public ValueTask PreProcess(DataDudeContext context) => default;
 
         public ValueTask PostProcess(DataDudeContext context)
         {
