@@ -1,37 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
-using ADatabaseFixture;
-using ADatabaseFixture.GalacticWasteManagement;
-using GalacticWasteManagement;
-using GalacticWasteManagement.Scripts;
-using GalacticWasteManagement.Scripts.EmbeddedScripts;
-using GalacticWasteManagement.Scripts.ScriptProviders;
+﻿using ADatabaseFixture;
+using Microsoft.Data.SqlClient;
 using Xunit;
 
 namespace DataDude.Tests.Core
 {
-    public class DatabaseFixture : DatabaseFixtureBase, IAsyncLifetime
+    public class DatabaseFixture() : DatabaseFixtureBase(
+        new SqlServerDatabaseAdapter(ConnectionFactory),
+        new FixtureMigrator()), IAsyncLifetime
     {
-        public DatabaseFixture()
-            : base(
-                new SqlServerDatabaseAdapter(),
-                GalacticWasteManagementMigrator.Create(new DefaultProjectSettings()))
-        {
-        }
-
-        private class DefaultProjectSettings : ProjectSettings
-        {
-            public DefaultProjectSettings()
-                : base(
-                new DefaultMigrationVersioning(),
-                new GalacticWasteManagement.SqlServer.MsSql150ScriptParser(),
-                new List<IScriptProvider>
-                {
-                    new BuiltInScriptsScriptProvider(),
-                    new EmbeddedScriptProvider(Assembly.GetAssembly(typeof(DatabaseFixture)), "Core.Scripts"),
-                })
-            {
-            }
-        }
+        public static SqlConnection ConnectionFactory(string connectionString) => new(connectionString);
     }
 }

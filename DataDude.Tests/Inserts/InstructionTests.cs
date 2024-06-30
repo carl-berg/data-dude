@@ -10,13 +10,8 @@ using Xunit;
 
 namespace DataDude.Tests
 {
-    public class InstructionTests : DatabaseTest
+    public class InstructionTests(DatabaseFixture fixture) : DatabaseTest(fixture)
     {
-        public InstructionTests(DatabaseFixture fixture)
-            : base(fixture)
-        {
-        }
-
         [Fact]
         public async Task Can_Insert_Instruction()
         {
@@ -141,7 +136,7 @@ namespace DataDude.Tests
             using var connection = Fixture.CreateNewConnection();
 
             await new Dude()
-                .EnableAutomaticForeignKeys(x => x.AddMissingForeignKeys = true)
+                .EnableAutomaticInsertOfForeignKeys()
                 .Insert("OfficeOccupant")
                 .Go(connection);
 
@@ -210,6 +205,26 @@ namespace DataDude.Tests
                     if (column.Name == "Name")
                     {
                         value.Set(new ColumnValue("Custom default"));
+                    }
+                })
+                .Insert("Office")
+                .Go(connection);
+
+            var name = await connection.QuerySingleAsync<string>("SELECT Name FROM Buildings.Office");
+            name.ShouldBe("Custom default");
+        }
+
+        [Fact]
+        public async Task Can_Specify_Custom_Defaults_Simpler()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await new Dude()
+                .ConfigureCustomColumnValue((column, value) =>
+                {
+                    if (column.Name == "Name")
+                    {
+                        value.Set("Custom default");
                     }
                 })
                 .Insert("Office")
@@ -326,7 +341,7 @@ namespace DataDude.Tests
             using var connection = Fixture.CreateNewConnection();
 
             var dude = new Dude()
-                .EnableAutomaticForeignKeys(x => x.AddMissingForeignKeys = true);
+                .EnableAutomaticInsertOfForeignKeys();
 
             // Inserts Office, Employee, OfficeOccupant and OfficeOccupancy
             await dude.Insert("OfficeOccupancy").Go(connection);
@@ -423,7 +438,9 @@ namespace DataDude.Tests
                 )
                 """);
 
-            await new Dude().Insert(tableName).Go(connection);
+            await new Dude()
+                .DisableStaticCaching(/* Disable static caching since we change the schema dynamically in this test */)
+                .Insert(tableName).Go(connection);
 
             var rows = await connection.QueryAsync<dynamic>($"SELECT * FROM [{tableName}]");
             rows.ShouldHaveSingleItem();

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Data.Common;
-using System.Threading.Tasks;
 using DataDude.Instructions;
 using DataDude.Instructions.Execute;
 using DataDude.Instructions.Insert;
@@ -13,19 +10,13 @@ namespace DataDude
     public class DataDudeContext
     {
         internal const string SchemaKey = "Schema";
-        private Dictionary<string, object> _store;
+        private Dictionary<string, object> _store = [];
         
         public DataDudeContext(ISchemaLoader schemaLoader)
         {
-            _store = new Dictionary<string, object>();
             SchemaLoader = schemaLoader;
-            Instructions = new List<IInstruction>();
-            InstructionHandlers = new List<IInstructionHandler>
-            {
-                new ExecuteInstructionHandler(),
-                new InsertInstructionHandler(this),
-            };
-            InstructionDecorators = new List<IInstructionDecorator>();
+            InstructionHandlers = [new ExecuteInstructionHandler(), new InsertInstructionHandler(this)];
+            InstructionDecorators = [new StaticCache()];
         }
 
         public static IDictionary<string, DbType> TypeMappings { get; } = new Dictionary<string, DbType>
@@ -64,7 +55,7 @@ namespace DataDude
 
         public ISchemaLoader SchemaLoader { get; }
 
-        public IList<IInstruction> Instructions { get; }
+        public IList<IInstruction> Instructions { get; } = [];
 
         public IList<IInstructionHandler> InstructionHandlers { get; }
 
@@ -81,7 +72,11 @@ namespace DataDude
                 return TypeMappings[column.DataType];
             }
 
-            throw new NotImplementedException($"Db type for {column.DataType} of column {column.Table.FullName}.{column.Name} is not known");
+            throw new NotImplementedException(
+                $"""
+                Db type for {column.DataType} of column {column.Table.FullName}.{column.Name} is not known.
+                You can update DataDudeContext.TypeMappings with missing mappings to correct missing defaults.
+                """);
         }
 
         public T? Get<T>(string key)
@@ -110,8 +105,13 @@ namespace DataDude
         {
             if (_store.ContainsKey(SchemaKey) is false)
             {
+                Console.WriteLine("Loading schema");
                 var schema = await SchemaLoader.Load(connection, transaction);
                 Set(SchemaKey, schema);
+            }
+            else
+            {
+                Console.WriteLine("Schema already loaded");
             }
         }
     }

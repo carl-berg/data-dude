@@ -10,7 +10,7 @@ using Xunit;
 
 namespace DataDude.Tests.Inserts
 {
-    public class AutoInsertFKTableTestscs
+    public class AutoInsertFKTableTests
     {
         [Fact]
         public async Task Chain()
@@ -142,8 +142,8 @@ namespace DataDude.Tests.Inserts
         public void Can_Enable_AutoFks_Multiple_Times()
         {
             var dude = new Dude()
-                .EnableAutomaticForeignKeys(x => x.AddMissingForeignKeys = false)
-                .EnableAutomaticForeignKeys(x => x.AddMissingForeignKeys = true);
+                .EnableAutomaticForeignKeys()
+                .EnableAutomaticInsertOfForeignKeys();
 
             dude.Configure(context =>
             {
@@ -160,7 +160,7 @@ namespace DataDude.Tests.Inserts
         public void Can_Disable_AutoFks()
         {
             var dude = new Dude()
-                .EnableAutomaticForeignKeys(x => x.AddMissingForeignKeys = true)
+                .EnableAutomaticInsertOfForeignKeys()
                 .DisableAutomaticForeignKeys();
 
             dude.Configure(context =>

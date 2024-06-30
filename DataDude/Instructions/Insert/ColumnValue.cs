@@ -27,5 +27,7 @@ namespace DataDude.Instructions.Insert
             Type = newValue.Type;
             DbType = newValue.DbType;
         }
+
+        public void Set(object newValue) => Set(new ColumnValue(newValue));
     }
 }

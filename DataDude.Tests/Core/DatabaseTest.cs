@@ -1,18 +1,13 @@
-﻿using System;
-using System.Threading.Tasks;
-using ADatabaseFixture.GalacticWasteManagement;
+﻿using System.Threading.Tasks;
 using Respawn;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace DataDude.Tests.Core
 {
     [Collection("DatabaseIntegrationTest")]
-    public abstract class DatabaseTest : IAsyncLifetime
+    public abstract class DatabaseTest(DatabaseFixture fixture) : IAsyncLifetime
     {
-        public DatabaseTest(DatabaseFixture fixture) => Fixture = fixture;
-
-        public DatabaseFixture Fixture { get; }
+        public DatabaseFixture Fixture { get; } = fixture;
 
         private static Respawner Checkpoint { get; set; }
 

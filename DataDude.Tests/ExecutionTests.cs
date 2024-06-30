@@ -6,13 +6,8 @@ using Xunit;
 
 namespace DataDude.Tests
 {
-    public class ExecutionTests : DatabaseTest
+    public class ExecutionTests(DatabaseFixture fixture) : DatabaseTest(fixture)
     {
-        public ExecutionTests(DatabaseFixture fixture)
-            : base(fixture)
-        {
-        }
-
         [Fact]
         public async Task Can_Execute_Instruction()
         {

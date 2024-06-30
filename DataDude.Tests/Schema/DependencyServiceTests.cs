@@ -17,8 +17,8 @@ namespace DataDude.Tests.Schema
             var c = new TestTable("C").AddFk(b);
 
             var service = new DependencyService(DependencyTraversalStrategy.FollowAllForeignKeys);
-            service.GetOrderedDependenciesFor(c).ShouldBe(new[] { a, b }, true);
-            service.GetOrderedDependenciesFor(b).ShouldBe(new[] { a });
+            service.GetOrderedDependenciesFor(c).ShouldBe([a, b], true);
+            service.GetOrderedDependenciesFor(b).ShouldBe([a]);
             service.GetOrderedDependenciesFor(a).ShouldBeEmpty();
         }
 
@@ -31,7 +31,7 @@ namespace DataDude.Tests.Schema
             var c = new TestTable("C").AddFk(a, b);
 
             var dependencies = service.GetOrderedDependenciesFor(c);
-            dependencies.ShouldBe(new[] { a, b }, true);
+            dependencies.ShouldBe([a, b], true);
             AssertDepencyOrderFor(c, dependencies);
         }
 
@@ -46,7 +46,7 @@ namespace DataDude.Tests.Schema
             var e = new TestTable("E").AddFk(c, d);
 
             var dependencies = service.GetOrderedDependenciesFor(e);
-            dependencies.ShouldBe(new[] { a, b, c, d }, true);
+            dependencies.ShouldBe([a, b, c, d], true);
             AssertDepencyOrderFor(e, dependencies);
         }
 
@@ -60,7 +60,7 @@ namespace DataDude.Tests.Schema
             var d = new TestTable("D").AddFk(b, c);
 
             var dependencies = service.GetOrderedDependenciesFor(d);
-            dependencies.ShouldBe(new[] { a, b, c }, true);
+            dependencies.ShouldBe([a, b, c], true);
             AssertDepencyOrderFor(d, dependencies);
         }
 
@@ -69,7 +69,7 @@ namespace DataDude.Tests.Schema
         {
             var service = new DependencyService(DependencyTraversalStrategy.FollowAllForeignKeys);
             var a = new TestTable("A");
-            a.AddForeignKey(new ForeignKeyInformation("FK", a, a, new[] { (a["Id"], a["Id"]) }));
+            a.AddForeignKey(new ForeignKeyInformation("FK", a, a, [(a["Id"], a["Id"])]));
 
             Should.Throw<DependencyTraversalFailedException>(() => service.GetOrderedDependenciesFor(a));
         }
@@ -79,7 +79,7 @@ namespace DataDude.Tests.Schema
         {
             var service = new DependencyService(DependencyTraversalStrategy.SkipRecursiveForeignKeys);
             var a = new TestTable("A");
-            a.AddForeignKey(new ForeignKeyInformation("FK", a, a, new[] { (a["Id"], a["Id"]) }));
+            a.AddForeignKey(new ForeignKeyInformation("FK", a, a, [(a["Id"], a["Id"])]));
 
             var dependencies = Should.NotThrow(() => service.GetOrderedDependenciesFor(a));
             dependencies.ShouldBeEmpty();
@@ -91,11 +91,11 @@ namespace DataDude.Tests.Schema
             var service = new DependencyService(DependencyTraversalStrategy.FollowAllForeignKeys);
 
             var a = new TestTable("A");
-            var b = new TableInformation("dbo", "B", table => new[]
-            {
+            var b = new TableInformation("dbo", "B", table =>
+            [
                 new ColumnInformation(table, "a_Id", "int", false, isNullable: true, false, null, 0, 0, 0),
-            });
-            b.AddForeignKey(new ForeignKeyInformation("FK", b, a, new[] { (b["a_Id"], a["Id"]) }));
+            ]);
+            b.AddForeignKey(new ForeignKeyInformation("FK", b, a, [(b["a_Id"], a["Id"])]));
 
             var dependencies = Should.NotThrow(() => service.GetOrderedDependenciesFor(b));
             dependencies.ShouldContain(a);
@@ -107,11 +107,11 @@ namespace DataDude.Tests.Schema
             var service = new DependencyService(DependencyTraversalStrategy.SkipNullableForeignKeys);
 
             var a = new TestTable("A");
-            var b = new TableInformation("dbo", "B", table => new[]
-            {
+            var b = new TableInformation("dbo", "B", table =>
+            [
                 new ColumnInformation(table, "a_Id", "int", false, isNullable: true, false, null, 0, 0, 0),
-            });
-            b.AddForeignKey(new ForeignKeyInformation("FK", b, a, new[] { (b["a_Id"], a["Id"]) }));
+            ]);
+            b.AddForeignKey(new ForeignKeyInformation("FK", b, a, [(b["a_Id"], a["Id"])]));
 
             var dependencies = Should.NotThrow(() => service.GetOrderedDependenciesFor(b));
             dependencies.ShouldBeEmpty();
@@ -120,7 +120,7 @@ namespace DataDude.Tests.Schema
         private void AssertDepencyOrderFor(TableInformation table, IEnumerable<TableInformation> dependencies)
         {
             var previousDependencies = new HashSet<TableInformation>();
-            foreach (var item in dependencies.Concat(new[] { table }))
+            foreach (var item in dependencies.Concat([table]))
             {
                 item.ForeignKeys.Select(x => x.ReferencedTable).ShouldBeSubsetOf(
                     previousDependencies,

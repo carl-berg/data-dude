@@ -6,13 +6,8 @@ using Xunit;
 
 namespace DataDude.Tests.Schema
 {
-    public class SchemaIntegrationTests : DatabaseTest
+    public class SchemaIntegrationTests(DatabaseFixture fixture) : DatabaseTest(fixture)
     {
-        public SchemaIntegrationTests(DatabaseFixture fixture)
-            : base(fixture)
-        {
-        }
-
         [Fact]
         public async Task Schema_Loading()
         {

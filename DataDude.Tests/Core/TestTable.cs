@@ -10,7 +10,7 @@ namespace DataDude.Tests.Core
         public TestTable(string name)
             : this(name, c => c.AddIntegerColumn("Id", true))
         {
-            AddIndex(new IndexInformation(this, $"PK_{name}", new[] { this["Id"] ! }, true, false, false, false));
+            AddIndex(new IndexInformation(this, $"PK_{name}", [this["Id"] !], true, false, false, false));
         }
 
         public TestTable(string name, Action<TestTableColumnBuilder> configureColumns)
