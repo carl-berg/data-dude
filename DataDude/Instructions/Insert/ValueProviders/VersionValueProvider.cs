@@ -6,7 +6,7 @@ namespace DataDude.Instructions.Insert.ValueProviders
     {
         protected override ColumnValue? GetDefaultValue(ColumnInformation column, ColumnValue value)
         {
-            if (column.DataType is "timestamp")
+            if (column.DataType is "timestamp" or "rowversion")
             {
                 return ColumnValue.Ignore;
             }

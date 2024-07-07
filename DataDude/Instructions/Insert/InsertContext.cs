@@ -25,6 +25,7 @@ namespace DataDude.Instructions.Insert
             new DateValueProvider(),
             new BoolValueProvider(),
             new VersionValueProvider(),
+            new GuidValueProvider(),
         };
 
         public IList<IInsertRowHandler> InsertRowHandlers { get; } = new List<IInsertRowHandler>
