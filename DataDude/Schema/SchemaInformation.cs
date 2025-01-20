@@ -22,9 +22,13 @@ namespace DataDude.Schema
 
                 var tableMatch = Find(tableName);
 
-                if (tableMatch.Count == 1)
+                if (tableMatch is [var single])
                 {
-                    return tableMatch.Single();
+                    return single;
+                }
+                else if (tableMatch.Where(x => x.Schema == "dbo").ToList() is [var singleDbo])
+                {
+                    return singleDbo;
                 }
                 else if (tableMatch.Count > 1)
                 {

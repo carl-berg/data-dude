@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Data.Common;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Data.Common;
 using DataDude.Core;
 using DataDude.Schema;
 
@@ -21,7 +18,11 @@ namespace DataDude.Instructions.Insert.Insertion
             var parameters = new List<DataDudeDbParameter>();
             foreach (var (column, value) in columnsToInsert)
             {
-                if (!(value.Value is RawSql))
+                if (value.Value is Enum @enum && IsText(column.DataType))
+                {
+                    parameters.Add(new(column, new ColumnValue(@enum.ToString())));
+                }
+                else if (value.Value is not RawSql)
                 {
                     parameters.Add(new (column, value));
                 }
@@ -51,5 +52,16 @@ namespace DataDude.Instructions.Insert.Insertion
                 throw new InsertHandlerException("Could not parse inserted row as dictionary", statement: statement);
             }
         }
+
+        protected bool IsText(string datatype) => datatype switch
+        {
+            "char" => true,
+            "varchar" => true,
+            "text" => true,
+            "nchar" => true,
+            "nvarchar" => true,
+            "ntext" => true,
+            _ => false
+        };
     }
 }

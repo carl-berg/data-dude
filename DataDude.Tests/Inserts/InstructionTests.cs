@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using DataDude.Instructions.Insert;
@@ -443,6 +444,34 @@ namespace DataDude.Tests
                 .Insert(tableName).Go(connection);
 
             var rows = await connection.QueryAsync<dynamic>($"SELECT * FROM [{tableName}]");
+            rows.ShouldHaveSingleItem();
+        }
+
+        [Theory]
+        [InlineData("CommonTable")]
+        [InlineData("dbo.CommonTable")]
+        [InlineData("People.CommonTable")]
+        public async Task Can_Handle_Inserts_Into(string tableName)
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await new Dude().Insert(tableName).Go(connection);
+
+            var rows = await connection.QueryAsync<string>($"SELECT Name FROM {tableName}");
+            rows.ShouldHaveSingleItem();
+        }
+
+        [Theory]
+        [InlineData("String")]
+        [InlineData("Int")]
+        public async Task Can_Handle_Enum_Inserts_As(string type)
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            var tableName = $"Test_Enum_As_{type}";
+            await new Dude().Insert(tableName, new { Value = DayOfWeek.Monday }).Go(connection);
+
+            var rows = await connection.QueryAsync<object>($"SELECT Value FROM {tableName}");
             rows.ShouldHaveSingleItem();
         }
     }

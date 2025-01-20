@@ -96,6 +96,30 @@ CREATE TABLE Test_DateTime_Data(
 )
 GO
 
+CREATE TABLE People.CommonTable(
+	Id INT IDENTITY PRIMARY KEY, 
+	Name NVARCHAR NOT NULL
+)
+GO
+
+CREATE TABLE CommonTable(
+	Id INT IDENTITY PRIMARY KEY, 
+	Name NVARCHAR NOT NULL
+)
+GO
+
+CREATE TABLE Test_Enum_As_String(
+	Id INT IDENTITY PRIMARY KEY, 
+	Value NVARCHAR(50) NOT NULL
+)
+GO
+
+CREATE TABLE Test_Enum_As_Int(
+	Id INT IDENTITY PRIMARY KEY, 
+	Value INT NOT NULL
+)
+GO
+
 CREATE TRIGGER People.EmployeeUpdatedAt ON People.Employee AFTER UPDATE AS BEGIN
 	UPDATE People.Employee 
 		SET People.Employee.UpdatedAt = GETDATE()
