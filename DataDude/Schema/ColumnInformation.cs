@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace DataDude.Schema
+﻿namespace DataDude.Schema
 {
     public class ColumnInformation
     {
@@ -46,5 +44,16 @@ namespace DataDude.Schema
                 .Where(x => x.IsPrimaryKey)
                 .Any(index => index.Columns.Contains(this));
         }
+
+        public bool IsText() => DataType switch
+        {
+            "char" => true,
+            "varchar" => true,
+            "text" => true,
+            "nchar" => true,
+            "nvarchar" => true,
+            "ntext" => true,
+            _ => false
+        };
     }
 }

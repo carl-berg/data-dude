@@ -6,7 +6,7 @@ namespace DataDude.Instructions.Insert.ValueProviders
     {
         protected override ColumnValue? GetDefaultValue(ColumnInformation column, ColumnValue value)
         {
-            if (column.DataType is "char" or "varchar" or "nchar" or "ntext" or "nvarchar" or "text")
+            if (column.IsText())
             {
                 return new ColumnValue(string.Empty);
             }
