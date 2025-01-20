@@ -18,7 +18,7 @@ namespace DataDude.Instructions.Insert.Insertion
             var parameters = new List<DataDudeDbParameter>();
             foreach (var (column, value) in columnsToInsert)
             {
-                if (value.Value is Enum @enum && IsText(column.DataType))
+                if (value.Value is Enum @enum && column.IsText())
                 {
                     parameters.Add(new(column, new ColumnValue(@enum.ToString())));
                 }
