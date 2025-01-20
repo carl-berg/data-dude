@@ -462,17 +462,21 @@ namespace DataDude.Tests
         }
 
         [Theory]
-        [InlineData("String")]
-        [InlineData("Int")]
-        public async Task Can_Handle_Enum_Inserts_As(string type)
+        [InlineData("String", "Value")]
+        [InlineData("Int", "IIF(VALUE = 1, 'Monday', NULL)")]
+        public async Task Can_Handle_Enum_Inserts_As(string type, string query)
         {
             using var connection = Fixture.CreateNewConnection();
 
             var tableName = $"Test_Enum_As_{type}";
-            await new Dude().Insert(tableName, new { Value = DayOfWeek.Monday }).Go(connection);
+            await new Dude()
+                .Insert(tableName, 
+                    new { Value = DayOfWeek.Monday },
+                    new { Value = (DayOfWeek?)null })
+                .Go(connection);
 
-            var rows = await connection.QueryAsync<object>($"SELECT Value FROM {tableName}");
-            rows.ShouldHaveSingleItem();
+            var rows = await connection.QueryAsync<string>($"SELECT {query} FROM {tableName}");
+            rows.ShouldBe(["Monday", null]);
         }
     }
 }
