@@ -52,16 +52,5 @@ namespace DataDude.Instructions.Insert.Insertion
                 throw new InsertHandlerException("Could not parse inserted row as dictionary", statement: statement);
             }
         }
-
-        protected bool IsText(string datatype) => datatype switch
-        {
-            "char" => true,
-            "varchar" => true,
-            "text" => true,
-            "nchar" => true,
-            "nvarchar" => true,
-            "ntext" => true,
-            _ => false
-        };
     }
 }
