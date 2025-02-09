@@ -478,5 +478,47 @@ namespace DataDude.Tests
             var rows = await connection.QueryAsync<string>($"SELECT {query} FROM {tableName}");
             rows.ShouldBe(["Monday", null]);
         }
+
+        [Fact]
+        public async Task Can_Handle_Enum_Flag_Inserts_As_Int()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await new Dude()
+                .Insert("Test_Enum_As_Int",
+                    new { Value = TestFlags.First },
+                    new { Value = TestFlags.First | TestFlags.Second | TestFlags.Third })
+                .Go(connection);
+
+            var rows = await connection.QueryAsync<TestFlags>("SELECT Value FROM Test_Enum_As_Int");
+            rows.ShouldSatisfyAllConditions(
+                rows => rows.First().ShouldBe(TestFlags.First),
+                rows => rows.Last().ShouldBe(TestFlags.First | TestFlags.Second | TestFlags.Third));
+        }
+
+        [Fact]
+        public async Task Can_Handle_Enum_Flag_Inserts_As_String()
+        {
+            using var connection = Fixture.CreateNewConnection();
+
+            await new Dude()
+                .Insert("Test_Enum_As_String",
+                    new { Value = TestFlags.First },
+                    new { Value = TestFlags.First | TestFlags.Second | TestFlags.Third })
+                .Go(connection);
+
+            var rows = await connection.QueryAsync<string>("SELECT Value FROM Test_Enum_As_String");
+            rows.ShouldSatisfyAllConditions(
+                rows => rows.First().ShouldBe("First"),
+                rows => rows.Last().ShouldBe("First, Second, Third"));
+        }
+
+        [Flags]
+        private enum TestFlags
+        {
+            First = 1,
+            Second = 2,
+            Third = 4,
+        }
     }
 }
